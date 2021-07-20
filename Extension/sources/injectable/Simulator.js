@@ -400,6 +400,9 @@
                         const tryToSim = area.monsters.reduce((sim, monsterID) => (this.monsterSimFilter[monsterID] && !this.monsterSimData[monsterID].inQueue) || sim, false);
                         if (tryToSim) {
                             this.parent.notify(`Can't access ${area.areaName}`, 'danger');
+                            area.monsters.forEach(monsterID => {
+                                this.monsterSimData[monsterID].reason = 'cannot access area';
+                            });
                         }
                         return;
                     }
@@ -574,33 +577,37 @@
                 return enemyStats;
             }
 
-            computeAverageSimData(filter, data, monsterIDs) {
-                // check filter
-                if (!filter) {
-                    data.simSuccess = false;
-                    data.reason = this.notSimulatedReason;
-                    return;
-                }
-                data.simSuccess = true;
-                // check failure
+            combineReasons(data, monsterIDs) {
                 let reasons = [];
                 for (const monsterID of monsterIDs) {
                     if (!this.monsterSimData[monsterID].simSuccess || this.monsterSimData[monsterID].tooManyActions > 0) {
                         data.simSuccess = false;
-                        const reason = this.monsterSimData[monsterID].reason;
-                        if (reason && !reasons.includes(reason)) {
-                            reasons.push(reason);
-                        }
+                    }
+                    const reason = this.monsterSimData[monsterID].reason;
+                    if (reason && !reasons.includes(reason)) {
+                        reasons.push(reason);
                     }
                 }
-                if (!data.simSuccess) {
-                    if (reasons.length) {
-                        data.reason = reasons.join(', ');
-                    } else {
-                        data.reason = undefined;
-                    }
+                if (reasons.length) {
+                    data.reason = reasons.join(', ');
+                    return true;
+                }
+                data.reason = undefined;
+                return false;
+            }
+
+            computeAverageSimData(filter, data, monsterIDs) {
+                // check filter
+                if (!filter) {
+                    data.simSuccess = false;
+                    data.reason = 'entity filtered';
                     return;
                 }
+                // check failure and set reasons
+                if (this.combineReasons(data, monsterIDs)) {
+                    return;
+                }
+                data.simSuccess = true;
                 // compute averages
                 let totXp = 0;
                 let totHpXp = 0;

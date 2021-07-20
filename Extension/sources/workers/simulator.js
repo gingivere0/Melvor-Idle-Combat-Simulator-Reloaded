@@ -189,14 +189,13 @@
             // Start Monte Carlo simulation
             let enemyFights = 0;
 
-            if (!stats.player.isMelee && stats.enemy.passiveID.includes(2)) {
-                return {simSuccess: false, reason: 'wrong style'};
-            }
-            if (!stats.player.isRanged && stats.enemy.passiveID.includes(3)) {
-                return {simSuccess: false, reason: 'wrong style'};
-            }
-            if (!stats.player.isMagic && stats.enemy.passiveID.includes(4)) {
-                return {simSuccess: false, reason: 'wrong style'};
+            if ((!stats.player.isMelee && stats.enemy.passiveID.includes(2))
+                || (!stats.player.isRanged && stats.enemy.passiveID.includes(3))
+                || (!stats.player.isMagic && stats.enemy.passiveID.includes(4))) {
+                return {
+                    simSuccess: false,
+                    reason: 'wrong style',
+                };
             }
             if (stats.enemy.passiveID.includes(2) || stats.enemy.passiveID.includes(3)) {
                 // can't curse these monsters
@@ -251,7 +250,10 @@
                     innerCount++
                     // Check Cancellation every 100000th loop
                     if (innerCount % 100000 === 0 && await this.isCanceled()) {
-                        return {simSuccess: false, reason: 'simulation cancelled'};
+                        return {
+                            simSuccess: false,
+                            reason: 'simulation cancelled',
+                        };
                     }
                     // check player action limit
                     if (player.actionsTaken > maxActions) {
@@ -2039,6 +2041,7 @@
             petRolls: {},
             tooManyActions: tooManyActions,
             monsterID: stats.enemy.monsterID,
+            reason: undefined,
         };
 
         simResult.verbose = gatherStatistics(stats);
@@ -2047,6 +2050,9 @@
         }
 
         const successes = trials - stats.player.deaths;
+        if (successes === 0) {
+            simResult.reason = '100% player deaths';
+        }
 
         // synergies
         const globalGPMultiplier = 1 + mergePlayerModifiers(player, 'GPGlobal') / 100;

@@ -2213,13 +2213,14 @@
             }
 
             getSimFailureText(data) {
-                if (data.simSuccess) {
-                    return '';
+                const prefix = 'No valid simulation data';
+                if (data.reason) {
+                    return `${prefix}: ${data.reason}.`;
                 }
-                if (!data.reason) {
-                    return 'Simulation failed.';
+                if (!data.simSuccess) {
+                    return `${prefix}: unknown simulation error.`;
                 }
-                return `Simulation failed: ${data.reason}.`;
+                return '';
             }
 
             setZoneInfoCard(title, id, media, data) {

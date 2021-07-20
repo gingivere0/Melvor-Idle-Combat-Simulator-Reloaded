@@ -361,10 +361,20 @@
                             barName = MONSTERS[this.parent.barMonsterIDs[barIndex]].name;
                         }
                     }
-                    let tooltip = `<div class="text-center">${barName}<br><span class="text-info">${tooltipText}</span></div>`;
-                    if (tooltipText === 'N/A') {
-                        tooltip = `<div class="text-center">${barName}<br><span style="color:red;">${this.parent.getSimFailureText(rawData[dataIndex])}</span></div>`;
+                    // open tooltip and set tooltip title
+                    let tooltip = `<div class="text-center">${barName}`;
+                    // set value if available
+                    if (tooltipText !== 'N/A') {
+                        tooltip += `<br><span class="text-info">${tooltipText}</span>`;
                     }
+                    // set failure text, if any
+                    const failureText = this.parent.getSimFailureText(rawData[dataIndex]);
+                    if (failureText) {
+                        tooltip += `<br><span style="color:red;">${failureText}</span>`;
+                    }
+                    // close tooltip
+                    tooltip += '</div>';
+                    // set tooltip conten
                     this.bars[barIndex]._tippy.setContent(tooltip);
                 }
                 for (let i = 0; i < 20; i++) {
