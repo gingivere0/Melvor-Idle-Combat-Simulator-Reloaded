@@ -280,6 +280,7 @@
                             enemyAttackTimer: enemy.attackTimer,
                             player: player,
                             enemy: enemy,
+                            stats: stats,
                             monsterID: stats.enemy.monsterID,
                         };
                     }
@@ -394,6 +395,8 @@
                     return {
                         simSuccess: false,
                         reason: 'invalid player or enemy hp',
+                        playerHP: player.hitpoints,
+                        enemyHP: enemy.hitpoints,
                         monsterID: stats.enemy.monsterID,
                         playerStats: {...stats.player},
                         player: {...player},
