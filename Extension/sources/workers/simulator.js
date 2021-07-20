@@ -1018,7 +1018,7 @@
     function getSpeed(stats, actor) {
         if (actor.recompute.speed) {
             calculateSpeed(stats, actor);
-            actor.recompute.speed = false;
+            toggleRecomputeFlags(actor, 'speed');
         }
         return actor.currentSpeed;
     }
@@ -1725,7 +1725,7 @@
     function getPlayerDR(stats, player, enemy, noTriangle = false) {
         if (player.recompute.damageReduction) {
             setPlayerDR(stats, player, enemy);
-            player.recompute.damageReduction = false;
+            toggleRecomputeFlags(player, 'damageReduction');
         }
         if (noTriangle) {
             return player.damageReductionNoTriangle;
@@ -1835,12 +1835,28 @@
         common.rangedEvasionDebuff = 0;
         common.decreasedAccuracy = 0;
         // recompute flags
-        common.recompute = {
-            speed: true,
-            accuracy: true,
-            damageReduction: true,
-            maxHit: true,
+        const recomputeProps = [
+                'speed',
+                'accuracy',
+                'damageReduction',
+                'maxHit',
+            ];
+        if (!common.recompute) {
+            common.recompute = {};
+            common.recomputed = {};
+            recomputeProps.forEach(prop => {
+                common.recompute[prop] = true;
+            });
         }
+        recomputeProps.forEach(prop => {
+            common.recompute[prop] = common.recompute[prop] || common.recomputed[prop];
+            common.recomputed[prop] = false;
+        });
+    }
+
+    function toggleRecomputeFlags(actor, prop) {
+        actor.recompute[prop] = false;
+        actor.recomputed[prop] = true;
     }
 
     function resetPlayer(stats, combatData, player, enemy) {
@@ -2146,7 +2162,7 @@
     function getAccuracy(stats, actor, target) {
         if (actor.recompute.accuracy) {
             setAccuracy(stats, actor, target);
-            actor.recompute.accuracy = false;
+            toggleRecomputeFlags(actor, 'accuracy');
         }
         return actor.accuracy;
     }
@@ -2298,7 +2314,7 @@
     function getPlayerMaxHit(stats, player) {
         if (player.recompute.maxHit) {
             setPlayerMaxHit(stats, player);
-            player.recompute.maxHit = false;
+            toggleRecomputeFlags(player, 'maxHit');
         }
         return player.maxHit;
     }
