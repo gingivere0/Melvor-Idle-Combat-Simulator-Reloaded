@@ -1530,7 +1530,8 @@
             statusEffect: {},
         };
         let attackHits;
-        if (canNotDodge(enemy) || (isSpecial && player.currentSpecial.forceHit)) {
+        const forceHit = isSpecial && player.currentSpecial.forceHit && (!stats.player.isMagic || !stats.player.usingAncient || player.maxAttackRoll > 20000);
+        if (canNotDodge(enemy) || forceHit) {
             attackHits = true;
         } else {
             // Roll for hit
@@ -1841,11 +1842,11 @@
         common.decreasedAccuracy = 0;
         // recompute flags
         const recomputeProps = [
-                'speed',
-                'accuracy',
-                'damageReduction',
-                'maxHit',
-            ];
+            'speed',
+            'accuracy',
+            'damageReduction',
+            'maxHit',
+        ];
         if (!common.recompute) {
             common.recompute = {};
             common.recomputed = {};
@@ -1904,6 +1905,8 @@
         setPlayerMaxHitPoints(stats, player);
         // init
         player.actionsTaken = 0;
+        // initial player accuracy
+        getAccuracy(stats, player, enemy);
     }
 
     function mergePlayerModifiers(player, modifier, both = true) {
@@ -2201,6 +2204,7 @@
                 multiplier += mergePlayerModifiers(actor, 'MagicAccuracyBonus') / 100;
             }
             maxAttackRoll = maxAttackRoll * multiplier;
+            actor.maxAttackRoll = maxAttackRoll;
         } else {
             maxAttackRoll = actorStats.baseMaximumAttackRoll;
             if (actor.decreasedAccuracy) {
@@ -2214,11 +2218,6 @@
         if (target.isPlayer) {
             calculatePlayerEvasionRating(stats, target, actor);
         } else {
-            // Adjust ancient magick forcehit
-            if (actorStats.usingAncient && (actorStats.specialData[0].forceHit || actorStats.specialData[0].checkForceHit)) {
-                actorStats.specialData[0].forceHit = maxAttackRoll > 20000;
-                actorStats.specialData[0].checkForceHit = true;
-            }
             setEvasionDebuffsEnemy(stats, target, actor);
         }
         // determine relevant defence roll
