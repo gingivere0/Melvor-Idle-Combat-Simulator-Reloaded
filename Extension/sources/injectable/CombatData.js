@@ -1115,6 +1115,7 @@
                     prayerXpPerDamage: 0,
                     isProtected: false,
                     hardcore: this.isHardcore,
+                    adventure: this.isAdventure,
                     // passive stats
                     ammoPreservation: this.combatStats.ammoPreservation,
                     lifesteal: this.auroraBonus.lifesteal + this.equipmentStats.lifesteal,

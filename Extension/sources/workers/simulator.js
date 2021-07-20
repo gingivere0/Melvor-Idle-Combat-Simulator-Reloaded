@@ -209,7 +209,7 @@
             // set initial regen interval
             player.regenTimer = Math.floor(Math.random() * hitpointRegenInterval);
             // Set Combat Triangle
-            if (stats.player.hardcore) {
+            if (stats.player.hardcore || stats.player.adventure) {
                 player.reductionModifier = combatTriangle.hardcore.reductionModifier[stats.player.attackType][stats.enemy.attackType];
                 player.damageModifier = combatTriangle.hardcore.damageModifier[stats.player.attackType][stats.enemy.attackType];
             } else {
