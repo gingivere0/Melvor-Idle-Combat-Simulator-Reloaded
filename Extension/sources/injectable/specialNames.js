@@ -146,13 +146,15 @@
 
     let loadCounter = 0;
     const waitLoadOrder = (reqs, setup, id) => {
-        loadCounter++;
+        if (characterSelected && !characterLoading) {
+            loadCounter++;
+        }
         if (loadCounter > 100) {
             console.log('Failed to load ' + id);
             return;
         }
         // check requirements
-        let reqMet = true;
+        let reqMet = characterSelected && !characterLoading;
         if (window.MICSR === undefined) {
             reqMet = false;
             console.log(id + ' is waiting for the MICSR object');
