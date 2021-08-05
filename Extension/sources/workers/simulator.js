@@ -64,12 +64,12 @@
     }
 
     // TODO move these globals?
+    const protectFromValue = 15;
+    const enemySpawnTimer = 3000;
+    const hitpointRegenInterval = 10000;
     let combatTriangle;
-    let protectFromValue;
     let numberMultiplier;
     let enemySpecialAttacks;
-    let enemySpawnTimer;
-    let hitpointRegenInterval;
     let CURSEIDS;
     let constantModifiers;
 
@@ -116,9 +116,7 @@
                 },
             };
             this.cancelStatus = false;
-            protectFromValue = data.protectFromValue;
             enemySpecialAttacks = data.enemySpecialAttacks;
-            hitpointRegenInterval = data.hitpointRegenInterval;
             CURSEIDS = data.CURSEIDS;
             constantModifiers = data.constantModifiers;
         }
@@ -2082,9 +2080,9 @@
         }
         if (stats.combatData.modifiers.summoningSynergy_0_1) {
             stats.gpGained += Math.max(
-                stats.enemy.baseMaximumDefenceRoll,
-                stats.enemy.baseMaximumRangedDefenceRoll,
-                stats.enemy.baseMaximumMagicDefenceRoll)
+                    stats.enemy.baseMaximumDefenceRoll,
+                    stats.enemy.baseMaximumRangedDefenceRoll,
+                    stats.enemy.baseMaximumMagicDefenceRoll)
                 * stats.combatData.modifiers.summoningSynergy_0_1 / 100
                 * globalGPMultiplier
                 * successes;

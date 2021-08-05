@@ -229,10 +229,7 @@
                 };
                 worker.postMessage({
                     action: 'RECEIVE_GAMEDATA',
-                    protectFromValue: protectFromValue,
-                    enemySpecialAttacks: enemySpecialAttacks,
-                    enemySpawnTimer: enemySpawnTimer,
-                    hitpointRegenInterval: hitpointRegenInterval,
+                    enemySpecialAttacks: attacks,
                     CURSEIDS: CONSTANTS.curse,
                     constantModifiers: this.constantModifiers,
                 });
