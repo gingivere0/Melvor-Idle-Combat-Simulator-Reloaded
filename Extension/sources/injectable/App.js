@@ -910,7 +910,7 @@
                             }
                         });
                     }
-                    if (monster.bones) {
+                    if (monster.bones > -1) {
                         lootMap[monster.bones] = true;
                         const upgradeID = items[monster.bones].trimmedItemID;
                         if (upgradeID) {
