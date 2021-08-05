@@ -27,11 +27,18 @@
         // global combat simulator object
         const MICSR = window.MICSR;
 
+        // combat sim name
+        MICSR.name = 'Melvor Idle Combat Simulator Reloaded';
+        MICSR.shortName = 'Combat Simulator';
+
+        // compatible game version
+        MICSR.gameVersion = 'Alpha v0.21';
+
         // combat sim version
         MICSR.majorVersion = 1;
-        MICSR.minorVersion = 4;
-        MICSR.patchVersion = 3;
-        MICSR.preReleaseVersion = undefined;
+        MICSR.minorVersion = 5;
+        MICSR.patchVersion = 0;
+        MICSR.preReleaseVersion = 0;
         MICSR.version = `v${MICSR.majorVersion}.${MICSR.minorVersion}.${MICSR.patchVersion}`;
         if (MICSR.preReleaseVersion !== undefined) {
             MICSR.version = `${MICSR.version}-${MICSR.preReleaseVersion}`;
@@ -64,9 +71,6 @@
             }
             return true;
         }
-
-        // compatible game version
-        MICSR.gameVersion = 'Alpha v0.20';
 
         // simulation settings
         MICSR.maxActions = 300;
