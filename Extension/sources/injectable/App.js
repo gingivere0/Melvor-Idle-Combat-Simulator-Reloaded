@@ -1480,8 +1480,9 @@
                 }
 
                 if (item.hasSpecialAttack) {
-                    const special = playerSpecialAttacks[item.specialAttackID];
-                    tooltip += `<span class='text-danger'>${special.name} (${special.chance}%): </span><span class='text-warning'>${special.description}</span><br>`;
+                    for (let special of item.specialAttacks) {
+                        tooltip += `<span class='text-danger'>${special.name} (${special.defaultChance}%): </span><span class='text-warning'>${special.description}</span><br>`;
+                    }
                 }
 
                 if (item.attackSpeed) {
