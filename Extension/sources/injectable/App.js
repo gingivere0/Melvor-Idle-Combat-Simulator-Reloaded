@@ -51,13 +51,7 @@
              */
             constructor(urls) {
                 // slayer tasks
-                this.slayerTasks = [
-                    SLAYER.task.Easy,
-                    SLAYER.task.Normal,
-                    SLAYER.task.Hard,
-                    SLAYER.task.Elite,
-                    SLAYER.task.Master,
-                ];
+                this.slayerTasks = SlayerTask.data;
                 // Plot Type Options
                 this.plotTypes = [];
                 const addPlotOption = (option, isTime, value, info) => {
