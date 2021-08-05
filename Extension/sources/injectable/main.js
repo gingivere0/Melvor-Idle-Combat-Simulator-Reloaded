@@ -43,22 +43,22 @@
                         let wrongVersion = false;
                         if (gameVersion !== MICSR.gameVersion) {
                             wrongVersion = true;
-                            tryLoad = window.confirm('Combat Simulator Reloaded\nA different game version was detected. Loading the combat sim may cause unexpected behaviour or result in inaccurate simulation results.\n Try loading it anyways?');
+                            tryLoad = window.confirm(`${MICSR.name}\nA different game version was detected. Loading the combat sim may cause unexpected behaviour or result in inaccurate simulation results.\n Try loading it anyways?`);
                         }
                         if (tryLoad) {
                             try {
                                 MICSR.melvorCombatSim = new MICSR.App(event.data.urls);
                                 if (wrongVersion) {
-                                    MICSR.log(`Melvor Combat Sim ${MICSR.version} Loaded, but simulation results may be inaccurate.`);
+                                    MICSR.log(`${MICSR.name} ${MICSR.version} loaded, but simulation results may be inaccurate due to game version incompatibility.`);
                                 } else {
-                                    MICSR.log(`Melvor Combat Sim ${MICSR.version} Loaded`);
+                                    MICSR.log(`${MICSR.name} ${MICSR.version} loaded.`);
                                 }
                             } catch (error) {
-                                MICSR.warn('Melvor Combat Sim was not properly loaded due to the following error:');
+                                MICSR.warn(`${MICSR.name} ${MICSR.version} was not loaded due to the following error:`);
                                 MICSR.error(error);
                             }
                         } else {
-                            MICSR.warn('Melvor Combat Sim was not Loaded due to game version incompatibility.');
+                            MICSR.warn(`${MICSR.name} ${MICSR.version} was not loaded due to game version incompatibility.`);
                         }
                         break;
                     case 'UNLOAD':

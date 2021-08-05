@@ -323,9 +323,9 @@
                 // Now that everything is done we add the menu and modal to the document
 
                 this.modalID = 'mcsModal';
-                MICSR.addModal(`Combat Simulator Reloaded ${MICSR.version}`, this.modalID, [this.topContent, this.botContent]);
+                MICSR.addModal(`${MICSR.name} ${MICSR.version}`, this.modalID, [this.topContent, this.botContent]);
                 this.menuItemId = 'mcsButton';
-                MICSR.addMenuItem('Combat Simulator', this.media.combat, this.menuItemId, this.modalID);
+                MICSR.addMenuItem(MICSR.shortName, this.media.combat, this.menuItemId, this.modalID);
 
                 // Finalize tooltips
                 const tippyOptions = {allowHTML: true, animation: false, hideOnClick: false};
