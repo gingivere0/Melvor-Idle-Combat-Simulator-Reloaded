@@ -135,8 +135,7 @@
         };
 
         // report unknown stats
-        MICSR.checkUnknown(playerSpecialAttacks, 'Player special', 'player special attacks', [MICSR.commonSpecialNames, MICSR.playerSpecialNames], {});
-        MICSR.checkUnknown(enemySpecialAttacks, 'Enemy special', 'enemy special attacks', [MICSR.commonSpecialNames, MICSR.enemySpecialNames], {});
+        MICSR.checkUnknown(attacks, 'Attacks', 'attacks', [MICSR.commonSpecialNames, MICSR.playerSpecialNames, MICSR.enemySpecialNames], {});
 
         // report stats that are known but not implemented
         MICSR.checkImplemented(MICSR.commonSpecialNames, 'Common special stat');
