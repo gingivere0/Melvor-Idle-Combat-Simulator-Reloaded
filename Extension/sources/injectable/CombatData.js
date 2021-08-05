@@ -159,7 +159,6 @@
                 this.potionSelected = false;
                 this.potionTier = 0;
                 this.potionID = -1;
-                this.herbloreModifiers = {};
                 this.luckyHerb = 0;
                 // Food
                 this.autoEatTier = -1;
@@ -171,7 +170,7 @@
                 // equipmentSlotKeys
                 this.equipmentSlotKeys = equipmentSlotKeys;
                 // player modifiers
-                this.modifiers = MICSR.copyModifierTemplate();
+                this.modifiers = new PlayerModifiers();
                 // base stats
                 this.baseStats = this.resetPlayerBaseStats();
                 // equipment stats
@@ -317,10 +316,6 @@
                 }
             }
 
-            getSkillHiddenLevels(skill) {
-                return MICSR.getModifierValue(this.modifiers, 'HiddenSkillLevel', skill);
-            }
-
             /**
              * mimic calculatePlayerAccuracyRating
              */
@@ -344,7 +339,7 @@
                 // effective level
                 const effectiveAttackLevel = Math.floor(
                     this.playerLevels.Ranged + 8 + attackStyleBonusAccuracy
-                    + this.getSkillHiddenLevels(CONSTANTS.skill.Ranged)
+                    + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Ranged)
                 );
                 // max roll
                 let maxAttackRoll = Math.floor(
@@ -368,7 +363,7 @@
                 // effective level
                 const effectiveAttackLevel = Math.floor(
                     this.playerLevels.Magic + 8 + attackStyleBonusAccuracy +
-                    this.getSkillHiddenLevels(CONSTANTS.skill.Magic)
+                    this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Magic)
                 );
                 // max roll
                 let maxAttackRoll = Math.floor(
@@ -395,7 +390,7 @@
                 // effective level
                 const effectiveAttackLevel = Math.floor(
                     this.playerLevels.Attack + 8 + attackStyleBonusAccuracy +
-                    this.getSkillHiddenLevels(CONSTANTS.skill.Attack)
+                    this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Attack)
                 );
                 // max roll
                 let maxAttackRoll = Math.floor(
@@ -522,7 +517,7 @@
                 if (this.attackStyle.Ranged === 0) {
                     attackStyleBonusStrength += 3;
                 }
-                const effectiveStrengthLevel = Math.floor(this.playerLevels.Ranged + attackStyleBonusStrength + this.getSkillHiddenLevels(CONSTANTS.skill.Ranged));
+                const effectiveStrengthLevel = Math.floor(this.playerLevels.Ranged + attackStyleBonusStrength + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Ranged));
                 const baseMaxHit = Math.floor(this.numberMultiplier * (1.3 + effectiveStrengthLevel / 10 + baseStats.strengthBonusRanged / 80 + (effectiveStrengthLevel * baseStats.strengthBonusRanged) / 640));
                 const maxHit = applyModifier(
                     baseMaxHit,
@@ -535,7 +530,7 @@
                 let maxHit;
                 let selectedSpell = this.spells.standard.selectedID;
                 if (!this.spells.ancient.isSelected) {
-                    const effectiveMagicLevel = 1 + this.playerLevels.Magic + this.getSkillHiddenLevels(CONSTANTS.skill.Magic);
+                    const effectiveMagicLevel = 1 + this.playerLevels.Magic + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Magic);
                     maxHit = Math.floor(this.numberMultiplier
                         * SPELLS[selectedSpell].maxHit * (1 + baseStats.damageBonusMagic / 100)
                         * (1 + effectiveMagicLevel / 2 / 100));
@@ -567,7 +562,7 @@
             }
 
             maxMeleeHit(baseStats, modifiers) {
-                const effectiveStrengthLevel = Math.floor(this.playerLevels.Strength + 8 + this.getSkillHiddenLevels(CONSTANTS.skill.Strength));
+                const effectiveStrengthLevel = Math.floor(this.playerLevels.Strength + 8 + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Strength));
                 const baseMaxHit = Math.floor(this.numberMultiplier * (1.3 + effectiveStrengthLevel / 10 + baseStats.strengthBonus / 80 + (effectiveStrengthLevel * baseStats.strengthBonus) / 640));
                 const maxHit = applyModifier(
                     baseMaxHit,
@@ -588,7 +583,7 @@
                     defenceBonusRanged += dr;
                 }
                 //Melee defence
-                combatStats.effectiveDefenceLevel = Math.floor(this.playerLevels.Defence + 8 + getSkillHiddenLevels(CONSTANTS.skill.Defence));
+                combatStats.effectiveDefenceLevel = Math.floor(this.playerLevels.Defence + 8 + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Defence));
                 if (this.combatStats.attackType === CONSTANTS.attackType.Ranged && this.attackStyle.Ranged === 2) {
                     // long range // TODO this is not implemented in the game #
                     // combatStats.effectiveDefenceLevel += 3;
@@ -601,7 +596,7 @@
                     player.meleeEvasionDebuff,
                 );
                 //Ranged Defence
-                combatStats.effectiveRangedDefenceLevel = Math.floor(this.playerLevels.Defence + 8 + 1 + getSkillHiddenLevels(CONSTANTS.skill.Defence));
+                combatStats.effectiveRangedDefenceLevel = Math.floor(this.playerLevels.Defence + 8 + 1 + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Defence));
                 const maximumRangedDefenceRoll = this.calculateGenericPlayerEvasionRating(
                     combatStats.effectiveRangedDefenceLevel,
                     defenceBonusRanged,
@@ -611,8 +606,8 @@
                 );
                 //Magic Defence
                 combatStats.effectiveMagicDefenceLevel = Math.floor(
-                    (this.playerLevels.Magic + getSkillHiddenLevels(CONSTANTS.skill.Magic)) * 0.7
-                    + (this.playerLevels.Defence + getSkillHiddenLevels(CONSTANTS.skill.Defence)) * 0.3
+                    (this.playerLevels.Magic + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Magic)) * 0.7
+                    + (this.playerLevels.Defence + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Defence)) * 0.3
                     + 8 + 1
                 );
                 const maximumMagicDefenceRoll = this.calculateGenericPlayerEvasionRating(
@@ -646,10 +641,8 @@
             /**
              * mimic calculatePlayerDamageReduction
              */
-            calculatePlayerDamageReduction(player = {}) {
-                let damageReduction = this.baseStats.damageReduction + MICSR.getModifierValue(this.modifiers, 'DamageReduction');
-
-                return damageReduction;
+            calculatePlayerDamageReduction() {
+                return this.baseStats.damageReduction + MICSR.getModifierValue(this.modifiers, 'DamageReduction');
             }
 
             /**
@@ -701,7 +694,7 @@
                 );
 
                 // set enemy spawn timer
-                this.enemySpawnTimer = enemySpawnTimer + MICSR.getModifierValue(modifiers, 'MonsterRespawnTimer');
+                this.enemySpawnTimer = 3000 + MICSR.getModifierValue(modifiers, 'MonsterRespawnTimer');
 
                 // attack speed without aurora
                 this.combatStats.attackSpeed = 4000;
@@ -709,10 +702,10 @@
                 if (this.combatStats.attackType === CONSTANTS.attackType.Ranged && this.attackStyle.Ranged === 1) {
                     this.combatStats.attackSpeed -= 400;
                 }
-                this.combatStats.attackSpeed += MICSR.getModifierValue(modifiers, 'PlayerAttackSpeed');
+                this.combatStats.attackSpeed += MICSR.getModifierValue(modifiers, 'AttackInterval');
                 this.combatStats.attackSpeed = applyModifier(
                     this.combatStats.attackSpeed,
-                    MICSR.getModifierValue(modifiers, 'PlayerAttackSpeedPercent')
+                    MICSR.getModifierValue(modifiers, 'AttackIntervalPercent')
                 );
 
                 // preservation
@@ -789,7 +782,7 @@
 
                 // Max Hitpoints
                 this.combatStats.baseMaxHitpoints = this.playerLevels.Hitpoints;
-                this.combatStats.baseMaxHitpoints += this.getSkillHiddenLevels(CONSTANTS.skill.Hitpoints);
+                this.combatStats.baseMaxHitpoints += this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Hitpoints);
                 this.combatStats.baseMaxHitpoints += MICSR.getModifierValue(modifiers, 'MaxHitpoints');
                 this.combatStats.maxHitpoints = this.combatStats.baseMaxHitpoints * this.numberMultiplier;
             }
@@ -802,7 +795,7 @@
                 for (let i = 0; i < this.prayerSelected.length; i++) {
                     if (this.prayerSelected[i]) {
                         if (PRAYER[i].modifiers !== undefined) {
-                            MICSR.addModifiers(PRAYER[i].modifiers, this.prayerBonus.modifiers);
+                            this.modifiers.addModifiers(PRAYER[i].modifiers);
                         }
                         if (PRAYER[i].vars !== undefined) {
                             let j = 0;
@@ -828,7 +821,6 @@
                         }
                     }));
                 this.prayerBonus = {
-                    modifiers: {},
                     vars: prayerVars,
                 };
             }
@@ -837,13 +829,13 @@
              * Update this.modifiers
              * mimics updateAllPlayerModifiers
              */
-            updateModifiers(selectedCombatArea = "") {
+            updateModifiers() {
                 // reset
-                this.modifiers = MICSR.copyModifierTemplate();
+                this.modifiers = new PlayerModifiers();
 
                 // mimic calculateEquippedItemModifiers // passives
                 const duplicateCheck = {};
-                const equipmentList = this.equipmentSelected.filter(x => {
+                this.equipmentSelected.filter(x => {
                     if (x <= 0) {
                         return false;
                     }
@@ -852,75 +844,45 @@
                     }
                     duplicateCheck[x] = true;
                     return true;
-                }).map(x => items[x]);
-                this.itemModifiers = MICSR.computeModifiers(equipmentList);
-                MICSR.mergeModifiers(this.itemModifiers, this.modifiers);
-
-                // mimic calculateCombatAreaEffectModifiers(selectedCombatArea)
-                // TODO: implement this
+                }).forEach(id => this.modifiers.addModifiers(items[id].modifiers));
 
                 // mimic calculatePetModifiers
-                const petList = this.petIds.filter(id => this.petOwned[id]).map(id => PETS[id]);
-                this.petModifiers = MICSR.computeModifiers(petList);
-                MICSR.mergeModifiers(this.petModifiers, this.modifiers);
+                this.petIds.filter(id => this.petOwned[id]).forEach(id => this.modifiers.addModifiers(PETS[id].modifiers));
 
                 // mimic calculatePrayerModifiers
                 this.computePrayerBonus();
-                MICSR.mergeModifiers(this.prayerBonus.modifiers, this.modifiers);
 
                 // mimic calculateAgilityModifiers
-                const obstacles = [];
                 let fullCourse = true
                 for (let i = 0; i < this.course.length; i++) {
                     if (this.course[i] < 0) {
                         fullCourse = false;
                         break;
                     }
-                    let modifiers = {};
                     if (this.courseMastery[i]) {
-                        const m = agilityObstacles[this.course[i]].modifiers;
-                        Object.getOwnPropertyNames(m).forEach(prop => {
-                            let passiveType = printPlayerModifier(prop, m[prop]);
-                            if (passiveType[1] !== "text-danger") {
-                                modifiers[prop] = m[prop];
-                                return;
-                            }
-                            const value = m[prop];
-                            if (value.length === undefined) {
-                                modifiers[prop] = value / 2;
-                                return;
-                            }
-                            modifiers[prop] = value.map(x => [x[0], x[1] / 2]);
-                        });
+                        this.modifiers.addModifiers(agilityObstacles[this.course[i]].modifiers, 0.5);
                     } else {
-                        modifiers = agilityObstacles[this.course[i]].modifiers;
+                        this.modifiers.addModifiers(agilityObstacles[this.course[i]].modifiers);
                     }
-                    obstacles.push({modifiers: modifiers});
                 }
-                this.agilityModifiers = MICSR.computeModifiers(obstacles);
                 if (fullCourse && this.pillar > -1) {
-                    MICSR.mergeModifiers(agilityPassivePillars[this.pillar].modifiers, this.agilityModifiers);
+                    this.modifiers.addModifiers(agilityPassivePillars[this.pillar].modifiers);
                 }
-                MICSR.mergeModifiers(this.agilityModifiers, this.modifiers);
 
                 // mimic calculateSummoningSynergyModifiers
-                this.synergyModifiers = this.computeSynergyBonus();
-                MICSR.mergeModifiers(this.synergyModifiers, this.modifiers);
+                this.modifiers.addModifiers(this.computeSynergyBonus());
 
                 // mimic calculateShopModifiers
                 // implement other parts of this if they ever are relevant
-                this.autoEatModifiers = {};
                 for (let i = 0; i <= this.autoEatTier; i++) {
-                    MICSR.mergeModifiers(this.autoEatData[i].contains.modifiers, this.autoEatModifiers);
+                    this.modifiers.addModifiers(this.autoEatData[i].contains.modifiers);
                 }
-                MICSR.mergeModifiers(this.autoEatModifiers, this.modifiers);
 
                 // mimic calculateMiscModifiers
                 // implement this if it ever is relevant
 
                 // potion modifiers
                 this.computePotionBonus();
-                MICSR.mergeModifiers(this.herbloreModifiers, this.modifiers);
 
                 // TODO: SPECIAL ATTACKS, MASTERY
                 //  when they get made into modifiers in the game
@@ -1007,11 +969,10 @@
              * Computes the potion bonuses for the selected potion
              * */
             computePotionBonus() {
-                this.herbloreModifiers = {};
                 this.luckyHerb = 0;
                 if (this.potionSelected) {
                     const potion = items[herbloreItemData[this.potionID].itemID[this.potionTier]];
-                    this.herbloreModifiers = potion.modifiers;
+                    this.modifiers.addModifiers(potion.modifiers);
                     if (potion.potionBonusID === 11) {
                         this.luckyHerb = potion.potionBonus;
                     }
