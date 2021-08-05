@@ -76,12 +76,23 @@
         MICSR.maxActions = 300;
         MICSR.trials = 10000;
 
-        // Copy equipmentSlot enum, so we don't break the game when we change the enum for Summoning
-        MICSR.equipmentSlot = {...CONSTANTS.equipmentSlot};
-        // Change shorthand for Summoning Familiar slots
-        // This will lead to some import-export incompatibility if there is ever a new equipment slot added
-        //  but other than that it should be fine
-        MICSR.equipmentSlot.SummonRight = Object.keys(MICSR.equipmentSlot).length;
+        // equipmentSlot enum
+        MICSR.equipmentSlot = {
+            Helmet: 0,
+            Platebody: 1,
+            Platelegs: 2,
+            Boots: 3,
+            Weapon: 4,
+            Shield: 5,
+            Amulet: 6,
+            Ring: 7,
+            Gloves: 8,
+            Quiver: 9,
+            Cape: 10,
+            Passive: 11,
+            Summon1: 12,
+            Summon2: 13,
+        };
 
         MICSR.dungeons = [];
         DUNGEONS.forEach(dungeon => MICSR.dungeons.push({...dungeon}));

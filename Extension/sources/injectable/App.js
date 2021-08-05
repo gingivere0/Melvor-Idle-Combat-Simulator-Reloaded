@@ -100,18 +100,14 @@
                 this.timeShorthand = ['kill', 's', 'm', 'h', 'd'];
                 this.timeMultipliers = [-1, 1, 60, 3600, 3600 * 24];
                 this.initialTimeUnitIndex = 3;
-                this.selectedTimeUnit = this.timeOptions[this.initialTimeUnitIndex];
                 this.selectedTimeShorthand = this.timeShorthand[this.initialTimeUnitIndex];
                 this.timeMultiplier = this.timeMultipliers[this.initialTimeUnitIndex];
                 // empty items
                 const makeEmptyItem = (img) => {
                     return {
                         name: 'None',
-                        itemID: 0,
+                        id: -1,
                         media: img,
-                        defenceLevelRequired: 0,
-                        magicLevelRequired: 0,
-                        rangedLevelRequired: 0,
                     }
                 };
                 this.emptyItems = {
@@ -127,8 +123,9 @@
                     Quiver: makeEmptyItem('assets/media/bank/weapon_quiver.png'),
                     Cape: makeEmptyItem('assets/media/bank/armour_cape.png'),
                     Passive: makeEmptyItem('assets/media/bank/passive_slot.png'),
-                    Summon: makeEmptyItem('assets/media/bank/misc_summon.png'),
-                    SummonRight: makeEmptyItem('assets/media/bank/misc_summon.png'),
+                    Summon1: makeEmptyItem('assets/media/bank/misc_summon.png'),
+                    Summon2: makeEmptyItem('assets/media/bank/misc_summon.png'),
+                    Food: makeEmptyItem('assets/media/skills/combat/food_empty.svg'),
                 };
 
                 // Useful assets
@@ -163,43 +160,45 @@
                 };
 
                 // Forced equipment sorting
-                this.forceMeleeArmour = [CONSTANTS.item.Slayer_Helmet_Basic, CONSTANTS.item.Slayer_Platebody_Basic];
-                this.forceRangedArmour = [CONSTANTS.item.Slayer_Cowl_Basic, CONSTANTS.item.Slayer_Leather_Body_Basic];
-                this.forceMagicArmour = [CONSTANTS.item.Slayer_Wizard_Hat_Basic, CONSTANTS.item.Slayer_Wizard_Robes_Basic, CONSTANTS.item.Enchanted_Shield];
+                this.force = {
+                    [CONSTANTS.skill.Defence]: [CONSTANTS.item.Slayer_Helmet_Basic, CONSTANTS.item.Slayer_Platebody_Basic],
+                    [CONSTANTS.skill.Ranged]: [CONSTANTS.item.Slayer_Cowl_Basic, CONSTANTS.item.Slayer_Leather_Body_Basic],
+                    [CONSTANTS.skill.Magic]: [CONSTANTS.item.Slayer_Wizard_Hat_Basic, CONSTANTS.item.Slayer_Wizard_Robes_Basic, CONSTANTS.item.Enchanted_Shield],
+                };
 
                 // Generate equipment subsets
                 this.equipmentSlotKeys = Object.keys(MICSR.equipmentSlot);
                 this.equipmentSubsets = [];
                 /** @type {number[]} */
                 this.equipmentSelected = [];
-                for (let equipmentSlot = 0; equipmentSlot < this.equipmentSlotKeys.length; equipmentSlot++) {
-                    const slotId = MICSR.equipmentSlot[this.equipmentSlotKeys[equipmentSlot]];
-                    this.equipmentSubsets.push([this.emptyItems[this.equipmentSlotKeys[equipmentSlot]]]);
+                for (let slotId = 0; slotId < this.equipmentSlotKeys.length; slotId++) {
+                    const equipmentSlotKey = this.equipmentSlotKeys[slotId];
+                    this.equipmentSubsets.push([this.emptyItems[this.equipmentSlotKeys[slotId]]]);
                     this.equipmentSelected.push(0);
                     for (let i = 0; i < items.length; i++) {
-                        if (i === CONSTANTS.item.Candy_Cane) {
+                        if (items[i].validSlots === undefined) {
                             continue;
                         }
-                        if (items[i].equipmentSlot === slotId
-                            || (items[i].equipmentSlot === MICSR.equipmentSlot.Summon
-                                && slotId === MICSR.equipmentSlot.SummonRight)) {
-                            this.equipmentSubsets[equipmentSlot].push(items[i]);
+                        if (items[i].validSlots.includes(equipmentSlotKey)
+                            || (items[i].validSlots.includes('Summon')
+                                && slotId === MICSR.equipmentSlot.Summon2)) {
+                            this.equipmentSubsets[slotId].push(items[i]);
                         }
                     }
                 }
                 this.equipmentSubsets[MICSR.equipmentSlot.Passive].push(...items.filter(x => x.isPassiveItem));
                 // Add ammoType 2 and 3 to weapon subsets
                 for (let i = 0; i < items.length; i++) {
-                    if (items[i].equipmentSlot === MICSR.equipmentSlot.Quiver && (items[i].ammoType === 2 || items[i].ammoType === 3)) {
+                    if (items[i].validSlots && items[i].validSlots.includes('Quiver') && (items[i].ammoType === 2 || items[i].ammoType === 3)) {
                         this.equipmentSubsets[MICSR.equipmentSlot.Weapon].push(items[i]);
                     }
                 }
                 // Sort equipment subsets
                 for (let equipmentSlot = 0; equipmentSlot < this.equipmentSlotKeys.length; equipmentSlot++) {
-                    this.equipmentSubsets[equipmentSlot].sort((a, b) => (a.attackLevelRequired || 0) - (b.attackLevelRequired || 0));
-                    this.equipmentSubsets[equipmentSlot].sort((a, b) => (a.defenceLevelRequired || 0) - (b.defenceLevelRequired || 0));
-                    this.equipmentSubsets[equipmentSlot].sort((a, b) => (a.rangedLevelRequired || 0) - (b.rangedLevelRequired || 0));
-                    this.equipmentSubsets[equipmentSlot].sort((a, b) => (a.magicLevelRequired || 0) - (b.magicLevelRequired || 0));
+                    this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Attack) - this.getItemLevelReq(b, CONSTANTS.skill.Attack));
+                    this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Defence) - this.getItemLevelReq(b, CONSTANTS.skill.Defence));
+                    this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Ranged) - this.getItemLevelReq(b, CONSTANTS.skill.Ranged));
+                    this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Magic) - this.getItemLevelReq(b, CONSTANTS.skill.Magic));
                     if (equipmentSlot === MICSR.equipmentSlot.Quiver) {
                         this.equipmentSubsets[equipmentSlot].sort((a, b) => (a.ammoType || 0) - (b.ammoType || 0));
                     }
@@ -223,8 +222,6 @@
                 this.import = new MICSR.Import(this);
                 // Loot Object
                 this.loot = new MICSR.Loot(this, this.simulator);
-                // Temporary GP/s settings variable
-                this.itemSubsetTemp = [];
 
                 // drop list filters
                 this.dropListFilters = {
@@ -349,8 +346,6 @@
                 this.updateEquipmentStats();
                 this.updateCombatStats();
                 this.updatePlotData();
-                // Saving and loading of Gear Sets
-                this.gearSets = [];
                 // slayer sim is off by default, so toggle auto slayer off
                 this.toggleSlayerSims(!this.slayerToggleState, false);
             }
@@ -401,7 +396,7 @@
                     [MICSR.equipmentSlot.Weapon, MICSR.equipmentSlot.Platebody, MICSR.equipmentSlot.Shield],
                     [MICSR.equipmentSlot.Platelegs],
                     [MICSR.equipmentSlot.Gloves, MICSR.equipmentSlot.Boots, MICSR.equipmentSlot.Ring],
-                    [MICSR.equipmentSlot.Summon, MICSR.equipmentSlot.SummonRight]
+                    [MICSR.equipmentSlot.Summon1, MICSR.equipmentSlot.Summon2]
                 ];
                 equipmentRows.forEach((row) => {
                     const rowSources = [];
@@ -469,16 +464,11 @@
                     foodSelectPopup.className = 'mcsPopup';
                     const equipmentSelectCard = new MICSR.Card(foodSelectPopup, '', '600px');
                     equipmentSelectCard.addSectionTitle('Food');
-                    const menuItems = items.filter((item) => this.filterIfHasKey('healsFor', item));
+                    const menuItems = [this.emptyItems.Food, ...items].filter((item) => this.filterIfHasKey('healsFor', item));
                     menuItems.sort((a, b) => b.healsFor - a.healsFor);
-                    const buttonMedia = menuItems.map((item) => {
-                        if (item.itemID === 0) {
-                            return this.media.emptyFood;
-                        }
-                        return item.media;
-                    });
-                    const buttonIds = menuItems.map((item) => this.getItemName(item.itemID));
-                    const buttonCallbacks = menuItems.map((item) => () => this.equipFood(item.itemID));
+                    const buttonMedia = menuItems.map((item) => item.media);
+                    const buttonIds = menuItems.map((item) => this.getItemName(item.id));
+                    const buttonCallbacks = menuItems.map((item) => () => this.equipFood(item.id));
                     const tooltips = menuItems.map((item) => this.getFoodTooltip(item));
                     equipmentSelectCard.addImageButtons(buttonMedia, buttonIds, 'Small', buttonCallbacks, tooltips, '100%');
                     return foodSelectPopup;
@@ -544,8 +534,8 @@
             equipFood(itemID) {
                 this.combatData.foodSelected = itemID;
                 const img = document.getElementById('MCS Food Image');
-                if (itemID === 0) {
-                    img.src = 'assets/media/skills/combat/food_empty.png';
+                if (itemID === -1) {
+                    img.src = 'assets/media/skills/combat/food_empty.svg';
                     img.style.border = '1px solid red';
                 } else {
                     img.src = items[itemID].media;
@@ -555,7 +545,7 @@
             }
 
             getFoodTooltip(item) {
-                if (!item || item.itemID === 0) {
+                if (!item || item.id === -1) {
                     return 'No Food';
                 }
                 let tooltip = `<div class="text-center">${item.name}<br><small>`;
@@ -866,7 +856,7 @@
                 }
                 const dropdown = this.lootSelectCard.addDropdown(
                     'Choose Item',
-                    droppedItems.map((itemID) => this.getItemName(itemID, -1)),
+                    droppedItems.map((itemID) => this.getItemName(itemID)),
                     droppedItems,
                     (event) => this.dropChanceOnChange(event),
                 );
@@ -968,7 +958,7 @@
                 if (this.combatData.dropSelected === -1) {
                     return `Drops/${this.selectedTimeShorthand}`;
                 }
-                return `${this.getItemName(this.combatData.dropSelected, -1)}/${this.selectedTimeShorthand}`;
+                return `${this.getItemName(this.combatData.dropSelected)}/${this.selectedTimeShorthand}`;
             }
 
             createEquipmentStatCard() {
@@ -1133,14 +1123,19 @@
              * @param {Card} card The parent card
              * @param {number} equipmentSlot The equipment slot
              * @param {Function} filterFunction Filter equipment with this function
-             * @param {string} [sortKey=itemID] Sort equipment by this key
+             * @param {Function} sortFunction Sort equipment by this key
              */
-            addEquipmentMultiButton(card, equipmentSlot, filterFunction, sortKey = 'itemID') {
+            addEquipmentMultiButton(card, equipmentSlot, filterFunction, sortFunction = item => item.id) {
                 const menuItems = this.equipmentSubsets[equipmentSlot].filter(filterFunction);
-                menuItems.sort((a, b) => ((a[sortKey]) ? a[sortKey] : 0) - ((b[sortKey]) ? b[sortKey] : 0));
+                MICSR.log(menuItems);
+                const sortKey = item => {
+                    const x = sortFunction(item);
+                    return x ? x : 0;
+                }
+                menuItems.sort((a, b) => sortKey(a) - sortKey(b));
                 const buttonMedia = menuItems.map((item) => item.media);
-                const buttonIds = menuItems.map((item) => this.getItemName(item.itemID));
-                const buttonCallbacks = menuItems.map((item) => () => this.equipItem(equipmentSlot, item.itemID));
+                const buttonIds = menuItems.map((item) => this.getItemName(item.id));
+                const buttonCallbacks = menuItems.map((item) => () => this.equipItem(equipmentSlot, item.id));
                 const tooltips = menuItems.map((item) => this.getEquipmentTooltip(equipmentSlot, item));
                 card.addImageButtons(buttonMedia, buttonIds, 'Small', buttonCallbacks, tooltips, '100%');
             }
@@ -1152,24 +1147,37 @@
              * @return {boolean}
              */
             filterIfHasKey(key, item) {
-                switch (key) {
-                    case 'magicLevelRequired':
-                        if (this.forceMagicArmour.includes(item.itemID)) {
-                            return true;
-                        }
-                        break;
-                    case 'rangedLevelRequired':
-                        if (this.forceRangedArmour.includes(item.itemID)) {
-                            return true;
-                        }
-                        break;
-                    case 'defenceLevelRequired':
-                        if (this.forceMeleeArmour.includes(item.itemID)) {
-                            return true;
-                        }
-                        break;
+                return key in item || item.id === -1;
+            }
+
+            filterIfHasLevelReq(item, skillID) {
+                if (item.id === -1) {
+                    return true;
                 }
-                return key in item || item.itemID === 0;
+                if (this.force[skillID].includes(item.id)) {
+                    return true;
+                }
+                return this.getItemLevelReq(item, skillID) > 0;
+            }
+
+            getItemLevelReq = (item, skillID) => {
+                if (skillID === CONSTANTS.skill.Summoning) {
+                    return item.summoningLevel | 0;
+                }
+                let req = 0;
+                if (item.equipRequirements === undefined) {
+                    return req;
+                }
+                const levelReqs = item.equipRequirements
+                    .filter(x => x.type === 'Level')
+                    .map(x => x.levels)
+                    .reduce((a, b) => [...a, ...b], []);
+                for (let levelReq of levelReqs) {
+                    if (levelReq.skill === skillID) {
+                        req = Math.max(req, levelReq.level);
+                    }
+                }
+                return req;
             }
 
             /**
@@ -1178,7 +1186,20 @@
              * @return {boolean}
              */
             filterIfHasNoLevelReq(item) {
-                return (!('defenceLevelRequired' in item) && !('rangedLevelRequired' in item) && !('magicLevelRequired' in item) && !(this.forceMagicArmour.includes(item.itemID) || this.forceRangedArmour.includes(item.itemID) || this.forceMeleeArmour.includes(item.itemID))) || item.itemID === 0;
+                if (item.id === -1) {
+                    return true;
+                }
+                const skillIDs = [
+                    CONSTANTS.skill.Defence,
+                    CONSTANTS.skill.Ranged,
+                    CONSTANTS.skill.Magic,
+                ]
+                for (let skillID of skillIDs) {
+                    if (this.getItemLevelReq(item, skillID) || (this.force[skillID] && this.force[skillID].includes(item.id))) {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             /**
@@ -1188,7 +1209,7 @@
              * @return {boolean}
              */
             filterByAmmoType(type, item) {
-                return item.ammoType === type || item.itemID === 0;
+                return item.ammoType === type || item.id === -1;
             }
 
             /**
@@ -1198,7 +1219,7 @@
              * @return {boolean}
              */
             filterByAmmoReq(type, item) {
-                return item.ammoTypeRequired === type || item.itemID === 0;
+                return item.ammoTypeRequired === type || item.id === -1;
             }
 
             /**
@@ -1208,11 +1229,17 @@
              * @return {boolean}
              */
             filterByTwoHanded(is2H, item) {
-                return item.isTwoHanded === is2H || item.itemID === 0;
+                if (item.id === -1) {
+                    return true;
+                }
+                if (item.occupiesSlots === undefined) {
+                    return !is2H;
+                }
+                return item.occupiesSlots.includes('Shield') === is2H;
             }
 
             filterMagicDamage(item) {
-                if (item.itemID === 0) {
+                if (item.id === -1) {
                     return true;
                 }
                 if (item.modifiers === undefined) {
@@ -1225,7 +1252,7 @@
             }
 
             filterSlayer(item) {
-                if (item.itemID === 0) {
+                if (item.id === -1) {
                     return true;
                 }
                 if (item.modifiers === undefined) {
@@ -1242,7 +1269,7 @@
             }
 
             filterRemainingPassive(item) {
-                if (item.itemID === 0) {
+                if (item.id === -1) {
                     return true;
                 }
                 return !this.filterMagicDamage(item) && !this.filterSlayer(item)
@@ -1254,9 +1281,11 @@
              * @param {Object} item
              * @return {boolean}
              */
-            filterByWeaponType(weaponType, item) {
-                // Change to the correct combat style selector
-                return this.getWeaponType(item) === weaponType || item.itemID === 0;
+            filterByWeaponType(attackType, item) {
+                if (item.id === -1) {
+                    return true;
+                }
+                return item.attackType === attackType;
             }
 
             /**
@@ -1279,10 +1308,17 @@
              * @return {boolean}
              */
             filterCombatSummon(item, combat) {
-                if (item.itemID === 0) {
+                if (item.id === -1) {
                     return true;
                 }
-                return item.summoningMaxHit > 0 === combat;
+                let maxhit = 0;
+                if (item.equipmentStats) {
+                    const maxhitList = item.equipmentStats.filter(x => x.key === 'summoningMaxhit');
+                    if (maxhitList.length > 0) {
+                        maxhit = maxhitList[0].value;
+                    }
+                }
+                return maxhit > 0 === combat;
             }
 
             /**
@@ -1295,7 +1331,7 @@
 
             /**
              * Change a button's classes to show that it is selected
-             * @param {HTMLButtonElement}
+             * @param {HTMLButtonElement} button
              */
             selectButton(button) {
                 button.classList.add('btn-primary');
@@ -1304,7 +1340,7 @@
 
             /**
              * Change a button's classes to show that it is not selected
-             * @param {HTMLButtonElement}
+             * @param {HTMLButtonElement} button
              */
             unselectButton(button) {
                 button.classList.remove('btn-primary');
@@ -1324,14 +1360,23 @@
                 const noSplit = [6, 7, 10];
                 if (triSplit.includes(equipmentSlot)) {
                     equipmentSelectCard.addSectionTitle('Melee');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterIfHasKey('defenceLevelRequired', item), 'defenceLevelRequired');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot,
+                        item => this.filterIfHasLevelReq(item, CONSTANTS.skill.Defence),
+                        x => this.filterIfHasLevelReq(x, CONSTANTS.skill.Defence)
+                    );
                     equipmentSelectCard.addSectionTitle('Ranged');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterIfHasKey('rangedLevelRequired', item), 'rangedLevelRequired');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot,
+                        item => this.filterIfHasLevelReq(item, CONSTANTS.skill.Ranged),
+                        x => this.filterIfHasLevelReq(x, CONSTANTS.skill.Ranged)
+                    );
                     equipmentSelectCard.addSectionTitle('Magic');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterIfHasKey('magicLevelRequired', item), 'magicLevelRequired');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot,
+                        item => this.filterIfHasLevelReq(item, CONSTANTS.skill.Magic),
+                        x => this.filterIfHasLevelReq(x, CONSTANTS.skill.Magic)
+                    );
                     if (this.equipmentSubsets[equipmentSlot].filter((item) => this.filterIfHasNoLevelReq(item)).length > 1) {
                         equipmentSelectCard.addSectionTitle('Other');
-                        this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterIfHasNoLevelReq(item), 'name');
+                        this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterIfHasNoLevelReq(item), x => x.name);
                     }
                 } else if (noSplit.includes(equipmentSlot)) {
                     equipmentSelectCard.addSectionTitle(this.equipmentSlotKeys[equipmentSlot]);
@@ -1339,57 +1384,57 @@
                 } else if (equipmentSlot === 4) {
                     equipmentSelectCard.addSectionTitle('1H Melee');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByTwoHanded(false, item) && this.filterByWeaponType('Melee', item);
-                    }, 'attackLevelRequired');
+                        return this.filterByTwoHanded(false, item) && this.filterByWeaponType('melee', item);
+                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Attack));
                     equipmentSelectCard.addSectionTitle('2H Melee');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByTwoHanded(true, item) && this.filterByWeaponType('Melee', item);
-                    }, 'attackLevelRequired');
+                        return this.filterByTwoHanded(true, item) && this.filterByWeaponType('melee', item);
+                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Attack));
                     equipmentSelectCard.addSectionTitle('Bows');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByAmmoReq(0, item) && this.filterByWeaponType('Ranged', item);
-                    }, 'rangedLevelRequired');
+                        return this.filterByAmmoReq(0, item) && this.filterByWeaponType('ranged', item);
+                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('Crossbows');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByAmmoReq(1, item) && this.filterByWeaponType('Ranged', item);
-                    }, 'rangedLevelRequired');
+                        return this.filterByAmmoReq(1, item) && this.filterByWeaponType('ranged', item);
+                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('Javelins');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByAmmoReq(2, item) && this.filterByWeaponType('Ranged', item);
-                    }, 'rangedLevelRequired');
+                        return this.filterByAmmoReq(2, item) && this.filterByWeaponType('ranged', item);
+                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('Throwing Knives');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByAmmoReq(3, item) && this.filterByWeaponType('Ranged', item);
-                    }, 'rangedLevelRequired');
+                        return this.filterByAmmoReq(3, item) && this.filterByWeaponType('ranged', item);
+                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('1H Magic');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByTwoHanded(false, item) && this.filterByWeaponType('Magic', item);
-                    }, 'magicLevelRequired');
+                        return this.filterByTwoHanded(false, item) && this.filterByWeaponType('magic', item);
+                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Magic));
                     equipmentSelectCard.addSectionTitle('2H Magic');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByTwoHanded(true, item) && this.filterByWeaponType('Magic', item);
-                    }, 'magicLevelRequired');
+                        return this.filterByTwoHanded(true, item) && this.filterByWeaponType('magic', item);
+                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Magic));
                 } else if (equipmentSlot === 9) {
                     equipmentSelectCard.addSectionTitle('Arrows');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(0, item), 'rangedLevelRequired');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(0, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('Bolts');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(1, item), 'rangedLevelRequired');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(1, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('Javelins');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(2, item), 'rangedLevelRequired');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(2, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('Throwing Knives');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(3, item), 'rangedLevelRequired');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(3, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                 } else if (equipmentSlot === MICSR.equipmentSlot.Passive) {
                     equipmentSelectCard.addSectionTitle('Magic Damage');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterMagicDamage(item), 'name');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterMagicDamage(item), x => x.name);
                     equipmentSelectCard.addSectionTitle('Slayer');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterSlayer(item), 'name');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterSlayer(item), x => x.name);
                     equipmentSelectCard.addSectionTitle('Other');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterRemainingPassive(item), 'name');
-                } else if (equipmentSlot === MICSR.equipmentSlot.Summon || equipmentSlot === MICSR.equipmentSlot.SummonRight) {
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterRemainingPassive(item), x => x.name);
+                } else if (equipmentSlot === MICSR.equipmentSlot.Summon1 || equipmentSlot === MICSR.equipmentSlot.Summon2) {
                     equipmentSelectCard.addSectionTitle('Combat Familiars')
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, true), 'summoningLevel');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, true), x => this.getItemLevelReq(x, CONSTANTS.skill.Summoning));
                     equipmentSelectCard.addSectionTitle('Non-Combat Familiars')
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, false), 'summoningLevel');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, false), x => this.getItemLevelReq(x, CONSTANTS.skill.Summoning));
                 } else {
                     throw Error(`Invalid equipmentSlot: ${equipmentSlot}`);
                 }
@@ -1416,7 +1461,7 @@
                 const weaponAmmo = [2, 3];
                 switch (equipmentSlot) {
                     case MICSR.equipmentSlot.Weapon:
-                        if (item.equipmentSlot === MICSR.equipmentSlot.Quiver) { // Swapping to throwing knives / javelins
+                        if (item.validSlots.includes('Quiver')) { // Swapping to throwing knives / javelins
                             this.equipItem(MICSR.equipmentSlot.Quiver, itemId);
                         } else if (weaponAmmo.includes(items[this.equipmentSelected[MICSR.equipmentSlot.Quiver]].ammoType)) { // Swapping from throwing knives / javelins
                             this.equipItem(MICSR.equipmentSlot.Quiver, 0);
@@ -1433,7 +1478,8 @@
                     case MICSR.equipmentSlot.Quiver:
                         if (weaponAmmo.includes(item.ammoType)) { // Swapping to throwing knives / javelins
                             this.equipItem(MICSR.equipmentSlot.Weapon, itemId);
-                        } else if (items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].equipmentSlot === MICSR.equipmentSlot.Quiver) { // Swapping from throwing knives / javelins
+                        } else if (items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].validSlots.includes('Quiver')) {
+                            // Swapping from throwing knives / javelins
                             this.equipItem(MICSR.equipmentSlot.Weapon, 0);
                         }
                         break;
@@ -1455,7 +1501,8 @@
                 const slotKey = this.equipmentSlotKeys[equipmentSlot];
                 const img = document.getElementById(`MCS ${slotKey} Image`);
                 let item;
-                if (itemId === 0) {
+                if (itemId === -1) {
+                    item = this.emptyItems[slotKey];
                     img.src = this.emptyItems[slotKey].media;
                 } else {
                     item = items[itemId];
@@ -1643,8 +1690,7 @@
              * @param {string} combatType The key of styles to change
              */
             styleDropdownOnChange(event, combatType) {
-                const styleID = parseInt(event.currentTarget.selectedOptions[0].value);
-                this.combatData.attackStyle[combatType] = styleID;
+                this.combatData.attackStyle[combatType] = parseInt(event.currentTarget.selectedOptions[0].value);
                 this.updateCombatStats();
             }
 
@@ -1862,7 +1908,7 @@
 
             /**
              * Callback for when the simulate button is clicked
-             * @param {MouseEvent} event The onclick event for a button
+             * @param {boolean} single
              */
             simulateButtonOnClick(single) {
                 if (((items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].type === 'Ranged Weapon') || items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].isRanged) && (items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].ammoTypeRequired !== items[this.equipmentSelected[MICSR.equipmentSlot.Quiver]].ammoType)) {
@@ -1949,7 +1995,6 @@
             timeUnitDropdownOnChange(event) {
                 this.timeMultiplier = this.timeMultipliers[event.currentTarget.selectedIndex];
                 this.simulator.selectedPlotIsTime = this.plotTypes[this.plotter.plotID].isTime;
-                this.selectedTimeUnit = this.timeOptions[event.currentTarget.selectedIndex];
                 this.selectedTimeShorthand = this.timeShorthand[event.currentTarget.selectedIndex];
                 // Update zone info card time units
                 for (let i = 0; i < this.plotTypes.length; i++) {
@@ -1990,7 +2035,7 @@
             popExport(data) {
                 navigator.clipboard.writeText(data).then(() => {
                     this.notify('Exported to clipboard!');
-                }, (error) => {
+                }, () => {
                     Swal.fire({
                         title: 'Clipboard API error!',
                         html: `<h5 class="font-w600 text-combat-smoke mb-1">Manually copy the data below, e.g. with ctrl-A ctrl-C.</h5><textarea class="mcsLabel mb-1">${data}</textarea>`,
@@ -2319,7 +2364,6 @@
 
             /**
              * Updates the list of options in the spell menus, based on if the player can use it
-             * @param {number} magicLevel The magic level the player has
              */
             updateSpellOptions() {
                 const magicLevel = this.combatData.virtualLevels.Magic || 1;
@@ -2484,23 +2528,12 @@
             }
 
             /**
-             * Updates the simulator display for when the drop chance time option is changed
-             */
-            updatePlotForDropChance() {
-                this.loot.updateDropChance();
-                if (this.plotter.plotType === 'dropChance') {
-                    this.updatePlotData();
-                }
-                this.updateZoneInfoCard();
-            }
-
-            /**
              * Updates the images and tooltips for potions when the potion tier is changed
              * @param {number} potionTier The new potion tier
              */
             updatePotionTier(potionTier) {
                 this.combatPotionIDs.forEach((potionId) => {
-                    const potion = items[herbloreItemData[potionId].itemID[potionTier]];
+                    const potion = items[herbloreItemData[potionId].id[potionTier]];
                     const img = document.getElementById(`MCS ${this.getPotionName(potionId)} Button Image`);
                     img.src = potion.media;
                     img.parentElement._tippy.setContent(this.getPotionTooltip(potion));
@@ -2557,79 +2590,7 @@
                 this.plotter.displayGeneral();
             }
 
-            // WIP Stuff for gear sets
-            /**
-             * @description WIP Function for gear set saving/loading.
-             * @param {string} setName
-             */
-            appendGearSet(setName) {
-                this.gearSets.push({
-                    setName: setName,
-                    setData: this.equipmentSelected,
-                });
-                // Update gear set dropdown
-
-                // Save gear sets to local storage
-            }
-
-            /**
-             * @description WIP Function for removing a gear set
-             * @param {number} setID
-             */
-            removeGearSet(setID) {
-                // Remove set from array
-
-                // Save gear sets to local storage
-            }
-
-            /**
-             * WIP function to change the currently selected gear to what is saved in a gear set
-             * @param {number} setID The index of the gear set
-             */
-            setGearToSet(setID) {
-                // Set Gearselected to data
-                this.equipmentSelected = this.gearSets[setID].setData;
-                // Update dropdowns to proper value
-                for (let i = 0; i < this.equipmentSelected.length; i++) {
-                    for (let j = 0; j < this.equipmentSubsets[i].length; j++) {
-                        if (this.equipmentSubsets[i][j].itemID === this.equipmentSelected[i]) {
-                            this.equipmentSelectCard.dropDowns[i].selectedIndex = j;
-                            break;
-                        }
-                    }
-                    // Do check for weapon type
-                    if (i === MICSR.equipmentSlot.Weapon) {
-                        if (items[gearID].isTwoHanded) {
-                            this.equipmentSelectCard.dropDowns[MICSR.equipmentSlot.Shield].selectedIndex = 0;
-                            this.equipmentSelected[MICSR.equipmentSlot.Shield] = 0;
-                            this.equipmentSelectCard.dropDowns[MICSR.equipmentSlot.Shield].disabled = true;
-                        } else {
-                            this.equipmentSelectCard.dropDowns[MICSR.equipmentSlot.Shield].disabled = false;
-                        }
-                        // Change to the correct combat style selector
-                        if ((items[gearID].type === 'Ranged Weapon') || items[gearID].isRanged) {
-                            this.disableStyleDropdown('Magic');
-                            this.disableStyleDropdown('Melee');
-                            this.enableStyleDropdown('Ranged');
-                            // Magic
-                        } else if (items[gearID].isMagic) {
-                            this.disableStyleDropdown('Ranged');
-                            this.disableStyleDropdown('Melee');
-                            this.enableStyleDropdown('Magic');
-                            // Melee
-                        } else {
-                            this.disableStyleDropdown('Magic');
-                            this.disableStyleDropdown('Ranged');
-                            this.enableStyleDropdown('Melee');
-                        }
-                    }
-                }
-                // Update equipment stats and combat stats
-                this.updateEquipmentStats();
-                this.updateCombatStats();
-            }
-
-            // Data Sanatizing Functions
+            // Data Sanitizing Functions
             /**
              * Removes HTML from the dungeon name
              * @param {number} dungeonID The index of Dungeons
@@ -2658,21 +2619,12 @@
             }
 
             /**
-             * Removes HTML from a spell name
-             * @param {number} spellID The index of SPELLS
-             * @return {string} The name of a spell
-             */
-            getSpellName(spellID) {
-                return this.replaceApostrophe(SPELLS[spellID].name);
-            }
-
-            /**
              * Removes HTML from an item name
              * @param {number} itemID The index of items
              * @return {string} The name of an item
              */
-            getItemName(itemID, defaultItemID = 0) {
-                if (itemID === defaultItemID) {
+            getItemName(itemID) {
+                if (itemID === -1) {
                     return 'None';
                 } else if (!items[itemID]) {
                     MICSR.warn(`Invalid itemID ${itemID} in getItemName`);

@@ -162,7 +162,7 @@
                 this.luckyHerb = 0;
                 // Food
                 this.autoEatTier = -1;
-                this.foodSelected = 0;
+                this.foodSelected = -1;
                 this.cookingPool = false;
                 this.cookingMastery = false;
                 // equipmentSelected, this is shared with an instance of App when it is the child of
@@ -240,7 +240,7 @@
                 // iterate over gear
                 for (let equipmentSlot = 0; equipmentSlot < this.equipmentSlotKeys.length; equipmentSlot++) {
                     const itemID = this.equipmentSelected[equipmentSlot];
-                    if (itemID === 0) {
+                    if (itemID === -1) {
                         continue;
                     }
                     const item = items[itemID];
@@ -835,16 +835,19 @@
 
                 // mimic calculateEquippedItemModifiers // passives
                 const duplicateCheck = {};
-                this.equipmentSelected.filter(x => {
-                    if (x <= 0) {
+                this.equipmentSelected.filter(itemID => {
+                    if (itemID === -1) {
                         return false;
                     }
-                    if (duplicateCheck[x]) {
+                    if (items[itemID].modifiers === undefined) {
+                        return false;
+                    }
+                    if (duplicateCheck[itemID]) {
                         return false
                     }
-                    duplicateCheck[x] = true;
+                    duplicateCheck[itemID] = true;
                     return true;
-                }).forEach(id => this.modifiers.addModifiers(items[id].modifiers));
+                }).forEach(itemID => this.modifiers.addModifiers(items[itemID].modifiers));
 
                 // mimic calculatePetModifiers
                 this.petIds.filter(id => this.petOwned[id]).forEach(id => this.modifiers.addModifiers(PETS[id].modifiers));
@@ -928,8 +931,8 @@
                     return {};
                 }
                 const summons = [
-                    items[this.equipmentSelected[MICSR.equipmentSlot.Summon]].summoningID,
-                    items[this.equipmentSelected[MICSR.equipmentSlot.SummonRight]].summoningID,
+                    items[this.equipmentSelected[MICSR.equipmentSlot.Summon1]].summoningID,
+                    items[this.equipmentSelected[MICSR.equipmentSlot.Summon2]].summoningID,
                 ];
                 const synergies = SUMMONING.Synergies[Math.min(...summons)];
                 if (!synergies) {
@@ -990,8 +993,8 @@
             }
 
             getSMH() {
-                const summ1 = this.equipmentSelected[MICSR.equipmentSlot.Summon];
-                const summ2 = this.equipmentSelected[MICSR.equipmentSlot.SummonRight];
+                const summ1 = this.equipmentSelected[MICSR.equipmentSlot.Summon1];
+                const summ2 = this.equipmentSelected[MICSR.equipmentSlot.Summon2];
                 let smh1 = 0;
                 if (summ1 >= 0) {
                     smh1 = items[summ1].summoningMaxHit | 0;
@@ -1004,8 +1007,8 @@
             }
 
             getSummoningXP() {
-                const summ1 = this.equipmentSelected[MICSR.equipmentSlot.Summon];
-                const summ2 = this.equipmentSelected[MICSR.equipmentSlot.SummonRight];
+                const summ1 = this.equipmentSelected[MICSR.equipmentSlot.Summon1];
+                const summ2 = this.equipmentSelected[MICSR.equipmentSlot.Summon2];
                 let xp = 0;
                 if (summ1 >= 0 && items[summ1].summoningMaxHit) {
                     xp += getBaseSummoningXP(items[summ1].summoningID, true, 3000);
@@ -1020,8 +1023,8 @@
                 if (!this.summoningSynergy) {
                     return undefined;
                 }
-                const summLeft = this.equipmentSelected[MICSR.equipmentSlot.Summon];
-                const summRight = this.equipmentSelected[MICSR.equipmentSlot.SummonRight];
+                const summLeft = this.equipmentSelected[MICSR.equipmentSlot.Summon1];
+                const summRight = this.equipmentSelected[MICSR.equipmentSlot.Summon2];
                 if (summLeft > 0 && summRight > 0 && summLeft !== summRight) {
                     const min = Math.min(items[summLeft].summoningID, items[summRight].summoningID);
                     const max = Math.max(items[summLeft].summoningID, items[summRight].summoningID);
@@ -1113,7 +1116,7 @@
                 } else {
                     playerStats.autoEat.manual = true;
                 }
-                if (this.foodSelected > 0) {
+                if (this.foodSelected > -1) {
                     playerStats.foodHeal = this.getFoodHealAmt();
                 }
 
@@ -1323,6 +1326,9 @@
             }
 
             getFoodHealAmt() {
+                if (this.foodSelected === -1) {
+                    return 0;
+                }
                 let amt = items[this.foodSelected].healsFor;
                 amt *= this.numberMultiplier;
                 let multiplier = 1;

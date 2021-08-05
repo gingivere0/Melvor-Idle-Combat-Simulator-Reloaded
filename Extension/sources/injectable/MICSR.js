@@ -32,9 +32,3 @@ window.MICSR = {
     /////////////
     loadedFiles: {},
 }
-
-
-// set itemID for each item
-items.forEach((x, i) => {
-    x.itemID = i;
-});
