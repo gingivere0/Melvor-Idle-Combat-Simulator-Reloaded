@@ -1142,12 +1142,14 @@
                 playerStats.specialData = [];
                 if (this.combatStats.attackType === CONSTANTS.attackType.Magic && this.spells.ancient.isSelected) {
                     playerStats.usingAncient = true;
-                    playerStats.specialData.push(playerSpecialAttacks[ANCIENT[this.spells.ancient.selectedID].specID]);
+                    playerStats.specialData.push(ANCIENT[this.spells.ancient.selectedID].specialAttack);
                 } else {
                     for (const itemId of this.equipmentSelected) {
                         if (items[itemId].hasSpecialAttack) {
                             playerStats.hasSpecialAttack = true;
-                            playerStats.specialData.push(playerSpecialAttacks[items[itemId].specialAttackID]);
+                            items[itemId].specialAttacks.forEach(attack =>
+                                playerStats.specialData.push(attack)
+                            );
                         }
                     }
                 }
