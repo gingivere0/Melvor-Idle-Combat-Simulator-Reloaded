@@ -115,26 +115,26 @@
                     }
                 };
                 this.emptyItems = {
-                    Helmet: makeEmptyItem('assets/media/bank/armour_helmet.svg'),
-                    Platebody: makeEmptyItem('assets/media/bank/armour_platebody.svg'),
-                    Platelegs: makeEmptyItem('assets/media/bank/armour_platelegs.svg'),
-                    Boots: makeEmptyItem('assets/media/bank/armour_boots.svg'),
-                    Weapon: makeEmptyItem('assets/media/bank/weapon_sword.svg'),
-                    Shield: makeEmptyItem('assets/media/bank/armour_shield.svg'),
-                    Amulet: makeEmptyItem('assets/media/bank/misc_amulet.svg'),
-                    Ring: makeEmptyItem('assets/media/bank/misc_ring.svg'),
-                    Gloves: makeEmptyItem('assets/media/bank/armour_gloves.svg'),
-                    Quiver: makeEmptyItem('assets/media/bank/weapon_quiver.svg'),
-                    Cape: makeEmptyItem('assets/media/bank/armour_cape.svg'),
-                    Passive: makeEmptyItem('assets/media/bank/passive_slot.svg'),
-                    Summon: makeEmptyItem('assets/media/bank/misc_summon.svg'),
-                    SummonRight: makeEmptyItem('assets/media/bank/misc_summon.svg'),
+                    Helmet: makeEmptyItem('assets/media/bank/armour_helmet.png'),
+                    Platebody: makeEmptyItem('assets/media/bank/armour_platebody.png'),
+                    Platelegs: makeEmptyItem('assets/media/bank/armour_platelegs.png'),
+                    Boots: makeEmptyItem('assets/media/bank/armour_boots.png'),
+                    Weapon: makeEmptyItem('assets/media/bank/weapon_sword.png'),
+                    Shield: makeEmptyItem('assets/media/bank/armour_shield.png'),
+                    Amulet: makeEmptyItem('assets/media/bank/misc_amulet.png'),
+                    Ring: makeEmptyItem('assets/media/bank/misc_ring.png'),
+                    Gloves: makeEmptyItem('assets/media/bank/armour_gloves.png'),
+                    Quiver: makeEmptyItem('assets/media/bank/weapon_quiver.png'),
+                    Cape: makeEmptyItem('assets/media/bank/armour_cape.png'),
+                    Passive: makeEmptyItem('assets/media/bank/passive_slot.png'),
+                    Summon: makeEmptyItem('assets/media/bank/misc_summon.png'),
+                    SummonRight: makeEmptyItem('assets/media/bank/misc_summon.png'),
                 };
 
                 // Useful assets
                 this.media = {
-                    combat: 'assets/media/skills/combat/combat.svg',
-                    slayer: 'assets/media/skills/slayer/slayer.svg',
+                    combat: 'assets/media/skills/combat/combat.png',
+                    slayer: 'assets/media/skills/slayer/slayer.png',
                     prayer: 'assets/media/skills/prayer/prayer.svg',
                     spellbook: 'assets/media/skills/combat/spellbook.svg',
                     curse: 'assets/media/skills/combat/curses.svg',
@@ -143,7 +143,7 @@
                     emptyPotion: 'assets/media/skills/herblore/potion_empty.svg',
                     pet: 'assets/media/pets/hitpoints.png',
                     settings: 'assets/media/main/settings_header.svg',
-                    gp: 'assets/media/main/coins.svg',
+                    gp: 'assets/media/main/coins.png',
                     attack: 'assets/media/skills/combat/attack.svg',
                     strength: 'assets/media/skills/combat/strength.svg',
                     ranged: 'assets/media/skills/ranged/ranged.svg',
@@ -152,13 +152,14 @@
                     hitpoints: 'assets/media/skills/hitpoints/hitpoints.svg',
                     emptyFood: 'assets/media/skills/combat/food_empty.svg',
                     agility: 'assets/media/skills/agility/agility.svg',
-                    mastery: 'assets/media/main/mastery_header.svg',
+                    mastery: 'assets/media/main/mastery_header.png',
                     statistics: 'assets/media/main/statistics_header.svg',
-                    loot: 'assets/media/bank/chapeau_noir.svg',
-                    summoning: 'assets/media/skills/summoning/summoning.svg',
+                    loot: 'assets/media/bank/chapeau_noir.png',
+                    summoning: 'assets/media/skills/summoning/summoning.png',
                     synergy: 'assets/media/skills/summoning/synergy.svg',
                     synergyLock: 'assets/media/skills/summoning/synergy_locked.svg',
-                    stamina: 'assets/media/main/stamina.svg',
+                    stamina: 'assets/media/main/stamina.png',
+                    question: 'assets/media/main/question.svg',
                 };
 
                 // Forced equipment sorting
@@ -544,7 +545,7 @@
                 this.combatData.foodSelected = itemID;
                 const img = document.getElementById('MCS Food Image');
                 if (itemID === 0) {
-                    img.src = 'assets/media/skills/combat/food_empty.svg';
+                    img.src = 'assets/media/skills/combat/food_empty.png';
                     img.style.border = '1px solid red';
                 } else {
                     img.src = items[itemID].media;
@@ -2321,7 +2322,7 @@
                 const setSpellsPerLevel = (spell, index, type) => {
                     const spellOption = this.combatData.spells[type];
                     if (spell.magicLevelRequired > magicLevel) {
-                        document.getElementById(`MCS ${spell.name} Button Image`).src = 'assets/media/main/question.svg';
+                        document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
                         if (spellOption.selectedID === index) {
                             spellOption.selectedID = null;
                             spellOption.isSelected = false;
@@ -2354,7 +2355,7 @@
                         if (this.equipmentSelected.includes(spell.requiredItem) && this.combatData.playerLevels.Magic >= spell.magicLevelRequired) {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                         } else {
-                            document.getElementById(`MCS ${spell.name} Button Image`).src = 'assets/media/main/question.svg';
+                            document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
                             if (spellOption.selectedID === index) {
                                 spellOption.selectedID = null;
                                 spellOption.isSelected = false;
@@ -2373,7 +2374,7 @@
                 const prayerLevel = this.combatData.virtualLevels.Prayer || 1;
                 PRAYER.forEach((prayer, i) => {
                     if (prayer.prayerLevel > prayerLevel) {
-                        document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = 'assets/media/main/question.svg';
+                        document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = this.media.question;
                         if (this.combatData.prayerSelected[i]) {
                             this.prayerButtonOnClick({currentTarget: document.getElementById(`MCS ${this.getPrayerName(i)} Button`)}, i);
                             notifyPlayer(CONSTANTS.skill.Prayer, `${this.getPrayerName(i)} has been de-selected. It requires level ${prayer.prayerLevel} Prayer.`, 'danger');
