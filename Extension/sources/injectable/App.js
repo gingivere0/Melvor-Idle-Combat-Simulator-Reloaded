@@ -720,12 +720,15 @@
                             tooltip += `Spell Damage: ${spell.maxHit * numberMultiplier}`;
                             break;
                         case 'aurora':
-                            tooltip += spell.description.replace(/^.*?<br>/, '');
+                            tooltip += describeAurora(spell);
+                            break;
+                        case 'ancient':
+                            tooltip += describeAttack(spell.specialAttack, youNoun, enemyNoun);
                             break;
                         default:
                             tooltip += spell.description;
                     }
-                    const runes = spell.runesRequired.map((rune) => `${rune.qty}${this.getTooltipIcon(items[rune.id].media)}`).join(' ');
+                    const runes = combatMenus.spells.standard.getRuneHTML(spell);
                     tooltip += `</span><br><span class="text-warning">Requires:</span><br>${runes}</small></div>`;
                     return tooltip;
                 });
