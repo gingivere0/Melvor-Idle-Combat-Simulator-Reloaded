@@ -94,6 +94,58 @@
             Summon2: 13,
         };
 
+        MICSR.equipmentSlotList = [
+            'Helmet',
+            'Platebody',
+            'Platelegs',
+            'Boots',
+            'Weapon',
+            'Shield',
+            'Amulet',
+            'Ring',
+            'Gloves',
+            'Quiver',
+            'Cape',
+            'Passive',
+            'Summon1',
+            'Summon2',
+        ];
+
+        // empty items
+        const makeEmptyItem = (img, slot) => {
+            return {
+                name: 'None',
+                id: -1,
+                media: img,
+                validSlots: [slot]
+            }
+        };
+
+        MICSR.emptyItems = {
+            Helmet: makeEmptyItem('assets/media/bank/armour_helmet.png', 'Helmet'),
+            Platebody: makeEmptyItem('assets/media/bank/armour_platebody.png', 'Platebody'),
+            Platelegs: makeEmptyItem('assets/media/bank/armour_platelegs.png', 'Platelegs'),
+            Boots: makeEmptyItem('assets/media/bank/armour_boots.png', 'Boots'),
+            Weapon: makeEmptyItem('assets/media/bank/weapon_sword.png', 'Weapon'),
+            Shield: makeEmptyItem('assets/media/bank/armour_shield.png', 'Shield'),
+            Amulet: makeEmptyItem('assets/media/bank/misc_amulet.png', 'Amulet'),
+            Ring: makeEmptyItem('assets/media/bank/misc_ring.png', 'Ring'),
+            Gloves: makeEmptyItem('assets/media/bank/armour_gloves.png', 'Gloves'),
+            Quiver: makeEmptyItem('assets/media/bank/weapon_quiver.png', 'Quiver'),
+            Cape: makeEmptyItem('assets/media/bank/armour_cape.png', 'Cape'),
+            Passive: makeEmptyItem('assets/media/bank/passive_slot.png', 'Passive'),
+            Summon1: makeEmptyItem('assets/media/bank/misc_summon.png', 'Summon1'),
+            Summon2: makeEmptyItem('assets/media/bank/misc_summon.png', 'Summon2'),
+            Food: makeEmptyItem('assets/media/skills/combat/food_empty.svg', 'Food'),
+        };
+
+        MICSR.getItem = (itemID, slotName) => {
+            if (itemID === -1) {
+                return MICSR.emptyItems[slotName];
+            }
+            return items[itemID];
+        }
+
         MICSR.dungeons = [];
         DUNGEONS.forEach(dungeon => MICSR.dungeons.push({...dungeon}));
         MICSR.dungeons[CONSTANTS.dungeon.Into_the_Mist].monsters = [147, 148, 149];

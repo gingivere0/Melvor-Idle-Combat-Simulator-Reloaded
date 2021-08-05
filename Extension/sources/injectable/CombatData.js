@@ -304,10 +304,11 @@
 
             setAttackType() {
                 const weaponID = this.equipmentSelected[MICSR.equipmentSlot.Weapon];
-                if (items[weaponID].type === 'Ranged Weapon' || items[weaponID].isRanged) {
+                const weapon = MICSR.getItem(weaponID, 'Weapon');
+                if (weapon.type === 'Ranged Weapon' || weapon.isRanged) {
                     // Ranged
                     this.combatStats.attackType = CONSTANTS.attackType.Ranged;
-                } else if (items[weaponID].isMagic) {
+                } else if (weapon.isMagic) {
                     // Magic
                     this.combatStats.attackType = CONSTANTS.attackType.Magic;
                 } else {
@@ -926,13 +927,17 @@
                 }
             }
 
+            getEquipedItem(slotName) {
+                return MICSR.getItem(this.equipmentSelected[MICSR.equipmentSlot[slotName]], slotName);
+            }
+
             computeSynergyBonus() {
                 if (!this.summoningSynergy) {
                     return {};
                 }
                 const summons = [
-                    items[this.equipmentSelected[MICSR.equipmentSlot.Summon1]].summoningID,
-                    items[this.equipmentSelected[MICSR.equipmentSlot.Summon2]].summoningID,
+                    this.getEquipedItem('Summon1').summoningID,
+                    this.getEquipedItem('Summon2').summoningID,
                 ];
                 const synergies = SUMMONING.Synergies[Math.min(...summons)];
                 if (!synergies) {

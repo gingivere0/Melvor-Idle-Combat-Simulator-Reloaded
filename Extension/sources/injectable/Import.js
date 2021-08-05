@@ -43,11 +43,7 @@
             importButtonOnClick(setID) {
                 // get in game levels
                 const levels = {};
-                this.app.skillKeys.forEach((key) => {
-                    const skillId = CONSTANTS.skill[key];
-                    const virtualLevel = Math.max(skillLevel[skillId], exp.xp_to_level(skillXP[skillId]) - 1);
-                    levels[key] = virtualLevel;
-                });
+                this.app.skillKeys.forEach((key) => levels[key] = skillLevel[CONSTANTS.skill[key]]);
                 // get potion
                 let potionID = -1;
                 let potionTier = -1;
@@ -65,29 +61,43 @@
                         }
                     }
                 }
+                // get food
+                const food = player.food.slots[player.food.selectedSlot].item;
                 // get cooking mastery for food
-                const foodMastery = items[this.app.combatData.foodSelected].masteryID;
+                const foodMastery = food.masteryID;
                 const cookingMastery = this.app.combatData.foodSelected && foodMastery && foodMastery[0] === CONSTANTS.skill.Cooking
                     && exp.xp_to_level(MASTERY[CONSTANTS.skill.Cooking].xp[foodMastery[1]]) > 99;
 
+                // get the player's auto eat tier
+                let autoEatTier = -1;
+                [
+                    CONSTANTS.shop.general.Auto_Eat_Tier_I,
+                    CONSTANTS.shop.general.Auto_Eat_Tier_II,
+                    CONSTANTS.shop.general.Auto_Eat_Tier_III,
+                ].forEach(id => {
+                    if (shopItemsPurchased.get(`General:${id}`).quantity > 0) {
+                        autoEatTier++;
+                    }
+                });
+
                 // create settings object
                 const settings = {
-                    equipment: equipmentSets[setID].equipment,
+                    equipment: player.equipmentSets[setID].slotArray.map(x => x.item.id),
                     levels: levels,
-                    meleeStyle: selectedAttackStyle[0],
-                    rangedStyle: selectedAttackStyle[1] - 3,
-                    magicStyle: selectedAttackStyle[2] - 6,
-                    isAncient: isSpellAncient,
-                    ancient: selectedAncient,
-                    spell: selectedSpell,
-                    curse: selectedCurse,
-                    aurora: activeAurora,
-                    prayerSelected: activePrayer,
+                    meleeStyle: player.attackStyles.melee,
+                    rangedStyle: player.attackStyles.ranged,
+                    magicStyle: player.attackStyles.magic,
+                    isAncient: player.spellSelection.ancient !== -1,
+                    ancient: player.spellSelection.ancient,
+                    standard: player.spellSelection.standard,
+                    curse: player.spellSelection.curse,
+                    aurora: player.spellSelection.aurora,
+                    prayerSelected: PRAYER.map((_, i) => [...player.activePrayers].includes(i)),
                     potionID: potionID,
                     potionTier: potionTier,
                     petOwned: petUnlocked,
-                    autoEatTier: -1,
-                    foodSelected: equippedFood[currentCombatFood].itemID,
+                    autoEatTier: autoEatTier,
+                    foodSelected: food.id,
                     cookingPool: getMasteryPoolProgress(CONSTANTS.skill.Cooking) >= 95,
                     cookingMastery: cookingMastery,
                     isSlayerTask: this.app.combatData.isSlayerTask,
@@ -99,17 +109,6 @@
                     pillar: agilityPassivePillarActive,
                     summoningSynergy: this.app.combatData.summoningSynergy, // TODO: import mark levels
                 };
-
-                // get the player's auto eat tier
-                [
-                    CONSTANTS.shop.general.Auto_Eat_Tier_I,
-                    CONSTANTS.shop.general.Auto_Eat_Tier_II,
-                    CONSTANTS.shop.general.Auto_Eat_Tier_III,
-                ].forEach(id => {
-                    if (shopItemsPurchased.filter(x => x[0] === "General" && x[1] === id).length > 0) {
-                        settings.autoEatTier++;
-                    }
-                });
 
                 // import settings
                 this.importSettings(settings);
@@ -135,7 +134,7 @@
                     magicStyle: this.app.combatData.attackStyle.Magic,
                     isAncient: this.app.combatData.spells.ancient.isSelected,
                     ancient: this.app.combatData.spells.ancient.selectedID,
-                    spell: this.app.combatData.spells.standard.selectedID,
+                    standard: this.app.combatData.spells.standard.selectedID,
                     curse: this.app.combatData.spells.curse.selectedID,
                     aurora: this.app.combatData.spells.aurora.selectedID,
                     prayerSelected: this.app.combatData.prayerSelected,
@@ -160,7 +159,7 @@
                 this.importEquipment(settings.equipment);
                 this.importLevels(settings.levels);
                 this.importStyle(settings.meleeStyle, settings.rangedStyle, settings.magicStyle);
-                this.importSpells(settings.isAncient, settings.ancient, settings.spell, settings.curse, settings.aurora);
+                this.importSpells(settings.ancient, settings.standard, settings.curse, settings.aurora);
                 this.importPrayers(settings.prayerSelected);
                 this.importPotion(settings.potionID, settings.potionTier);
                 this.importPets(settings.petOwned);
@@ -210,7 +209,7 @@
                 document.getElementById('MCS Magic Style Dropdown').selectedIndex = magicStyle;
             }
 
-            importSpells(isAncient, ancient, spell, curse, aurora) {
+            importSpells(ancient, standard, curse, aurora) {
                 // Set all active spell UI to be disabled
                 Object.keys(this.app.combatData.spells).forEach((spellType) => {
                     const spellOpts = this.app.combatData.spells[spellType];
@@ -219,32 +218,33 @@
                     }
                 });
                 // import spells
-                if (isAncient) {
+                if (ancient !== -1) {
                     this.app.combatData.spells.ancient.isSelected = true;
                     this.app.combatData.spells.ancient.selectedID = ancient;
+                    // clear standard and curse
                     this.app.combatData.spells.standard.isSelected = false;
-                    this.app.combatData.spells.standard.selectedID = null;
+                    this.app.combatData.spells.standard.selectedID = -1;
                     this.app.combatData.spells.curse.isSelected = false;
-                    this.app.combatData.spells.curse.selectedID = null;
+                    this.app.combatData.spells.curse.selectedID = -1;
                 } else {
                     this.app.combatData.spells.standard.isSelected = true;
-                    this.app.combatData.spells.standard.selectedID = spell;
+                    this.app.combatData.spells.standard.selectedID = standard;
                     this.app.combatData.spells.ancient.isSelected = false;
-                    this.app.combatData.spells.ancient.selectedID = null;
-                    if (curse !== null) {
+                    this.app.combatData.spells.ancient.selectedID = -1;
+                    if (curse !== -1) {
                         this.app.combatData.spells.curse.isSelected = true;
                         this.app.combatData.spells.curse.selectedID = curse;
                     } else {
                         this.app.combatData.spells.curse.isSelected = false;
-                        this.app.combatData.spells.curse.selectedID = null;
+                        this.app.combatData.spells.curse.selectedID = -1;
                     }
                 }
-                if (aurora !== null) {
+                if (aurora !== -1) {
                     this.app.combatData.spells.aurora.isSelected = true;
                     this.app.combatData.spells.aurora.selectedID = aurora;
                 } else {
                     this.app.combatData.spells.aurora.isSelected = false;
-                    this.app.combatData.spells.aurora.selectedID = null;
+                    this.app.combatData.spells.aurora.selectedID = -1;
                 }
                 // Update spell UI
                 Object.values(this.app.combatData.spells).forEach((spellOpts, i) => {

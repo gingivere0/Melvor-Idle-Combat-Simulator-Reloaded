@@ -102,31 +102,6 @@
                 this.initialTimeUnitIndex = 3;
                 this.selectedTimeShorthand = this.timeShorthand[this.initialTimeUnitIndex];
                 this.timeMultiplier = this.timeMultipliers[this.initialTimeUnitIndex];
-                // empty items
-                const makeEmptyItem = (img) => {
-                    return {
-                        name: 'None',
-                        id: -1,
-                        media: img,
-                    }
-                };
-                this.emptyItems = {
-                    Helmet: makeEmptyItem('assets/media/bank/armour_helmet.png'),
-                    Platebody: makeEmptyItem('assets/media/bank/armour_platebody.png'),
-                    Platelegs: makeEmptyItem('assets/media/bank/armour_platelegs.png'),
-                    Boots: makeEmptyItem('assets/media/bank/armour_boots.png'),
-                    Weapon: makeEmptyItem('assets/media/bank/weapon_sword.png'),
-                    Shield: makeEmptyItem('assets/media/bank/armour_shield.png'),
-                    Amulet: makeEmptyItem('assets/media/bank/misc_amulet.png'),
-                    Ring: makeEmptyItem('assets/media/bank/misc_ring.png'),
-                    Gloves: makeEmptyItem('assets/media/bank/armour_gloves.png'),
-                    Quiver: makeEmptyItem('assets/media/bank/weapon_quiver.png'),
-                    Cape: makeEmptyItem('assets/media/bank/armour_cape.png'),
-                    Passive: makeEmptyItem('assets/media/bank/passive_slot.png'),
-                    Summon1: makeEmptyItem('assets/media/bank/misc_summon.png'),
-                    Summon2: makeEmptyItem('assets/media/bank/misc_summon.png'),
-                    Food: makeEmptyItem('assets/media/skills/combat/food_empty.svg'),
-                };
 
                 // Useful assets
                 this.media = {
@@ -173,8 +148,8 @@
                 this.equipmentSelected = [];
                 for (let slotId = 0; slotId < this.equipmentSlotKeys.length; slotId++) {
                     const equipmentSlotKey = this.equipmentSlotKeys[slotId];
-                    this.equipmentSubsets.push([this.emptyItems[this.equipmentSlotKeys[slotId]]]);
-                    this.equipmentSelected.push(0);
+                    this.equipmentSubsets.push([MICSR.emptyItems[this.equipmentSlotKeys[slotId]]]);
+                    this.equipmentSelected.push(-1);
                     for (let i = 0; i < items.length; i++) {
                         if (items[i].validSlots === undefined) {
                             continue;
@@ -404,16 +379,16 @@
                     const rowPopups = [];
                     const tooltips = [];
                     row.forEach((equipmentSlot) => {
-                        if (!this.emptyItems[this.equipmentSlotKeys[equipmentSlot]]) {
+                        if (!MICSR.emptyItems[this.equipmentSlotKeys[equipmentSlot]]) {
                             MICSR.log(MICSR.equipmentSlot);
-                            MICSR.log(this.emptyItems);
+                            MICSR.log(MICSR.emptyItems);
                             MICSR.log(this.equipmentSlotKeys);
                             MICSR.log(equipmentSlot);
                             MICSR.log(this.equipmentSlotKeys[equipmentSlot]);
-                            MICSR.log(this.emptyItems[this.equipmentSlotKeys[equipmentSlot]]);
+                            MICSR.log(MICSR.emptyItems[this.equipmentSlotKeys[equipmentSlot]]);
                             return;
                         }
-                        rowSources.push(this.emptyItems[this.equipmentSlotKeys[equipmentSlot]].media);
+                        rowSources.push(MICSR.emptyItems[this.equipmentSlotKeys[equipmentSlot]].media);
                         rowIDs.push(`MCS ${this.equipmentSlotKeys[equipmentSlot]} Image`);
                         rowPopups.push(this.createEquipmentPopup(equipmentSlot));
                         tooltips.push(this.equipmentSlotKeys[equipmentSlot]);
@@ -464,7 +439,7 @@
                     foodSelectPopup.className = 'mcsPopup';
                     const equipmentSelectCard = new MICSR.Card(foodSelectPopup, '', '600px');
                     equipmentSelectCard.addSectionTitle('Food');
-                    const menuItems = [this.emptyItems.Food, ...items].filter((item) => this.filterIfHasKey('healsFor', item));
+                    const menuItems = [MICSR.emptyItems.Food, ...items].filter((item) => this.filterIfHasKey('healsFor', item));
                     menuItems.sort((a, b) => b.healsFor - a.healsFor);
                     const buttonMedia = menuItems.map((item) => item.media);
                     const buttonIds = menuItems.map((item) => this.getItemName(item.id));
@@ -962,7 +937,7 @@
             }
 
             createEquipmentStatCard() {
-                this.equipStatCard = this.mainTabCard.addTab('Equipment Stats', this.emptyItems.Helmet.media, '', '50px');
+                this.equipStatCard = this.mainTabCard.addTab('Equipment Stats', MICSR.emptyItems.Helmet.media, '', '50px');
                 this.equipStatCard.addSectionTitle('Equipment Stats');
                 this.equipKeys = [
                     'attackSpeed',
@@ -1232,10 +1207,11 @@
                 if (item.id === -1) {
                     return true;
                 }
-                if (item.occupiesSlots === undefined) {
-                    return !is2H;
-                }
-                return item.occupiesSlots.includes('Shield') === is2H;
+                return this.isTwoHanded(item) === is2H;
+            }
+
+            isTwoHanded(item) {
+                return item.occupiesSlots && item.occupiesSlots.includes('Shield');
             }
 
             filterMagicDamage(item) {
@@ -1441,6 +1417,10 @@
                 return equipmentSelectPopup;
             }
 
+            getEquipedItem(slotName) {
+                return MICSR.getItem(this.equipmentSelected[MICSR.equipmentSlot[slotName]], slotName);
+            }
+
             // Callback Functions for equipment select card
             /**
              * Equips an item to an equipment slot
@@ -1457,30 +1437,30 @@
                 this.equipmentSelected[equipmentSlot] = itemId;
                 this.setEquipmentImage(equipmentSlot, itemId);
 
-                const item = items[itemId];
+                const item = MICSR.getItem(itemId, MICSR.equipmentSlotList[equipmentSlot]);
                 const weaponAmmo = [2, 3];
                 switch (equipmentSlot) {
                     case MICSR.equipmentSlot.Weapon:
                         if (item.validSlots.includes('Quiver')) { // Swapping to throwing knives / javelins
                             this.equipItem(MICSR.equipmentSlot.Quiver, itemId);
-                        } else if (weaponAmmo.includes(items[this.equipmentSelected[MICSR.equipmentSlot.Quiver]].ammoType)) { // Swapping from throwing knives / javelins
-                            this.equipItem(MICSR.equipmentSlot.Quiver, 0);
+                        } else if (weaponAmmo.includes(this.getEquipedItem('Quiver').ammoType)) { // Swapping from throwing knives / javelins
+                            this.equipItem(MICSR.equipmentSlot.Quiver, -1);
                         }
-                        if (item.isTwoHanded) {
-                            this.equipItem(MICSR.equipmentSlot.Shield, 0);
+                        if (this.isTwoHanded(item)) {
+                            this.equipItem(MICSR.equipmentSlot.Shield, -1);
                         }
                         break;
                     case MICSR.equipmentSlot.Shield:
-                        if (itemId && items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].isTwoHanded) {
-                            this.equipItem(MICSR.equipmentSlot.Weapon, 0);
+                        if (itemId && this.isTwoHanded(this.getEquipedItem('Weapon'))) {
+                            this.equipItem(MICSR.equipmentSlot.Weapon, -1);
                         }
                         break;
                     case MICSR.equipmentSlot.Quiver:
                         if (weaponAmmo.includes(item.ammoType)) { // Swapping to throwing knives / javelins
                             this.equipItem(MICSR.equipmentSlot.Weapon, itemId);
-                        } else if (items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].validSlots.includes('Quiver')) {
+                        } else if (this.getEquipedItem('Weapon').validSlots.includes('Quiver')) {
                             // Swapping from throwing knives / javelins
-                            this.equipItem(MICSR.equipmentSlot.Weapon, 0);
+                            this.equipItem(MICSR.equipmentSlot.Weapon, -1);
                         }
                         break;
                 }
@@ -1500,14 +1480,8 @@
             setEquipmentImage(equipmentSlot, itemId) {
                 const slotKey = this.equipmentSlotKeys[equipmentSlot];
                 const img = document.getElementById(`MCS ${slotKey} Image`);
-                let item;
-                if (itemId === -1) {
-                    item = this.emptyItems[slotKey];
-                    img.src = this.emptyItems[slotKey].media;
-                } else {
-                    item = items[itemId];
-                    img.src = item.media;
-                }
+                const item = MICSR.getItem(itemId, slotKey);
+                img.src = item.media;
                 img._tippy.setContent(this.getEquipmentTooltip(equipmentSlot, item));
             }
 
@@ -1642,7 +1616,8 @@
              * @memberof McsApp
              */
             updateStyleDropdowns() {
-                const item = items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]];
+                const itemID = this.equipmentSelected[MICSR.equipmentSlot.Weapon]
+                const item = MICSR.getItem(itemID, 'Weapon');
                 switch (this.getWeaponType(item)) {
                     case 'Ranged':
                         this.disableStyleDropdown('Magic');
@@ -1911,7 +1886,10 @@
              * @param {boolean} single
              */
             simulateButtonOnClick(single) {
-                if (((items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].type === 'Ranged Weapon') || items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].isRanged) && (items[this.equipmentSelected[MICSR.equipmentSlot.Weapon]].ammoTypeRequired !== items[this.equipmentSelected[MICSR.equipmentSlot.Quiver]].ammoType)) {
+                const weapon = this.getEquipedItem('Weapon');
+                const quiver = this.getEquipedItem('Quiver');
+                if ((weapon.type === 'Ranged Weapon' || weapon.isRanged)
+                    && (weapon.ammoTypeRequired !== quiver.ammoType)) {
                     notifyPlayer(CONSTANTS.skill.Ranged, 'Incorrect Ammo type equipped for weapon.', 'danger');
                 } else {
                     if (this.simulator.simInProgress) {
@@ -2533,7 +2511,7 @@
              */
             updatePotionTier(potionTier) {
                 this.combatPotionIDs.forEach((potionId) => {
-                    const potion = items[herbloreItemData[potionId].id[potionTier]];
+                    const potion = items[herbloreItemData[potionId].itemID[potionTier]];
                     const img = document.getElementById(`MCS ${this.getPotionName(potionId)} Button Image`);
                     img.src = potion.media;
                     img.parentElement._tippy.setContent(this.getPotionTooltip(potion));
