@@ -1644,7 +1644,7 @@
             levelInputOnChange(event, skillName) {
                 const newLevel = parseInt(event.currentTarget.value);
                 if (newLevel >= 1) {
-                    this.combatData.playerLevels[skillName] = Math.min(newLevel, 99);
+                    this.combatData.player.skillLevel[CONSTANTS.skill[skillName]] = Math.min(newLevel, 99);
                     this.combatData.virtualLevels[skillName] = newLevel;
                     // Update Spell and Prayer Button UIS, and deselect things if they become invalid
                     if (skillName === 'Magic') {
@@ -1677,7 +1677,7 @@
             prayerButtonOnClick(event, prayerID) {
                 // Escape if prayer level is not reached
                 const prayer = PRAYER[prayerID];
-                if (!this.combatData.prayerSelected[prayerID] && this.combatData.playerLevels.Prayer < prayer.prayerLevel) {
+                if (!this.combatData.prayerSelected[prayerID] && this.combatData.player.skillLevel[CONSTANTS.skill.Prayer] < prayer.prayerLevel) {
                     notifyPlayer(CONSTANTS.skill.Prayer, `${this.getPrayerName(prayerID)} requires level ${prayer.prayerLevel} Prayer.`, 'danger');
                     return;
                 }
@@ -1748,7 +1748,7 @@
                 const spellOpts = this.combatData.spells[spellType];
                 const spell = spellOpts.array[spellID];
                 // Escape for not meeting the level/item requirement
-                if (this.combatData.playerLevels.Magic < spell.magicLevelRequired) {
+                if (this.combatData.player.skillLevel[CONSTANTS.skill.Magic] < spell.magicLevelRequired) {
                     notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires level ${spell.magicLevelRequired} Magic.`, 'danger');
                     return;
                 }
@@ -2377,7 +2377,7 @@
                 const spellOption = this.combatData.spells.aurora;
                 AURORAS.forEach((spell, index) => {
                     if (spell.requiredItem !== -1) {
-                        if (this.equipmentSelected.includes(spell.requiredItem) && this.combatData.playerLevels.Magic >= spell.magicLevelRequired) {
+                        if (this.equipmentSelected.includes(spell.requiredItem) && this.combatData.player.Level[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                         } else {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;

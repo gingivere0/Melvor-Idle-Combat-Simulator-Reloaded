@@ -41,9 +41,6 @@
              * @param {number} setID Index of equipmentSets from 0-2 to import
              */
             importButtonOnClick(setID) {
-                // get in game levels
-                const levels = {};
-                this.app.skillKeys.forEach((key) => levels[key] = skillLevel[CONSTANTS.skill[key]]);
                 // get potion
                 let potionID = -1;
                 let potionTier = -1;
@@ -83,7 +80,7 @@
                 // create settings object
                 const settings = {
                     equipment: player.equipmentSets[setID].slotArray.map(x => x.item.id),
-                    levels: levels,
+                    levels: skillXP.map(x => Math.max(1, exp.xp_to_level(x) - 1)),
                     meleeStyle: player.attackStyles.melee,
                     rangedStyle: player.attackStyles.ranged,
                     magicStyle: player.attackStyles.magic,
@@ -193,11 +190,11 @@
 
             importLevels(levels) {
                 this.app.skillKeys.forEach(key => {
-                    const virtualLevel = levels[key];
+                    const virtualLevel = levels[CONSTANTS.skill[key]];
                     document.getElementById(`MCS ${key} Input`).value = virtualLevel;
-                    this.app.combatData.playerLevels[key] = Math.min(virtualLevel, 99);
                     this.app.combatData.virtualLevels[key] = virtualLevel;
                 });
+                this.app.combatData.player.skillLevel = levels.map(virtualLevel => Math.min(virtualLevel, 99));
             }
 
             importStyle(meleeStyle, rangedStyle, magicStyle) {

@@ -42,17 +42,6 @@
                 this.manager.initialize();
                 this.player = this.manager.player;
                 /** @type {Levels} */
-                this.playerLevels = {
-                    Attack: 1,
-                    Strength: 1,
-                    Defence: 1,
-                    Hitpoints: 10,
-                    Ranged: 1,
-                    Magic: 1,
-                    Prayer: 1,
-                    Slayer: 1,
-                };
-                /** @type {Levels} */
                 this.virtualLevels = {
                     Attack: 1,
                     Strength: 1,
@@ -529,8 +518,7 @@
                 this.combatStats.damageReduction = this.calculatePlayerDamageReduction();
 
                 // Max Hitpoints
-                this.combatStats.baseMaxHitpoints = this.playerLevels.Hitpoints;
-                this.combatStats.baseMaxHitpoints += this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Hitpoints);
+                this.combatStats.baseMaxHitpoints = this.player.levels.Hitpoints;
                 this.combatStats.baseMaxHitpoints += MICSR.getModifierValue(modifiers, 'MaxHitpoints');
                 this.combatStats.maxHitpoints = this.combatStats.baseMaxHitpoints * this.numberMultiplier;
             }
@@ -822,7 +810,7 @@
                     hasSpecialAttack: false,
                     specialData: {},
                     startingGP: 50000000,
-                    levels: Object.assign({}, this.playerLevels), // Shallow copy of player levels
+                    levels: this.player.levels.map(x => x),
                     activeItems: {...this.equipmentStats.activeItems},
                     equipmentSelected: [...this.equipmentSelected],
                     prayerPointsPerAttack: 0,
@@ -1032,7 +1020,7 @@
              */
             canAccessArea(area) {
                 // check level requirement
-                if (area.slayerLevel !== undefined && this.playerLevels.Slayer < area.slayerLevel) {
+                if (area.slayerLevel !== undefined && this.player.skillLevel[CONSTANTS.skill.Slayer] < area.slayerLevel) {
                     return false;
                 }
                 // check clear requirement
