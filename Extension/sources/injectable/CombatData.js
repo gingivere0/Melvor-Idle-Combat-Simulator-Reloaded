@@ -322,98 +322,6 @@
             }
 
             /**
-             * mimic calculatePlayerAccuracyRating
-             */
-            calculatePlayerAccuracyRating(combatStats, baseStats, modifiers) {
-                switch (this.combatStats.attackType) {
-                    case CONSTANTS.attackType.Ranged:
-                        return this.maxRangedAttackRoll(combatStats, baseStats, modifiers);
-                    case CONSTANTS.attackType.Magic:
-                        return this.maxMagicAttackRoll(combatStats, baseStats, modifiers);
-                    case CONSTANTS.attackType.Melee:
-                        return this.maxMeleeAttackRoll(combatStats, baseStats, modifiers);
-                }
-            }
-
-            maxRangedAttackRoll(combatStats, baseStats, modifiers) {
-                // attack style bonus
-                let attackStyleBonusAccuracy = 0;
-                if (this.attackStyle.Ranged === 0) {
-                    attackStyleBonusAccuracy += 3;
-                }
-                // effective level
-                const effectiveAttackLevel = Math.floor(
-                    this.playerLevels.Ranged + 8 + attackStyleBonusAccuracy
-                    + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Ranged)
-                );
-                // max roll
-                let maxAttackRoll = Math.floor(
-                    effectiveAttackLevel
-                    * (baseStats.attackBonusRanged + 64)
-                );
-                combatStats.unmodifiedAttackRoll = maxAttackRoll;
-                maxAttackRoll = applyModifier(
-                    maxAttackRoll,
-                    MICSR.getModifierValue(modifiers, 'RangedAccuracyBonus')
-                    + MICSR.getModifierValue(modifiers, 'GlobalAccuracy')
-                    // TODO: is this a debuff? if so, add it to the acc calc in the simulation
-                    // - combatData.player.decreasedAccuracy
-                );
-                return maxAttackRoll;
-            }
-
-            maxMagicAttackRoll(combatStats, baseStats, modifiers) {
-                // attack style bonus
-                let attackStyleBonusAccuracy = 0;
-                // effective level
-                const effectiveAttackLevel = Math.floor(
-                    this.playerLevels.Magic + 8 + attackStyleBonusAccuracy +
-                    this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Magic)
-                );
-                // max roll
-                let maxAttackRoll = Math.floor(
-                    effectiveAttackLevel
-                    * (baseStats.attackBonusMagic + 64)
-                );
-                combatStats.unmodifiedAttackRoll = maxAttackRoll;
-                maxAttackRoll = applyModifier(
-                    maxAttackRoll,
-                    MICSR.getModifierValue(modifiers, 'MagicAccuracyBonus')
-                    + MICSR.getModifierValue(modifiers, 'GlobalAccuracy')
-                    // TODO: is this a debuff? if so, add it to the acc calc in the simulation
-                    // - combatData.player.decreasedAccuracy
-                );
-                return maxAttackRoll;
-            }
-
-            maxMeleeAttackRoll(combatStats, baseStats, modifiers) {
-                // attack style bonus
-                let attackStyleBonusAccuracy = 0;
-                if (this.petOwned[12]) {
-                    attackStyleBonusAccuracy += 3;
-                }
-                // effective level
-                const effectiveAttackLevel = Math.floor(
-                    this.playerLevels.Attack + 8 + attackStyleBonusAccuracy +
-                    this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Attack)
-                );
-                // max roll
-                let maxAttackRoll = Math.floor(
-                    effectiveAttackLevel
-                    * (baseStats.attackBonus[this.attackStyle.Melee] + 64)
-                );
-                combatStats.unmodifiedAttackRoll = maxAttackRoll;
-                maxAttackRoll = applyModifier(
-                    maxAttackRoll,
-                    MICSR.getModifierValue(modifiers, 'MeleeAccuracyBonus')
-                    + MICSR.getModifierValue(modifiers, 'GlobalAccuracy')
-                    // TODO: is this a debuff? if so, add it to the acc calc in the simulation
-                    // - combatData.player.decreasedAccuracy
-                );
-                return maxAttackRoll;
-            }
-
-            /**
              * mimic getNumberMultiplierValue
              */
             getNumberMultiplierValue(value) {
@@ -718,7 +626,7 @@
                 this.combatStats.runePreservation = MICSR.getModifierValue(this.modifiers, 'RunePreservation');
 
                 // max attack roll
-                this.combatStats.maxAttackRoll = this.calculatePlayerAccuracyRating(this.combatStats, this.baseStats, modifiers);
+                this.combatStats.maxAttackRoll = this.player.stats.accuracy;
 
                 // max hit roll
                 const maxHits = this.calculatePlayerMaxHit(this.baseStats, modifiers);

@@ -888,7 +888,7 @@
                     // recompute base stats
                     const baseStats = combatData.updatePlayerBaseStats(monsterID);
                     // max attack roll
-                    combatStats.maxAttackRoll = combatData.calculatePlayerAccuracyRating(combatStats, baseStats, modifiers);
+                    combatStats.maxAttackRoll = combatData.player.stats.accuracy;
                     // max hit roll
                     const maxHits = combatData.calculatePlayerMaxHit(baseStats, modifiers);
                     combatStats.baseMeleeMaxHit = maxHits.baseMeleeMaxHit;
