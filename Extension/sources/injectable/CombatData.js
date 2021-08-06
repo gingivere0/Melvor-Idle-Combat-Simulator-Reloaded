@@ -23,6 +23,7 @@
     const reqs = [
         'statNames',
         'util',
+        'SimManager',
     ];
 
     const setup = () => {
@@ -37,6 +38,9 @@
              *
              */
             constructor(equipmentSelected, equipmentSlotKeys) {
+                this.manager = new MICSR.SimManager();
+                this.manager.initialize();
+                this.player = this.manager.player;
                 /** @type {Levels} */
                 this.playerLevels = {
                     Attack: 1,

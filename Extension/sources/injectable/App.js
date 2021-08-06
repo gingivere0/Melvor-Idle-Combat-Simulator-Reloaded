@@ -1102,7 +1102,6 @@
              */
             addEquipmentMultiButton(card, equipmentSlot, filterFunction, sortFunction = item => item.id) {
                 const menuItems = this.equipmentSubsets[equipmentSlot].filter(filterFunction);
-                MICSR.log(menuItems);
                 const sortKey = item => {
                     const x = sortFunction(item);
                     return x ? x : 0;

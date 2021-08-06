@@ -79,6 +79,8 @@ function injectScripts() {
         'Plotter',
         'Menu',
         'Simulator',
+        'SimManager',
+        'SimPlayer',
         'TabCard',
         // uses the other classes
         'App',
