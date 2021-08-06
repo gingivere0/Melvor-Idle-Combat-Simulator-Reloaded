@@ -407,73 +407,6 @@
             }
 
             /**
-             * mimic calculatePlayerEvasionRating
-             */
-            calculatePlayerEvasionRating(combatStats, player) {
-                let defenceBonus = this.baseStats.defenceBonus;
-                let defenceBonusRanged = this.baseStats.defenceBonusRanged;
-                if (this.modifiers.summoningSynergy_1_13) {
-                    const dr = this.calculatePlayerDamageReduction()
-                    defenceBonus += dr;
-                    defenceBonusRanged += dr;
-                }
-                //Melee defence
-                combatStats.effectiveDefenceLevel = Math.floor(this.playerLevels.Defence + 8 + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Defence));
-                if (this.combatStats.attackType === CONSTANTS.attackType.Ranged && this.attackStyle.Ranged === 2) {
-                    // long range // TODO this is not implemented in the game #
-                    // combatStats.effectiveDefenceLevel += 3;
-                }
-                const maximumDefenceRoll = this.calculateGenericPlayerEvasionRating(
-                    combatStats.effectiveDefenceLevel,
-                    defenceBonus,
-                    'MeleeEvasion',
-                    player.meleeEvasionBuff,
-                    player.meleeEvasionDebuff,
-                );
-                //Ranged Defence
-                combatStats.effectiveRangedDefenceLevel = Math.floor(this.playerLevels.Defence + 8 + 1 + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Defence));
-                const maximumRangedDefenceRoll = this.calculateGenericPlayerEvasionRating(
-                    combatStats.effectiveRangedDefenceLevel,
-                    defenceBonusRanged,
-                    'RangedEvasion',
-                    player.rangedEvasionBuff,
-                    player.rangedEvasionDebuff,
-                );
-                //Magic Defence
-                combatStats.effectiveMagicDefenceLevel = Math.floor(
-                    (this.playerLevels.Magic + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Magic)) * 0.7
-                    + (this.playerLevels.Defence + this.modifiers.getHiddenSkillLevels(CONSTANTS.skill.Defence)) * 0.3
-                    + 8 + 1
-                );
-                const maximumMagicDefenceRoll = this.calculateGenericPlayerEvasionRating(
-                    combatStats.effectiveMagicDefenceLevel,
-                    this.baseStats.defenceBonusMagic,
-                    'MagicEvasion',
-                    player.magicEvasionBuff,
-                    player.magicEvasionDebuff,
-                );
-                return {
-                    melee: maximumDefenceRoll,
-                    ranged: maximumRangedDefenceRoll,
-                    magic: maximumMagicDefenceRoll,
-                }
-            }
-
-            calculateGenericPlayerEvasionRating(effectiveDefenceLevel, baseStat, modifier, buff, debuff) {
-                let maxDefRoll = Math.floor(effectiveDefenceLevel * (baseStat + 64));
-                maxDefRoll = applyModifier(maxDefRoll, MICSR.getModifierValue(this.modifiers, modifier));
-                //apply player buffs first
-                if (buff) {
-                    maxDefRoll = Math.floor(maxDefRoll * (1 + buff / 100));
-                }
-                //then apply enemy debuffs
-                if (debuff) {
-                    maxDefRoll = Math.floor(maxDefRoll * (1 - debuff / 100));
-                }
-                return maxDefRoll;
-            }
-
-            /**
              * mimic calculatePlayerDamageReduction
              */
             calculatePlayerDamageReduction() {
@@ -587,17 +520,9 @@
                 this.summoningXPPerHit = this.getSummoningXP();
 
                 // max defence roll
-                const evasionRatings = this.calculatePlayerEvasionRating(
-                    this.combatStats,
-                    {
-                        meleeEvasionBuff: this.auroraBonus.meleeEvasionBuff,
-                        rangedEvasionBuff: this.auroraBonus.rangedEvasionBuff,
-                        magicEvasionBuff: this.auroraBonus.magicEvasionBuff,
-                    },
-                );
-                this.combatStats.maxDefRoll = evasionRatings.melee;
-                this.combatStats.maxRngDefRoll = evasionRatings.ranged;
-                this.combatStats.maxMagDefRoll = evasionRatings.magic;
+                this.combatStats.maxDefRoll = this.player.stats.evasion.melee;
+                this.combatStats.maxRngDefRoll = this.player.stats.evasion.ranged;
+                this.combatStats.maxMagDefRoll = this.player.stats.evasion.magic;
 
                 // Calculate damage reduction
                 this.combatStats.damageReduction = this.calculatePlayerDamageReduction();
