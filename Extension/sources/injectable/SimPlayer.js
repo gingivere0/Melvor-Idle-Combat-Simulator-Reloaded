@@ -164,9 +164,23 @@
             }
 
             equipItem(itemID, set, slot = "Default", quantity = 1) {
+                const equipment = this.equipmentSets[set];
+                const itemToEquip = itemID === -1 ? emptyItem : items[itemID];
+                if (slot === "Default") {
+                    slot = itemToEquip.validSlots[0];
+                }
+                // clear other slots occupied by current slot
+                equipment.slotArray.forEach(x => {
+                    if (x.occupiedBy === slot) {
+                        x.occupiedBy = "None";
+                    }
+                });
+                equipment.equipItem(itemToEquip, slot, quantity);
             }
 
             unequipItem(set, slot) {
+                const equipment = this.equipmentSets[set];
+                equipment.unequipItem(slot);
             }
 
             equipFood(itemID, quantity) {

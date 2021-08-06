@@ -79,7 +79,7 @@
 
                 // create settings object
                 const settings = {
-                    equipment: player.equipmentSets[setID].slotArray.map(x => x.item.id),
+                    equipment: player.equipmentSets[setID].slotArray.map(x => x.occupiedBy === 'None' ? x.item.id : -1),
                     levels: skillXP.map(x => Math.max(1, exp.xp_to_level(x) - 1)),
                     meleeStyle: player.attackStyles.melee,
                     rangedStyle: player.attackStyles.ranged,
@@ -180,10 +180,14 @@
             }
 
             importEquipment(equipment) {
-                this.app.equipmentSlotKeys.forEach((key, i) => {
-                    const itemID = equipment[i] | 0;
-                    this.app.equipmentSelected[i] = itemID;
-                    this.app.setEquipmentImage(i, itemID);
+                this.app.combatData.player.equipment.unequipAll();
+                MICSR.equipmentSlotKeys.forEach((_, slotID) => {
+                    const itemID = equipment[slotID];
+                    if (itemID === -1 && this.app.combatData.equipmentOccupiedBy(slotID) !== 'None') {
+                        return;
+                    }
+                    this.app.equipItem(slotID, itemID);
+                    this.app.setEquipmentImage(slotID, itemID);
                 });
                 this.app.updateStyleDropdowns();
             }

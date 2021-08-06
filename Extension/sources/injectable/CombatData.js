@@ -37,7 +37,7 @@
             /**
              *
              */
-            constructor(equipmentSelected, equipmentSlotKeys) {
+            constructor() {
                 this.manager = new MICSR.SimManager();
                 this.manager.initialize();
                 this.player = this.manager.player;
@@ -158,10 +158,6 @@
                 this.foodSelected = -1;
                 this.cookingPool = false;
                 this.cookingMastery = false;
-                // equipmentSelected, this is shared with an instance of App when it is the child of
-                this.equipmentSelected = equipmentSelected;
-                // equipmentSlotKeys
-                this.equipmentSlotKeys = equipmentSlotKeys;
                 // player modifiers
                 this.modifiers = new PlayerModifiers();
                 // base stats
@@ -176,12 +172,24 @@
                 this.dropSelected = -1;
             }
 
+            equipmentID(slotID) {
+                return this.player.equipment.slotArray[slotID].item.id;
+            }
+
+            equipmentIDs() {
+                return this.player.equipment.slotArray.map(x => x.item.id);
+            }
+
+            equipmentOccupiedBy(slotID) {
+                return this.player.equipment.slotArray[slotID].occupiedBy;
+            }
+
             /**
              * Calculates the equipment's combined stats and stores them in `this.equipmentStats`
              */
             updateEquipmentStats() {
                 this.setAttackType();
-                const maxCape = this.equipmentSelected.includes(CONSTANTS.item.Max_Skillcape) || this.equipmentSelected.includes(CONSTANTS.item.Cape_of_Completion);
+                const maxCape = this.equipmentIDs().includes(CONSTANTS.item.Max_Skillcape) || this.equipmentIDs().includes(CONSTANTS.item.Cape_of_Completion);
                 /** @type {EquipmentStats} */
                 const equipmentStats = {
                     runesProvidedByWeapon: {},
@@ -189,29 +197,29 @@
                     activeItems: {
                         // TODO: check which of these items are passive slot items
                         //   also check any other use of `CONSTANTS.item` and `items`
-                        hitpointsSkillcape: this.equipmentSelected.includes(CONSTANTS.item.Hitpoints_Skillcape) || maxCape,
-                        magicSkillcape: this.equipmentSelected.includes(CONSTANTS.item.Magic_Skillcape) || maxCape,
-                        prayerSkillcape: this.equipmentSelected.includes(CONSTANTS.item.Prayer_Skillcape) || maxCape,
-                        slayerSkillcape: this.equipmentSelected.includes(CONSTANTS.item.Slayer_Skillcape) || maxCape,
-                        firemakingSkillcape: this.equipmentSelected.includes(CONSTANTS.item.Firemaking_Skillcape) || maxCape,
-                        capeOfArrowPreservation: this.equipmentSelected.includes(CONSTANTS.item.Cape_of_Arrow_Preservation),
-                        skullCape: this.equipmentSelected.includes(CONSTANTS.item.Skull_Cape),
-                        goldDiamondRing: this.equipmentSelected.includes(CONSTANTS.item.Gold_Diamond_Ring),
-                        goldEmeraldRing: this.equipmentSelected.includes(CONSTANTS.item.Gold_Emerald_Ring),
-                        goldSapphireRing: this.equipmentSelected.includes(CONSTANTS.item.Gold_Sapphire_Ring),
-                        fighterAmulet: this.equipmentSelected.includes(CONSTANTS.item.Fighter_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Melee,
-                        warlockAmulet: this.equipmentSelected.includes(CONSTANTS.item.Warlock_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Magic,
-                        guardianAmulet: this.equipmentSelected.includes(CONSTANTS.item.Guardian_Amulet),
-                        deadeyeAmulet: this.equipmentSelected.includes(CONSTANTS.item.Deadeye_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Ranged,
-                        confettiCrossbow: this.equipmentSelected.includes(CONSTANTS.item.Confetti_Crossbow),
-                        stormsnap: this.equipmentSelected.includes(CONSTANTS.item.Stormsnap),
-                        slayerCrossbow: this.equipmentSelected.includes(CONSTANTS.item.Slayer_Crossbow),
-                        bigRon: this.equipmentSelected.includes(CONSTANTS.item.Big_Ron),
-                        aorpheatsSignetRing: this.equipmentSelected.includes(CONSTANTS.item.Aorpheats_Signet_Ring),
-                        elderCrown: this.equipmentSelected.includes(CONSTANTS.item.Elder_Crown),
+                        hitpointsSkillcape: this.equipmentIDs().includes(CONSTANTS.item.Hitpoints_Skillcape) || maxCape,
+                        magicSkillcape: this.equipmentIDs().includes(CONSTANTS.item.Magic_Skillcape) || maxCape,
+                        prayerSkillcape: this.equipmentIDs().includes(CONSTANTS.item.Prayer_Skillcape) || maxCape,
+                        slayerSkillcape: this.equipmentIDs().includes(CONSTANTS.item.Slayer_Skillcape) || maxCape,
+                        firemakingSkillcape: this.equipmentIDs().includes(CONSTANTS.item.Firemaking_Skillcape) || maxCape,
+                        capeOfArrowPreservation: this.equipmentIDs().includes(CONSTANTS.item.Cape_of_Arrow_Preservation),
+                        skullCape: this.equipmentIDs().includes(CONSTANTS.item.Skull_Cape),
+                        goldDiamondRing: this.equipmentIDs().includes(CONSTANTS.item.Gold_Diamond_Ring),
+                        goldEmeraldRing: this.equipmentIDs().includes(CONSTANTS.item.Gold_Emerald_Ring),
+                        goldSapphireRing: this.equipmentIDs().includes(CONSTANTS.item.Gold_Sapphire_Ring),
+                        fighterAmulet: this.equipmentIDs().includes(CONSTANTS.item.Fighter_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Melee,
+                        warlockAmulet: this.equipmentIDs().includes(CONSTANTS.item.Warlock_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Magic,
+                        guardianAmulet: this.equipmentIDs().includes(CONSTANTS.item.Guardian_Amulet),
+                        deadeyeAmulet: this.equipmentIDs().includes(CONSTANTS.item.Deadeye_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Ranged,
+                        confettiCrossbow: this.equipmentIDs().includes(CONSTANTS.item.Confetti_Crossbow),
+                        stormsnap: this.equipmentIDs().includes(CONSTANTS.item.Stormsnap),
+                        slayerCrossbow: this.equipmentIDs().includes(CONSTANTS.item.Slayer_Crossbow),
+                        bigRon: this.equipmentIDs().includes(CONSTANTS.item.Big_Ron),
+                        aorpheatsSignetRing: this.equipmentIDs().includes(CONSTANTS.item.Aorpheats_Signet_Ring),
+                        elderCrown: this.equipmentIDs().includes(CONSTANTS.item.Elder_Crown),
                         // slayer gear
-                        mirrorShield: this.equipmentSelected.includes(CONSTANTS.item.Mirror_Shield),
-                        magicalRing: this.equipmentSelected.includes(CONSTANTS.item.Magical_Ring),
+                        mirrorShield: this.equipmentIDs().includes(CONSTANTS.item.Mirror_Shield),
+                        magicalRing: this.equipmentIDs().includes(CONSTANTS.item.Magical_Ring),
                     },
                 };
 
@@ -231,8 +239,8 @@
                 equipmentStats.attackBonus = [0, 0, 0];
 
                 // iterate over gear
-                for (let equipmentSlot = 0; equipmentSlot < this.equipmentSlotKeys.length; equipmentSlot++) {
-                    const itemID = this.equipmentSelected[equipmentSlot];
+                for (let equipmentSlot = 0; equipmentSlot < MICSR.equipmentSlotKeys.length; equipmentSlot++) {
+                    const itemID = this.equipmentID(equipmentSlot);
                     if (itemID === -1) {
                         continue;
                     }
@@ -296,7 +304,7 @@
             }
 
             setAttackType() {
-                const weaponID = this.equipmentSelected[MICSR.equipmentSlot.Weapon];
+                const weaponID = this.equipmentID(MICSR.equipmentSlot.Weapon);
                 const weapon = MICSR.getItem(weaponID, 'Weapon');
                 if (weapon.type === 'Ranged Weapon' || weapon.isRanged) {
                     // Ranged
@@ -571,7 +579,7 @@
 
                 // mimic calculateEquippedItemModifiers // passives
                 const duplicateCheck = {};
-                this.equipmentSelected.filter(itemID => {
+                this.equipmentIDs().filter(itemID => {
                     if (itemID === -1) {
                         return false;
                     }
@@ -663,7 +671,7 @@
             }
 
             getEquipedItem(slotName) {
-                return MICSR.getItem(this.equipmentSelected[MICSR.equipmentSlot[slotName]], slotName);
+                return MICSR.getItem(this.equipmentID(MICSR.equipmentSlot[slotName]), slotName);
             }
 
             computeSynergyBonus() {
@@ -733,8 +741,8 @@
             }
 
             getSMH() {
-                const summ1 = this.equipmentSelected[MICSR.equipmentSlot.Summon1];
-                const summ2 = this.equipmentSelected[MICSR.equipmentSlot.Summon2];
+                const summ1 = this.equipmentID(MICSR.equipmentSlot.Summon1);
+                const summ2 = this.equipmentID(MICSR.equipmentSlot.Summon2);
                 let smh1 = 0;
                 if (summ1 >= 0) {
                     smh1 = items[summ1].summoningMaxHit | 0;
@@ -747,8 +755,8 @@
             }
 
             getSummoningXP() {
-                const summ1 = this.equipmentSelected[MICSR.equipmentSlot.Summon1];
-                const summ2 = this.equipmentSelected[MICSR.equipmentSlot.Summon2];
+                const summ1 = this.equipmentID(MICSR.equipmentSlot.Summon1);
+                const summ2 = this.equipmentID(MICSR.equipmentSlot.Summon2);
                 let xp = 0;
                 if (summ1 >= 0 && items[summ1].summoningMaxHit) {
                     xp += getBaseSummoningXP(items[summ1].summoningID, true, 3000);
@@ -763,8 +771,8 @@
                 if (!this.summoningSynergy) {
                     return undefined;
                 }
-                const summLeft = this.equipmentSelected[MICSR.equipmentSlot.Summon1];
-                const summRight = this.equipmentSelected[MICSR.equipmentSlot.Summon2];
+                const summLeft = this.equipmentID(MICSR.equipmentSlot.Summon1);
+                const summRight = this.equipmentID(MICSR.equipmentSlot.Summon2);
                 if (summLeft > 0 && summRight > 0 && summLeft !== summRight) {
                     const min = Math.min(items[summLeft].summoningID, items[summRight].summoningID);
                     const max = Math.max(items[summLeft].summoningID, items[summRight].summoningID);
@@ -812,7 +820,7 @@
                     startingGP: 50000000,
                     levels: this.player.levels.map(x => x),
                     activeItems: {...this.equipmentStats.activeItems},
-                    equipmentSelected: [...this.equipmentSelected],
+                    equipmentSelected: this.equipmentIDs(),
                     prayerPointsPerAttack: 0,
                     prayerPointsPerEnemy: 0,
                     prayerPointsPerHeal: 0,
@@ -887,7 +895,7 @@
                     playerStats.usingAncient = true;
                     playerStats.specialData.push(ANCIENT[this.spells.ancient.selectedID].specialAttack);
                 } else {
-                    for (const itemId of this.equipmentSelected) {
+                    for (const itemId of this.equipmentIDs()) {
                         if (items[itemId].hasSpecialAttack) {
                             playerStats.hasSpecialAttack = true;
                             items[itemId].specialAttacks.forEach(attack =>
@@ -1030,7 +1038,7 @@
                 // check gear requirement
                 if (area.slayerItem > 0
                     && !this.equipmentStats.activeItems.slayerSkillcape
-                    && !this.equipmentSelected.includes(area.slayerItem)) {
+                    && !this.equipmentIDs().includes(area.slayerItem)) {
                     return false;
                 }
                 return true;

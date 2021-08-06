@@ -50,6 +50,8 @@
              * @param {string} urls.crossedOut URL for crossed out svg
              */
             constructor(urls) {
+                // Combat Data Object
+                this.combatData = new MICSR.CombatData();
                 // slayer tasks
                 this.slayerTasks = SlayerTask.data;
                 // Plot Type Options
@@ -142,14 +144,11 @@
                 };
 
                 // Generate equipment subsets
-                this.equipmentSlotKeys = Object.keys(MICSR.equipmentSlot);
                 this.equipmentSubsets = [];
                 /** @type {number[]} */
-                this.equipmentSelected = [];
-                for (let slotId = 0; slotId < this.equipmentSlotKeys.length; slotId++) {
-                    const equipmentSlotKey = this.equipmentSlotKeys[slotId];
-                    this.equipmentSubsets.push([MICSR.emptyItems[this.equipmentSlotKeys[slotId]]]);
-                    this.equipmentSelected.push(-1);
+                for (let slotId = 0; slotId < MICSR.equipmentSlotKeys.length; slotId++) {
+                    const equipmentSlotKey = MICSR.equipmentSlotKeys[slotId];
+                    this.equipmentSubsets.push([MICSR.emptyItems[MICSR.equipmentSlotKeys[slotId]]]);
                     for (let i = 0; i < items.length; i++) {
                         if (items[i].validSlots === undefined) {
                             continue;
@@ -169,7 +168,7 @@
                     }
                 }
                 // Sort equipment subsets
-                for (let equipmentSlot = 0; equipmentSlot < this.equipmentSlotKeys.length; equipmentSlot++) {
+                for (let equipmentSlot = 0; equipmentSlot < MICSR.equipmentSlotKeys.length; equipmentSlot++) {
                     this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Attack) - this.getItemLevelReq(b, CONSTANTS.skill.Attack));
                     this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Defence) - this.getItemLevelReq(b, CONSTANTS.skill.Defence));
                     this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Ranged) - this.getItemLevelReq(b, CONSTANTS.skill.Ranged));
@@ -189,8 +188,6 @@
                     Prayer: 'Pra.',
                     Slayer: 'Sla.',
                 };
-                // Combat Data Object
-                this.combatData = new MICSR.CombatData(this.equipmentSelected, this.equipmentSlotKeys);
                 // Simulation Object
                 this.simulator = new MICSR.Simulator(this, urls.simulationWorker);
                 // Import Object
@@ -379,19 +376,19 @@
                     const rowPopups = [];
                     const tooltips = [];
                     row.forEach((equipmentSlot) => {
-                        if (!MICSR.emptyItems[this.equipmentSlotKeys[equipmentSlot]]) {
+                        if (!MICSR.emptyItems[MICSR.equipmentSlotKeys[equipmentSlot]]) {
                             MICSR.log(MICSR.equipmentSlot);
                             MICSR.log(MICSR.emptyItems);
-                            MICSR.log(this.equipmentSlotKeys);
+                            MICSR.log(MICSR.equipmentSlotKeys);
                             MICSR.log(equipmentSlot);
-                            MICSR.log(this.equipmentSlotKeys[equipmentSlot]);
-                            MICSR.log(MICSR.emptyItems[this.equipmentSlotKeys[equipmentSlot]]);
+                            MICSR.log(MICSR.equipmentSlotKeys[equipmentSlot]);
+                            MICSR.log(MICSR.emptyItems[MICSR.equipmentSlotKeys[equipmentSlot]]);
                             return;
                         }
-                        rowSources.push(MICSR.emptyItems[this.equipmentSlotKeys[equipmentSlot]].media);
-                        rowIDs.push(`MCS ${this.equipmentSlotKeys[equipmentSlot]} Image`);
+                        rowSources.push(MICSR.emptyItems[MICSR.equipmentSlotKeys[equipmentSlot]].media);
+                        rowIDs.push(`MCS ${MICSR.equipmentSlotKeys[equipmentSlot]} Image`);
                         rowPopups.push(this.createEquipmentPopup(equipmentSlot));
-                        tooltips.push(this.equipmentSlotKeys[equipmentSlot]);
+                        tooltips.push(MICSR.equipmentSlotKeys[equipmentSlot]);
                     });
                     this.equipmentSelectCard.addMultiPopupMenu(rowSources, rowIDs, rowPopups, tooltips);
                 });
@@ -1354,7 +1351,7 @@
                         this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterIfHasNoLevelReq(item), x => x.name);
                     }
                 } else if (noSplit.includes(equipmentSlot)) {
-                    equipmentSelectCard.addSectionTitle(this.equipmentSlotKeys[equipmentSlot]);
+                    equipmentSelectCard.addSectionTitle(MICSR.equipmentSlotKeys[equipmentSlot]);
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, () => this.returnTrue());
                 } else if (equipmentSlot === 4) {
                     equipmentSelectCard.addSectionTitle('1H Melee');
@@ -1417,55 +1414,46 @@
             }
 
             getEquipedItem(slotName) {
-                return MICSR.getItem(this.equipmentSelected[MICSR.equipmentSlot[slotName]], slotName);
+                return MICSR.getItem(this.equipmentID(MICSR.equipmentSlot[slotName]), slotName);
             }
 
             // Callback Functions for equipment select card
             /**
              * Equips an item to an equipment slot
-             * @param {number} equipmentSlot
+             * @param {number} slotID
              * @param {number} itemId
              * @memberof McsApp
              */
-            equipItem(equipmentSlot, itemId) {
-                if (this.equipmentSelected[equipmentSlot] === itemId) {
-                    return;
+            equipItem(slotID, itemId) {
+                let slot = MICSR.equipmentSlotKeys[slotID];
+                const item = MICSR.getItem(itemId, slot);
+                // determine equipment slot
+                if (item.occupiesSlots && item.occupiesSlots.includes(slot)) {
+                    slot = item.validSlots[0];
+                    slotID = MICSR.equipmentSlot[slot];
                 }
-
-                const prevWeapon = this.equipmentSelected[MICSR.equipmentSlot.Weapon];
-                this.equipmentSelected[equipmentSlot] = itemId;
-                this.setEquipmentImage(equipmentSlot, itemId);
-
-                const item = MICSR.getItem(itemId, MICSR.equipmentSlotList[equipmentSlot]);
-                const weaponAmmo = [2, 3];
-                switch (equipmentSlot) {
-                    case MICSR.equipmentSlot.Weapon:
-                        if (item.validSlots.includes('Quiver')) { // Swapping to throwing knives / javelins
-                            this.equipItem(MICSR.equipmentSlot.Quiver, itemId);
-                        } else if (weaponAmmo.includes(this.getEquipedItem('Quiver').ammoType)) { // Swapping from throwing knives / javelins
-                            this.equipItem(MICSR.equipmentSlot.Quiver, -1);
-                        }
-                        if (this.isTwoHanded(item)) {
-                            this.equipItem(MICSR.equipmentSlot.Shield, -1);
-                        }
-                        break;
-                    case MICSR.equipmentSlot.Shield:
-                        if (itemId && this.isTwoHanded(this.getEquipedItem('Weapon'))) {
-                            this.equipItem(MICSR.equipmentSlot.Weapon, -1);
-                        }
-                        break;
-                    case MICSR.equipmentSlot.Quiver:
-                        if (weaponAmmo.includes(item.ammoType)) { // Swapping to throwing knives / javelins
-                            this.equipItem(MICSR.equipmentSlot.Weapon, itemId);
-                        } else if (this.getEquipedItem('Weapon').validSlots.includes('Quiver')) {
-                            // Swapping from throwing knives / javelins
-                            this.equipItem(MICSR.equipmentSlot.Weapon, -1);
-                        }
-                        break;
+                // clear previous item
+                let slots = [slot];
+                if (item.occupiesSlots) {
+                    slots = [
+                        slot,
+                        ...item.occupiesSlots,
+                    ]
                 }
-                if (prevWeapon !== this.equipmentSelected[MICSR.equipmentSlot.Weapon]) {
-                    this.updateStyleDropdowns();
-                }
+                slots.forEach(slotToOccupy => {
+                    const equipment = this.combatData.player.equipment;
+                    const prevSlot = equipment.getRootSlot(slotToOccupy);
+                    equipment.slots[prevSlot].occupies.forEach(occupied => {
+                        this.setEquipmentImage(MICSR.equipmentSlot[occupied], -1);
+                    });
+                    this.combatData.player.unequipItem(0, prevSlot);
+                    this.setEquipmentImage(MICSR.equipmentSlot[prevSlot], -1);
+                });
+                // equip new item
+                this.combatData.player.equipItem(itemId, 0, slot);
+                this.setEquipmentImage(slotID, itemId);
+                // update stats
+                this.updateStyleDropdowns();
                 this.checkForElisAss();
                 this.updateEquipmentStats();
                 this.updateCombatStats();
@@ -1475,13 +1463,17 @@
              * Change the equipment image
              * @param {number} equipmentSlot
              * @param {number} itemId
+             * @param {boolean} occupy
              */
-            setEquipmentImage(equipmentSlot, itemId) {
-                const slotKey = this.equipmentSlotKeys[equipmentSlot];
+            setEquipmentImage(equipmentSlot, itemId, occupy = true) {
+                const slotKey = MICSR.equipmentSlotKeys[equipmentSlot];
                 const img = document.getElementById(`MCS ${slotKey} Image`);
                 const item = MICSR.getItem(itemId, slotKey);
                 img.src = item.media;
                 img._tippy.setContent(this.getEquipmentTooltip(equipmentSlot, item));
+                if (occupy && item.occupiesSlots) {
+                    item.occupiesSlots.forEach(slot => this.setEquipmentImage(MICSR.equipmentSlot[slot], itemId, false));
+                }
             }
 
             /**
@@ -1493,7 +1485,7 @@
              */
             getEquipmentTooltip(equipmentSlot, item) {
                 if (!item) {
-                    return this.equipmentSlotKeys[equipmentSlot];
+                    return MICSR.equipmentSlotKeys[equipmentSlot];
                 }
 
                 let tooltip = `<div class="text-center">${item.name}<br><small>`;
@@ -1615,7 +1607,7 @@
              * @memberof McsApp
              */
             updateStyleDropdowns() {
-                const itemID = this.equipmentSelected[MICSR.equipmentSlot.Weapon]
+                const itemID = this.equipmentID(MICSR.equipmentSlot.Weapon);
                 const item = MICSR.getItem(itemID, 'Weapon');
                 switch (this.getWeaponType(item)) {
                     case 'Ranged':
@@ -1634,6 +1626,14 @@
                         this.enableStyleDropdown('Melee');
                         break;
                 }
+            }
+
+            equipmentID(slotID) {
+                return this.combatData.equipmentID(slotID);
+            }
+
+            equipmentIDs() {
+                return this.combatData.equipmentIDs();
             }
 
             /**
@@ -1752,7 +1752,7 @@
                     notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires level ${spell.magicLevelRequired} Magic.`, 'danger');
                     return;
                 }
-                if (spell.requiredItem !== undefined && spell.requiredItem !== -1 && !this.equipmentSelected.includes(spell.requiredItem)) {
+                if (spell.requiredItem !== undefined && spell.requiredItem !== -1 && !this.equipmentIDs().includes(spell.requiredItem)) {
                     notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires ${this.getItemName(spell.requiredItem)}.`, 'danger');
                     return;
                 }
@@ -2377,7 +2377,7 @@
                 const spellOption = this.combatData.spells.aurora;
                 AURORAS.forEach((spell, index) => {
                     if (spell.requiredItem !== -1) {
-                        if (this.equipmentSelected.includes(spell.requiredItem) && this.combatData.player.Level[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
+                        if (this.equipmentIDs().includes(spell.requiredItem) && this.combatData.player.Level[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                         } else {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;

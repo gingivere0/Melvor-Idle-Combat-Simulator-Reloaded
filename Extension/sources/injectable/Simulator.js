@@ -435,7 +435,7 @@
                 // setup combat data for simulation
                 this.setupCurrentSimCombatData(this.currentSim, this.parent.combatData);
                 const rawCombatData = JSON.parse(JSON.stringify(this.parent.combatData, null, 1));
-                this.currentSim.combatData = new MICSR.CombatData([], []);
+                this.currentSim.combatData = new MICSR.CombatData();
                 Object.getOwnPropertyNames(rawCombatData).forEach(prop => this.currentSim.combatData[prop] = rawCombatData[prop]);
 
                 // add sim options

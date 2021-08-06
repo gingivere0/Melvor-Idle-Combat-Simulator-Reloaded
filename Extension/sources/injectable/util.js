@@ -94,22 +94,7 @@
             Summon2: 13,
         };
 
-        MICSR.equipmentSlotList = [
-            'Helmet',
-            'Platebody',
-            'Platelegs',
-            'Boots',
-            'Weapon',
-            'Shield',
-            'Amulet',
-            'Ring',
-            'Gloves',
-            'Quiver',
-            'Cape',
-            'Passive',
-            'Summon1',
-            'Summon2',
-        ];
+        MICSR.equipmentSlotKeys = Object.keys(MICSR.equipmentSlot);
 
         // empty items
         const makeEmptyItem = (img, slot) => {
