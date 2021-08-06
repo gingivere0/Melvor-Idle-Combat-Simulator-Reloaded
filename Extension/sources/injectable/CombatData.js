@@ -555,7 +555,6 @@
                 this.combatStats.maxHit = this.player.stats.maxHit;
 
                 // min hit roll
-                this.combatStats.minHit = 0;
                 this.combatStats.increasedMinHit = 0;
                 if (this.combatStats.attackType === CONSTANTS.attackType.Magic) {
                     // Magic
@@ -575,24 +574,13 @@
                                 break;
                             default:
                         }
-                        if (this.modifiers.summoningSynergy_6_8 && this.isSlayerTask) {
-                            this.combatStats.minHit += Math.floor(this.combatStats.maxHit * this.modifiers.summoningSynergy_6_8 / 100);
-                        }
-                    }
-                } else if (this.isMelee()) {
-                    if (this.modifiers.summoningSynergy_6_12 && this.isSlayerTask) {
-                        this.combatStats.minHit += Math.floor(this.combatStats.maxHit * this.modifiers.summoningSynergy_6_12 / 100);
-                    }
-                } else if (this.isRanged()) {
-                    if (this.modifiers.summoningSynergy_7_12 && this.isSlayerTask) {
-                        this.combatStats.minHit += Math.floor(this.combatStats.maxHit * this.modifiers.summoningSynergy_7_12 / 100);
                     }
                 }
                 if (this.auroraBonus.increasedMinHit !== 0 && this.spells.standard.isSelected) {
                     this.combatStats.increasedMinHit += this.auroraBonus.increasedMinHit;
                 }
                 this.combatStats.increasedMinHit *= this.numberMultiplier;
-                this.combatStats.minHit += this.combatStats.increasedMinHit;
+                this.combatStats.minHit = this.player.stats.minHit;
 
                 // max summ roll
                 this.combatStats.summoningMaxHit = this.getSMH();
