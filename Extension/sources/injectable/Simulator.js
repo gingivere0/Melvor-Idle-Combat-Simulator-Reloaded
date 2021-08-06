@@ -890,9 +890,8 @@
                     // max attack roll
                     combatStats.maxAttackRoll = combatData.player.stats.accuracy;
                     // max hit roll
-                    const maxHits = combatData.calculatePlayerMaxHit(baseStats, modifiers);
-                    combatStats.baseMeleeMaxHit = maxHits.baseMeleeMaxHit;
-                    combatStats.maxHit = maxHits.maxHit;
+                    combatStats.baseMeleeMaxHit = combatData.baseMeleeMaxHit(baseStats);
+                    combatStats.maxHit = combatData.player.stats.maxHit;
                     // update player stats
                     this.currentSim.playerStats = combatData.getPlayerStats();
                 }
