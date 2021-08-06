@@ -417,6 +417,7 @@
              * Calculates the combat stats from equipment, combat style, spell selection and player levels and stores them in `this.combatStats`
              */
             updateCombatStats() {
+                this.player.computeAllStats();
 
                 /*
                 First, gather all bonuses TODO: extract this
