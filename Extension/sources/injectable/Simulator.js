@@ -447,13 +447,6 @@
 
                 // reset and setup sim data
                 this.resetSimulationData(single);
-
-                // An attempt to sort jobs by relative complexity so they go from highest to lowest.
-                this.simulationQueue = this.simulationQueue.sort((jobA, jobB) => {
-                    const jobAComplex = this.enemyStats[jobA.monsterID].hitpoints / this.parent.combatData.calculateAccuracy(this.currentSim.playerStats, this.enemyStats[jobA.monsterID]);
-                    const jobBComplex = this.enemyStats[jobB.monsterID].hitpoints / this.parent.combatData.calculateAccuracy(this.currentSim.playerStats, this.enemyStats[jobB.monsterID]);
-                    return jobBComplex - jobAComplex;
-                });
             }
 
             /**

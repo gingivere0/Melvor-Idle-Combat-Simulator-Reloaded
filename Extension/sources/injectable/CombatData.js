@@ -1305,35 +1305,6 @@
                 return true;
             }
 
-            // TODO: duplicated in workers/simulator.js
-            /**
-             * Computes the accuracy of attacker vs target
-             * @param {Object} attacker
-             * @param {number} attacker.attackType Attack Type Melee:0, Ranged:1, Magic:2
-             * @param {number} attacker.maxAttackRoll Accuracy Rating
-             * @param {Object} target
-             * @param {number} target.maxDefRoll Melee Evasion Rating
-             * @param {number} target.maxRngDefRoll Ranged Evasion Rating
-             * @param {number} target.maxMagDefRoll Magic Evasion Rating
-             * @return {number}
-             */
-            calculateAccuracy(attacker, target) {
-                // determine relevant defence roll
-                let targetDefRoll;
-                if (attacker.attackType === CONSTANTS.attackType.Melee) {
-                    targetDefRoll = target.maxDefRoll;
-                } else if (attacker.attackType === CONSTANTS.attackType.Ranged) {
-                    targetDefRoll = target.maxRngDefRoll;
-                } else {
-                    targetDefRoll = target.maxMagDefRoll;
-                }
-                // accuracy based on attack roll and defence roll
-                if (attacker.maxAttackRoll < targetDefRoll) {
-                    return (0.5 * attacker.maxAttackRoll / targetDefRoll) * 100;
-                }
-                return (1 - 0.5 * targetDefRoll / attacker.maxAttackRoll) * 100;
-            }
-
             getFoodHealAmt() {
                 if (this.foodSelected === -1) {
                     return 0;
