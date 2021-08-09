@@ -272,6 +272,27 @@
         MICSR.averageDoubleMultiplier = (modifier) => {
             return 1 + modifier / 100
         }
+
+        /**
+         * Add agility course modifiers to `modifiers` object
+         */
+        MICSR.addAgilityModifiers = (course, courseMastery, pillar, modifiers) => {
+            let fullCourse = true
+            for (let i = 0; i < course.length; i++) {
+                if (course[i] < 0) {
+                    fullCourse = false;
+                    break;
+                }
+                if (courseMastery[i]) {
+                    modifiers.addModifiers(agilityObstacles[course[i]].modifiers, 0.5);
+                } else {
+                    modifiers.addModifiers(agilityObstacles[course[i]].modifiers);
+                }
+            }
+            if (fullCourse && pillar > -1) {
+                modifiers.addModifiers(agilityPassivePillars[pillar].modifiers);
+            }
+        }
     }
 
     let loadCounter = 0;

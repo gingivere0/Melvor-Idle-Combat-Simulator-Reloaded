@@ -600,21 +600,7 @@
                 this.computePrayerBonus();
 
                 // mimic calculateAgilityModifiers
-                let fullCourse = true
-                for (let i = 0; i < this.course.length; i++) {
-                    if (this.course[i] < 0) {
-                        fullCourse = false;
-                        break;
-                    }
-                    if (this.courseMastery[i]) {
-                        this.modifiers.addModifiers(agilityObstacles[this.course[i]].modifiers, 0.5);
-                    } else {
-                        this.modifiers.addModifiers(agilityObstacles[this.course[i]].modifiers);
-                    }
-                }
-                if (fullCourse && this.pillar > -1) {
-                    this.modifiers.addModifiers(agilityPassivePillars[this.pillar].modifiers);
-                }
+                MICSR.addAgilityModifiers(this.course, this.courseMastery, this.pillar, this.modifiers);
 
                 // mimic calculateSummoningSynergyModifiers
                 this.modifiers.addModifiers(this.computeSynergyBonus());
