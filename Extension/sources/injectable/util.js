@@ -46,30 +46,37 @@
 
         MICSR.versionCheck = (exact, major, minor, patch, prerelease) => {
             // check exact version match
+            if (major === MICSR.majorVersion
+                && minor === MICSR.minorVersion
+                && patch === MICSR.patchVersion
+                && prerelease === MICSR.preReleaseVersion) {
+                return true;
+            }
             if (exact) {
-                return major === MICSR.majorVersion
-                    && minor === MICSR.minorVersion
-                    && patch === MICSR.patchVersion
-                    && prerelease === MICSR.preReleaseVersion;
+                // exact match is required
+                return false;
             }
             // check minimal version match
-            if (major > MICSR.majorVersion) {
-                return false;
+            if (major !== MICSR.majorVersion) {
+                return major < MICSR.majorVersion;
             }
-            if (minor > MICSR.minorVersion) {
-                return false;
+            if (minor !== MICSR.minorVersion) {
+                return minor < MICSR.minorVersion;
+
             }
-            if (patch > MICSR.patchVersion) {
-                return false;
+            if (patch !== MICSR.patchVersion) {
+                return patch < MICSR.patchVersion;
+
             }
             if (MICSR.preReleaseVersion !== undefined) {
                 if (prerelease === undefined) {
-                    return false;
-                } else if (prerelease > MICSR.preReleaseVersion) {
+                    // requires release version
                     return false;
                 }
+                return prerelease < MICSR.preReleaseVersion;
             }
-            return true;
+            // all cases should be covered before
+            return false;
         }
 
         // simulation settings
