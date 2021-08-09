@@ -27,7 +27,7 @@
         const MICSR = window.MICSR;
 
         /**
-         * class ShowModifiers is copied from Melvor Show Modifiers v0.0.15, latest version can be found at:
+         * class ShowModifiers is copied from Melvor Show Modifiers v0.1.0, latest version can be found at:
          * https://raw.githubusercontent.com/gmiclotte/melvor-scripts/master/Show-Modifiers/Show-Modifiers.js
          * TODO: instead of copying it, pull it as a required file or something? No idea how to go about that.
          */
@@ -72,11 +72,17 @@
                         MaxHitpoints: 0,
                         MinHitBasedOnMaxHit: 0,
                         MonsterRespawnTimer: 0,
-                        PlayerAttackSpeed: 0,
-                        PlayerAttackSpeedPercent: 0,
+                        AttackInterval: 0,
+                        AttackIntervalPercent: 0,
                         EnemyAccuracy: 0,
                         ChanceToApplyBurn: 0,
                         GPOnEnemyHit: 0,
+                        BleedLifesteal: 0,
+                        BurnLifesteal: 0,
+                        PoisonLifesteal: 0,
+                        FlatMinHit: 0,
+                        DamageTaken: 0,
+                        GlobalEvasion: 0,
                     },
                     // modifiers that relate to healing
                     hitpoints: {
@@ -87,6 +93,7 @@
                         HPRegenFlat: 0,
                         HitpointRegeneration: 0,
                         Lifesteal: 0,
+                        FlatMaxHitpoints: 0,
                     },
                     // modifiers that relate to defence
                     defence: {
@@ -95,12 +102,19 @@
                         MeleeEvasion: 0,
                         RangedEvasion: 0,
                         ReflectDamage: 0,
+                        FlatReflectDamage: 0,
+                        RolledReflectDamage: 0,
+                        DamageReductionPercent: 0,
                     },
                     // modifiers that relate to using melee attacks
                     melee: {
                         MeleeAccuracyBonus: 0,
                         MeleeStrengthBonus: 0,
                         EnemyMeleeEvasion: 0,
+                        MeleeMaxHit: 0,
+                        MeleeLifesteal: 0,
+                        MeleeCritChance: 0,
+                        MeleeCritMult: 0,
                     },
                     // modifiers that relate to using ranged attacks
                     ranged: {
@@ -108,17 +122,31 @@
                         RangedAccuracyBonus: 0,
                         RangedStrengthBonus: 0,
                         EnemyRangedEvasion: 0,
+                        RangedMaxHit: 0,
+                        RangedLifesteal: 0,
+                        RangedCritChance: 0,
+                        RangedCritMult: 0,
                     },
                     // modifiers that relate to using magic attacks
                     magic: {
                         MagicAccuracyBonus: 0,
                         MagicDamageBonus: 0,
                         MinAirSpellDmg: 0,
+                        MaxAirSpellDmg: 0,
                         MinEarthSpellDmg: 0,
+                        MaxEarthSpellDmg: 0,
                         MinFireSpellDmg: 0,
+                        MaxFireSpellDmg: 0,
                         MinWaterSpellDmg: 0,
+                        MaxWaterSpellDmg: 0,
                         RunePreservation: 0,
                         EnemyMagicEvasion: 0,
+                        MagicMaxHit: 0,
+                        MagicLifesteal: 0,
+                        MagicCritChance: 0,
+                        MagicCritMult: 0,
+                        Confusion: 0,
+                        Decay: 0,
                     },
                     // modifiers that relate to slayer tasks, areas, or monsters
                     slayer: {
@@ -132,6 +160,7 @@
                     prayer: {
                         ChanceToPreservePrayerPoints: 0,
                         FlatPrayerCostReduction: 0,
+                        PrayerCost: 0,
                     },
                     // modifiers that apply to general non-combat skilling
                     nonCombat: {
@@ -151,6 +180,7 @@
                     // specific skills
                     agility: {
                         GPFromAgility: 0,
+                        AgilityObstacleCost: 0,
                     },
                     altMagic: {
                         AltMagicSkillXP: 0,
@@ -202,9 +232,68 @@
                         dungeonEquipmentSwapping: 0,
                         increasedEquipmentSets: 0,
                     },
+                    skilling: {
+                        allowSignetDrops: 0,
+                        increasedMasteryPoolProgress: 0,
+                    },
+                    combat: {
+                        meleeProtection: 0,
+                        rangedProtection: 0,
+                        magicProtection: 0,
+                        curseImmunity: 0,
+                        stunImmunity: 0,
+                        sleepImmunity: 0,
+                        burnImmunity: 0,
+                        poisonImmunity: 0,
+                        bleedImmunity: 0,
+                        debuffImmunity: 0,
+                        increasedRebirthChance: 0,
+                        decreasedDragonBreathDamage: 0,
+                        increasedMeleeStunThreshold: 0,
+                        increasedRuneProvision: 0,
+                        increasedChanceToConvertSeedDrops: 0,
+                        bonusCoalOnDungeonCompletion: 0,
+                        bypassSlayerItems: 0,
+                        itemProtection: 0,
+                        autoLooting: 0,
+                        autoBurying: 0,
+                        increasedCombatStoppingThreshold: 0,
+                        increasedGPMultiplierPer1MGP: 0,
+                        increasedGPMultiplierCap: 0,
+                        increasedGPMultiplierMin: 0,
+                        allowAttackAugmentingMagic: 0,
+                    },
+                    prayer: {
+                        increasedRedemptionPercent: 0,
+                        increasedRedemptionThreshold: 0,
+                    },
+                    nonCombat: {
+                        increasedOffItemChance: 0,
+                    },
                     // specific skills
+                    cooking: {
+                        decreasedFoodBurnChance: 0,
+                        decreasedSecondaryFoodBurnChance: 0,
+                    },
+                    farming: {
+                        freeCompost: 0,
+                        increasedCompostPreservationChance: 0,
+                    },
                     firemaking: {
                         freeBonfires: 0,
+                        increasedFiremakingCoalChance: 0,
+                    },
+                    mining: {
+                        increasedMiningGemChance: 0,
+                        doubleOresMining: 0,
+                        increasedBonusCoalMining: 0,
+                    },
+                    smithing: {
+                        decreasedSmithingCoalCost: 0,
+                    },
+                    thieving: {
+                        increasedThievingSuccessRate: 0,
+                        increasedThievingSuccessCap: 0,
                     },
                     woodcutting: {
                         increasedTreeCutLimit: 0,
@@ -291,6 +380,7 @@
                         summoningSynergy_9_19: 0,
                         summoningSynergy_10_11: 0,
                         summoningSynergy_10_16: 0,
+                        summoningSynergy_10_17: 0,
                         summoningSynergy_10_18: 0,
                         summoningSynergy_10_19: 0,
                         summoningSynergy_11_16: 0,
@@ -339,7 +429,13 @@
 
                 // check for unknown modifiers
                 let hasUnknownModifiers = false;
-                Object.getOwnPropertyNames(playerModifiers).forEach(modifier => {
+                [
+                    ...Object.getOwnPropertyNames(player.modifiers),
+                    ...player.modifiers.skillModifiers.keys()
+                ].forEach(modifier => {
+                    if (modifier === 'skillModifiers') {
+                        return;
+                    }
                     if (this.knownModifiers[modifier]) {
                         return;
                     }
@@ -556,111 +652,11 @@
                 return result[0].value | result[0][1] | 0;
             }
 
-            printPlayerModifier(modifier, value) {
-                const result = printPlayerModifier(modifier, value);
-                if (result[0].length > 0) {
-                    return result;
+            printUniqueModifier(modifier, value) {
+                if (value === 0) {
+                    return [];
                 }
-                let toPrint = '';
-                // summoning synergy modifiers
-                const split = modifier.split('_');
-                if (split.length === 3 && split[0] === 'summoningSynergy') {
-                    return [SUMMONING.Synergies[split[1]][split[2]].description, 'text-success'];
-                }
-                // positive modifiers
-                switch (modifier) {
-                    // positive
-                    case 'golbinRaidWaveSkipCostReduction':
-                        toPrint = `-${value}% Wave Skip Cost`;
-                        break;
-                    case 'golbinRaidIncreasedMinimumFood':
-                        toPrint = `+${value} Minimum Food Quantity Roll`;
-                        break;
-                    case 'golbinRaidIncreasedMaximumAmmo':
-                        toPrint = `+${value}% Maximum Ranged Ammo Quantity Roll`;
-                        break;
-                    case 'golbinRaidIncreasedMaximumRunes':
-                        toPrint = `+${value}% Maximum Runes Quantity Roll`;
-                        break;
-                    case 'golbinRaidPrayerUnlocked':
-                        toPrint = value === 0 ? 'Prayer Locked in Golbin Raid' : 'Prayer Unlocked in Golbin Raid';
-                        break;
-                    case 'golbinRaidIncreasedPrayerLevel':
-                        toPrint = `+${value} Prayer Level in Golbin Raid`;
-                        break;
-                    case 'golbinRaidIncreasedPrayerPointsStart':
-                        toPrint = `+${value} Initial Prayer Points`;
-                        break;
-                    case 'golbinRaidIncreasedPrayerPointsWave':
-                        toPrint = `+${value} Prayer Points per Wave`;
-                        break;
-                    case 'golbinRaidPassiveSlotUnlocked':
-                        toPrint = value === 0 ? 'Passive Slot Locked in Golbin Raid' : 'Passive Slot Unlocked in Golbin Raid';
-                        break;
-                    case 'golbinRaidIncreasedStartingRuneCount':
-                        toPrint = `+${value} Initial Runes`;
-                        break;
-                    case 'golbinRaidStartingWeapon':
-                        toPrint = 'Starting Weapon: ' + (value === 0
-                            ? 'Bronze Scimitar'
-                            : items[value].name);
-                        break;
-                    case 'freeBonfires':
-                        toPrint = value < 1 ? 'No Free Bonfires' : 'Free Bonfires';
-                        break;
-                }
-                if (toPrint.length > 0) {
-                    return [toPrint, value > 0 ? 'text-success' : 'text-warning'];
-                }
-                // negative modifiers
-                switch (modifier) {
-                }
-                if (toPrint.length > 0) {
-                    return [toPrint, value > 0 ? 'text-danger' : 'text-warning'];
-                }
-                // creased modifiers
-                switch (modifier.slice(9)) {
-                    case 'BirdNestDropRate':
-                        toPrint = `${value}% Bird Nest Drop Rate`;
-                        break;
-                    case 'ChanceNoDamageMining':
-                        toPrint = `${value}% to do Zero Damage to Mining Rocks`;
-                        break;
-                    case 'SeeingGoldChance':
-                        toPrint = `${value}% Chance for Silver Ore to Produce a Gold Bar`;
-                        break;
-                    case 'ChanceDoubleHarvest':
-                        toPrint = `${value}% Chance for Double Harvest`;
-                        break;
-                    case 'ChanceForElementalRune':
-                        toPrint = `${value}% Chance for Random Elemental Runes`;
-                        break;
-                    case 'ElementalRuneGain':
-                        toPrint = `${value} Random Elemental Runes`;
-                        break;
-                    case 'ChanceRandomPotionHerblore':
-                        toPrint = `${value}% Chance for Random Tier Herblore Potion`;
-                        break;
-                    case 'AttackRolls':
-                        toPrint = `${value} Additional Attack Roll`;
-                        if (value !== 1) {
-                            toPrint += 's';
-                        }
-                        break;
-                    case 'AltMagicSkillXP':
-                        toPrint = `${value}% Alt. Magic Skill XP`;
-                        break;
-                }
-                if (toPrint.length > 0) {
-                    if (modifier.slice(0, 9) === 'increased') {
-                        return [`+${toPrint}`, value > 0 ? 'text-success' : 'text-warning'];
-                    }
-                    if (modifier.slice(0, 9) === 'decreased') {
-                        return [`-${toPrint}`, value > 0 ? 'text-danger' : 'text-warning'];
-                    }
-                }
-                // unknown modifiers
-                return [`${modifier}: ${value}`, 'text-warning']
+                return [printPlayerModifier(modifier, value)];
             }
 
             printDiffModifier(modifier, increased, decreased, skillID = undefined) {
@@ -677,37 +673,41 @@
                 valueToPrint = skillID !== undefined ? [skillID, valueToPrint] : valueToPrint;
                 // print increased or decreased
                 if (positive) {
-                    return [this.printPlayerModifier('increased' + modifier, valueToPrint)];
+                    return [printPlayerModifier('increased' + modifier, valueToPrint)];
                 } else {
-                    return [this.printPlayerModifier('decreased' + modifier, valueToPrint)];
+                    return [printPlayerModifier('decreased' + modifier, valueToPrint)];
                 }
             }
 
             printModifier(modifiers, modifier, skillIDs) {
-                // modifiers that occur on their own
-                if (modifiers[modifier] !== undefined) {
-                    if (modifiers[modifier] === 0) {
-                        return [];
-                    }
-                    return [this.printPlayerModifier(modifier, modifiers[modifier])];
+                // unique
+                const unique = modifiers[modifier]
+                if (unique !== undefined) {
+                    return this.printUniqueModifier(modifier, unique);
                 }
-                // increased-decreased type modifier
+                // creased
                 const increased = modifiers['increased' + modifier];
                 const decreased = modifiers['decreased' + modifier];
-                let toPrint = [];
-                if (increased === undefined && decreased === undefined) {
+                if (increased !== undefined || decreased !== undefined) {
+                    return this.printDiffModifier(modifier, increased | 0, decreased | 0);
+                }
+                // skillModifiers
+                const skillModifiers = modifiers.skillModifiers;
+                if (skillModifiers === undefined) {
                     return [];
                 }
-                if ((increased && increased.length !== undefined) || (decreased && decreased.length !== undefined)) {
-                    skillIDs.forEach(skillID => {
-                        const increasedEntry = this.arrayModifierToSkill(increased !== undefined ? increased : [], skillID);
-                        const decreasedEntry = this.arrayModifierToSkill(decreased !== undefined ? decreased : [], skillID);
-                        toPrint = toPrint.concat(this.printDiffModifier(modifier, increasedEntry, decreasedEntry, skillID));
-                    });
-                } else {
-                    toPrint = toPrint.concat(this.printDiffModifier(modifier, increased | 0, decreased | 0));
-                }
-                return toPrint;
+                return skillIDs.map(skillID => {
+                    const getSkillModifier = map => map ? map.get(skillID) | 0 : 0;
+                    // unique
+                    const unique = skillModifiers.get(modifier);
+                    if (unique !== undefined) {
+                        return this.printUniqueModifier(modifier, getSkillModifier(unique));
+                    }
+                    // creased
+                    const increased = skillModifiers.get('increased' + modifier);
+                    const decreased = skillModifiers.get('decreased' + modifier);
+                    return this.printDiffModifier(modifier, getSkillModifier(increased), getSkillModifier(decreased), skillID);
+                }).reduce((a, b) => a.concat(b), []);
             }
 
             printRelevantModifiers(modifiers, tag) {
@@ -725,7 +725,7 @@
                     + '<button type="button" '
                     + 'class="btn btn-sm btn-dual text-combat-smoke" '
                     + 'id="page-header-modifiers" '
-                    + `onclick="window.${this.name}.replaceRelevantModifiersHtml(playerModifiers, '${text}', '${tag}');" `
+                    + `onclick="window.${this.name}.replaceRelevantModifiersHtml(player.modifiers, '${text}', '${tag}');" `
                     + 'aria-haspopup="true" '
                     + 'aria-expanded="true">'
                     + `<img class="skill-icon-xxs" src="${icon}">`
@@ -798,8 +798,8 @@
             MaxHitpoints: {implemented: true},
             MinHitBasedOnMaxHit: {implemented: true},
             MonsterRespawnTimer: {implemented: true},
-            PlayerAttackSpeed: {implemented: true},
-            PlayerAttackSpeedPercent: {implemented: true},
+            AttackInterval: {implemented: false},
+            AttackIntervalPercent: {implemented: false},
             EnemyAccuracy: {implemented: false}, // not implemented in game
             ChanceToApplyBurn: {implemented: true},
             // modifiers that relate to healing
