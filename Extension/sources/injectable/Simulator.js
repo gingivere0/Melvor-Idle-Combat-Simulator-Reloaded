@@ -894,7 +894,10 @@
                     || this.currentSim.playerStats.activeItems.slayerCrossbow
                     || this.currentSim.playerStats.activeItems.bigRon
                     || modifiers.summoningSynergy_6_7
-                    || modifiers.summoningSynergy_7_8) {
+                    || modifiers.summoningSynergy_7_8
+                    || modifiers.summoningSynergy_6_13
+                    || modifiers.summoningSynergy_7_13
+                    || modifiers.summoningSynergy_8_13) {
                     // recompute base stats
                     const baseStats = combatData.updatePlayerBaseStats(monsterID);
                     // max attack roll
