@@ -27,7 +27,7 @@
         const MICSR = window.MICSR;
 
         /**
-         * class ShowModifiers is copied from Melvor Show Modifiers v0.1.0, latest version can be found at:
+         * class ShowModifiers is copied from Melvor Show Modifiers v0.1.1, latest version can be found at:
          * https://raw.githubusercontent.com/gmiclotte/melvor-scripts/master/Show-Modifiers/Show-Modifiers.js
          * TODO: instead of copying it, pull it as a required file or something? No idea how to go about that.
          */
@@ -74,7 +74,6 @@
                         MonsterRespawnTimer: 0,
                         AttackInterval: 0,
                         AttackIntervalPercent: 0,
-                        EnemyAccuracy: 0,
                         ChanceToApplyBurn: 0,
                         GPOnEnemyHit: 0,
                         BleedLifesteal: 0,
@@ -110,7 +109,6 @@
                     melee: {
                         MeleeAccuracyBonus: 0,
                         MeleeStrengthBonus: 0,
-                        EnemyMeleeEvasion: 0,
                         MeleeMaxHit: 0,
                         MeleeLifesteal: 0,
                         MeleeCritChance: 0,
@@ -121,7 +119,6 @@
                         AmmoPreservation: 0,
                         RangedAccuracyBonus: 0,
                         RangedStrengthBonus: 0,
-                        EnemyRangedEvasion: 0,
                         RangedMaxHit: 0,
                         RangedLifesteal: 0,
                         RangedCritChance: 0,
@@ -140,7 +137,6 @@
                         MinWaterSpellDmg: 0,
                         MaxWaterSpellDmg: 0,
                         RunePreservation: 0,
-                        EnemyMagicEvasion: 0,
                         MagicMaxHit: 0,
                         MagicLifesteal: 0,
                         MagicCritChance: 0,
@@ -639,30 +635,16 @@
                 console.log(`${this.logName}:`, ...args);
             }
 
-            arrayModifierToSkill(array, skillID) {
-                if (!array) {
-                    return 0;
-                }
-                const result = array.filter(x => {
-                    return x.id === skillID || x[0] === skillID
-                });
-                if (result.length === 0) {
-                    return 0;
-                }
-                return result[0].value | result[0][1] | 0;
-            }
-
             printUniqueModifier(modifier, value) {
-                if (value === 0) {
+                if (!value) {
                     return [];
                 }
                 return [printPlayerModifier(modifier, value)];
             }
 
-            printDiffModifier(modifier, increased, decreased, skillID = undefined) {
+            printDiffModifier(modifier, value, skillID = undefined) {
                 // compute difference
-                const value = increased - decreased;
-                if (value === 0) {
+                if (!value) {
                     return [];
                 }
                 // store if value is positive or negative
@@ -674,40 +656,102 @@
                 // print increased or decreased
                 if (positive) {
                     return [printPlayerModifier('increased' + modifier, valueToPrint)];
-                } else {
-                    return [printPlayerModifier('decreased' + modifier, valueToPrint)];
                 }
+                return [printPlayerModifier('decreased' + modifier, valueToPrint)];
             }
 
-            printModifier(modifiers, modifier, skillIDs) {
+            getModifierValue(modifiers, modifier, skillID = undefined) {
+                if (!this.isSkillModifier(modifier)) {
+                    return this.getSimpleModifier(modifiers, modifier);
+                }
+                return this.getSkillModifier(modifiers, modifier, skillID);
+            }
+
+            getSimpleModifier(modifiers, modifier) {
                 // unique
-                const unique = modifiers[modifier]
-                if (unique !== undefined) {
-                    return this.printUniqueModifier(modifier, unique);
+                if (this.isUniqueModifier(modifier)) {
+                    return modifiers[modifier];
                 }
                 // creased
                 const increased = modifiers['increased' + modifier];
                 const decreased = modifiers['decreased' + modifier];
-                if (increased !== undefined || decreased !== undefined) {
-                    return this.printDiffModifier(modifier, increased | 0, decreased | 0);
+                return (increased | 0) - (decreased | 0);
+            }
+
+            getSkillModifier(modifiers, modifier, skillID) {
+                const skillModifiers = modifiers.skillModifiers ? modifiers.skillModifiers : modifiers;
+                // unique
+                if (this.isUniqueModifier(modifier)) {
+                    const map = this.skillModifierMapAux(skillModifiers, modifier);
+                    return this.skillModifierAux(map, skillID);
                 }
-                // skillModifiers
-                const skillModifiers = modifiers.skillModifiers;
-                if (skillModifiers === undefined) {
+                // creased
+                const increased = this.skillModifierMapAux(skillModifiers, 'increased' + modifier);
+                const decreased = this.skillModifierMapAux(skillModifiers, 'decreased' + modifier);
+                return this.skillModifierAux(increased, skillID) - this.skillModifierAux(decreased, skillID);
+            }
+
+            skillModifierMapAux(map, skillID) {
+                if (!map) {
                     return [];
                 }
-                return skillIDs.map(skillID => {
-                    const getSkillModifier = map => map ? map.get(skillID) | 0 : 0;
-                    // unique
-                    const unique = skillModifiers.get(modifier);
-                    if (unique !== undefined) {
-                        return this.printUniqueModifier(modifier, getSkillModifier(unique));
+                let tmp;
+                if (map.constructor.name === 'Map') {
+                    tmp = map.get(skillID);
+                } else {
+                    tmp = map[skillID];
+                }
+                return tmp ? tmp : [];
+            }
+
+            skillModifierAux(map, skillID) {
+                if (!map || map.length === 0) {
+                    return 0;
+                }
+                if (map.constructor.name === 'Map') {
+                    return map.get(skillID) | 0;
+                }
+                return map.filter(x => x[0] === skillID)
+                    .map(x => x[1])
+                    .reduce((a, b) => a + b, 0);
+            }
+
+            printModifier(modifiers, modifier, skillIDs) {
+                if (!this.isSkillModifier(modifier)) {
+                    const value = this.getSimpleModifier(modifiers, modifier);
+                    if (this.isUniqueModifier(modifier)) {
+                        // unique
+                        return this.printUniqueModifier(modifier, value | 0);
                     }
                     // creased
-                    const increased = skillModifiers.get('increased' + modifier);
-                    const decreased = skillModifiers.get('decreased' + modifier);
-                    return this.printDiffModifier(modifier, getSkillModifier(increased), getSkillModifier(decreased), skillID);
+                    return this.printDiffModifier(modifier, value | 0);
+                }
+                // skillModifiers
+                return skillIDs.map(skillID => {
+                    const value = this.getSkillModifier(modifiers, modifier, skillID);
+                    if (this.isUniqueModifier(modifier)) {
+                        // unique
+                        return this.printUniqueModifier(modifier, value | 0);
+                    }
+                    // creased
+                    return this.printDiffModifier(modifier, value | 0, skillID);
                 }).reduce((a, b) => a.concat(b), []);
+            }
+
+            isUniqueModifier(modifier) {
+                return modifierData[modifier] !== undefined;
+            }
+
+            isSkillModifier(modifier) {
+                if (this.isUniqueModifier(modifier)) {
+                    return modifierData[modifier].isSkill;
+                }
+                const data = modifierData['increased' + modifier];
+                if (data === undefined) {
+                    // this.log(`Unknown modifier ${modifier}`);
+                    return false;
+                }
+                return data.isSkill;
             }
 
             printRelevantModifiers(modifiers, tag) {
@@ -800,7 +844,6 @@
             MonsterRespawnTimer: {implemented: true},
             AttackInterval: {implemented: false},
             AttackIntervalPercent: {implemented: false},
-            EnemyAccuracy: {implemented: false}, // not implemented in game
             ChanceToApplyBurn: {implemented: true},
             // modifiers that relate to healing
             AutoEatEfficiency: {implemented: true},
@@ -819,12 +862,10 @@
             // modifiers that relate to using melee attacks
             MeleeAccuracyBonus: {implemented: true},
             MeleeStrengthBonus: {implemented: true},
-            EnemyMeleeEvasion: {implemented: true},
             // modifiers that relate to using ranged attacks
             AmmoPreservation: {implemented: true},
             RangedAccuracyBonus: {implemented: true},
             RangedStrengthBonus: {implemented: true},
-            EnemyRangedEvasion: {implemented: true},
             // modifiers that relate to using magic attacks
             MagicAccuracyBonus: {implemented: true},
             MagicDamageBonus: {implemented: true},
@@ -833,7 +874,6 @@
             MinFireSpellDmg: {implemented: true},
             MinWaterSpellDmg: {implemented: true},
             RunePreservation: {implemented: true},
-            EnemyMagicEvasion: {implemented: true},
             // modifiers that relate to slayer tasks, areas, or monsters
             DamageToSlayerAreaMonsters: {implemented: true},
             DamageToSlayerTasks: {implemented: true},
