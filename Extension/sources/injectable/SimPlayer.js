@@ -161,7 +161,7 @@
 
             addSummonSynergyModifiers() {
                 if (!this.summoningSynergy) {
-                    return {};
+                    return;
                 }
                 const summons = [
                     this.getEquipedItem('Summon1').summoningID,
@@ -169,27 +169,14 @@
                 ];
                 const synergies = SUMMONING.Synergies[Math.min(...summons)];
                 if (!synergies) {
-                    return {};
+                    return;
                 }
                 const synergy = synergies[Math.max(...summons)];
                 if (!synergy) {
-                    return {};
+                    return;
                 }
-                const modifiers = {...synergy.modifiers};
-                // convert summoningSynergy_x_y to modifiers
-                if (modifiers.summoningSynergy_1_12 && this.isSlayerTask) {
-                    modifiers.decreasedEnemyAccuracy = modifiers.summoningSynergy_1_12;
-                } else if (modifiers.summoningSynergy_2_6 && this.isMelee()) {
-                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_6;
-                } else if (modifiers.summoningSynergy_2_7 && this.isRanged()) {
-                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_7;
-                } else if (modifiers.summoningSynergy_2_8 && this.isMagic()) {
-                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_8;
-                } else if (modifiers.summoningSynergy_7_15 && this.isRanged()) {
-                    modifiers.increasedChanceToApplyBurn = modifiers.summoningSynergy_7_15;
-                }
-                // return the synergy modifiers
-                return modifiers;
+                // add the synergy modifiers
+                this.modifiers.addModifiers(synergy.modifiers);
             }
 
             getCurrentSynergy() {
