@@ -118,7 +118,7 @@
                 const courseMastery = {};
                 this.app.player.course.forEach((o, i) => courseMastery[o] = this.app.player.courseMastery[i]);
                 return {
-                    // combatData: this.app.player,
+                    // player: this.app.player,
                     // TODO: all these should be in SimPlayer class?
                     // lists
                     course: [...this.app.player.course],
@@ -258,7 +258,7 @@
             importPrayers(prayerSelected) {
                 // toggle old prayers off
                 this.app.player.activePrayers.forEach(prayerID => {
-                    this.activePrayers.delete(prayerID)
+                    this.app.player.activePrayers.delete(prayerID)
                 });
                 // Update prayers
                 for (let prayerID = 0; prayerID < PRAYER.length; prayerID++) {
