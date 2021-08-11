@@ -512,7 +512,7 @@
                 this.equipmentSelectCard.container.appendChild(importSetCCContainer);
                 // add button to show all modifiers
                 const modifierCCContainer = this.equipmentSelectCard.createCCContainer();
-                modifierCCContainer.appendChild(this.equipmentSelectCard.addButton('Show Modifiers', () => this.showRelevantModifiers(this.combatData.modifiers, 'Active modifiers')));
+                modifierCCContainer.appendChild(this.equipmentSelectCard.addButton('Show Modifiers', () => this.showRelevantModifiers(this.player.modifiers, 'Active modifiers')));
                 this.equipmentSelectCard.container.appendChild(modifierCCContainer);
             }
 
