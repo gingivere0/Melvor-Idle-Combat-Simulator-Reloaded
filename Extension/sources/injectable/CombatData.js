@@ -773,6 +773,9 @@
                     playerStats.specialData.push(ANCIENT[this.spells.ancient.selectedID].specialAttack);
                 } else {
                     for (const itemId of this.player.equipmentIDs()) {
+                        if (itemId === -1) {
+                            continue;
+                        }
                         if (items[itemId].hasSpecialAttack) {
                             playerStats.hasSpecialAttack = true;
                             items[itemId].specialAttacks.forEach(attack =>
