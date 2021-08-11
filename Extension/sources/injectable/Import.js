@@ -314,43 +314,23 @@
                 this.app.combatData.autoEatTier = autoEatTier;
                 document.getElementById('MCS Auto Eat Tier Dropdown').selectedIndex = autoEatTier + 1;
                 this.app.equipFood(foodSelected);
-                if (cookingPool) {
-                    this.app.combatData.cookingPool = true;
-                    document.getElementById('MCS 95% Cooking Pool Radio Yes').checked = true;
-                } else {
-                    this.app.combatData.cookingPool = false;
-                    document.getElementById('MCS 95% Cooking Pool Radio No').checked = true;
-                }
-                if (cookingMastery) {
-                    this.app.combatData.cookingMastery = true;
-                    document.getElementById('MCS 99 Cooking Mastery Radio Yes').checked = true;
-                } else {
-                    this.app.combatData.cookingMastery = false;
-                    document.getElementById('MCS 99 Cooking Mastery Radio No').checked = true;
-                }
+                this.checkRadio('MCS 95% Cooking Pool', cookingPool);
+                this.app.combatData.cookingPool = cookingPool;
+                this.checkRadio('MCS 99 Cooking Mastery', cookingMastery);
+                this.app.combatData.cookingMastery = cookingMastery;
             }
 
             importSlayerTask(isSlayerTask) {
                 // Update slayer task mode
-                if (isSlayerTask) {
-                    this.app.combatData.isSlayerTask = true;
-                    document.getElementById('MCS Slayer Task Radio Yes').checked = true;
-                } else {
-                    this.app.combatData.isSlayerTask = false;
-                    document.getElementById('MCS Slayer Task Radio No').checked = true;
-                }
+                this.checkRadio('MCS Slayer Task', isSlayerTask);
+                this.app.combatData.isSlayerTask = isSlayerTask;
                 this.app.slayerTaskSimsToggle();
             }
 
             importHardCore(isHardcore) {
                 // Update hardcore mode
-                if (isHardcore) {
-                    this.app.combatData.isHardcore = true;
-                    document.getElementById('MCS Hardcore Mode Radio Yes').checked = true;
-                } else {
-                    this.app.combatData.isHardcore = false;
-                    document.getElementById('MCS Hardcore Mode Radio No').checked = true;
-                }
+                this.checkRadio('MCS Hardcore Mode', isHardcore);
+                this.app.combatData.isHardcore = isHardcore;
             }
 
             importSummoningSynergy(summoningSynergy) {
@@ -364,29 +344,24 @@
 
             importAdventure(isAdventure) {
                 // Update adventure mode
-                if (isAdventure) {
-                    this.app.combatData.isAdventure = true;
-                    document.getElementById('MCS Adventure Mode Radio Yes').checked = true;
-                } else {
-                    this.app.combatData.isAdventure = false;
-                    document.getElementById('MCS Adventure Mode Radio No').checked = true;
-                }
+                this.checkRadio('MCS Adventure Mode', isAdventure);
+                this.app.combatData.isAdventure = isAdventure;
                 this.app.updateCombatStats();
             }
 
             importUseCombinationRunes(useCombinationRunes) {
                 // Update hardcore mode
-                if (useCombinationRunes) {
-                    this.app.combatData.useCombinationRunes = true;
-                    document.getElementById('MCS Use Combination Runes Radio Yes').checked = true;
-                } else {
-                    this.app.combatData.useCombinationRunes = false;
-                    document.getElementById('MCS Use Combination Runes Radio No').checked = true;
-                }
+                this.checkRadio('MCS Use Combination Runes', useCombinationRunes);
+                this.app.combatData.useCombinationRunes = useCombinationRunes;
             }
 
             importAgilityCourse(course, masteries, pillar) {
                 this.app.agilityCourse.importAgilityCourse(course, masteries, pillar);
+            }
+
+            checkRadio(baseID, check) {
+                const yesOrNo = check ? 'Yes' : 'No';
+                document.getElementById(`${baseID} Radio ${yesOrNo}`).checked = true;
             }
         }
     }
