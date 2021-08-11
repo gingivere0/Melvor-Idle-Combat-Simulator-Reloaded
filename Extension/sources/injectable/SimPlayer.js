@@ -80,6 +80,12 @@
                 // TODO: currentGamemode, numberMultiplier
                 // gp, skillXP, PETS, slayercoins
                 this.resetGains();
+                // petUnlocked
+                this.petUnlocked = petUnlocked.map(x => false);
+                // chosenAgilityObstacles, agility MASTERY, agilityPassivePillarActive
+                this.course = Array(10).fill(-1);
+                this.courseMastery = Array(10).fill(false);
+                this.pillar = -1;
             }
 
             resetGains() {
@@ -109,6 +115,35 @@
 
             addXP(skill, amount) {
                 this.skillXP[skill] += this.getSkillXPToAdd(skill, amount);
+            }
+
+            addPetModifiers() {
+                PETS.forEach((pet, i) => {
+                    if (this.petUnlocked[i] && !pet.activeInRaid && pet.modifiers !== undefined) {
+                        this.modifiers.addModifiers(pet.modifiers);
+                    }
+                });
+            }
+
+            addConditionalModifiers() {
+                [
+                    this.bankConditionWatchLists,
+                    this.gloveConditionWatchLists,
+                ].forEach(watchLists => {
+                    watchLists.forEach(conditions => {
+                        conditions.forEach((condition) => {
+                            // for the combat simulator we always assume the bank and glove conditions are true
+                            // instead of skipping the entire conditional, we set condition.active to true in case this is used elsewhere
+                            condition.active = true;
+                            if (condition.active)
+                                this.modifiers.addModifiers(condition.modifiers);
+                        });
+                    });
+                });
+            }
+
+            addAgilityModifiers() {
+                MICSR.addAgilityModifiers(this.course, this.courseMastery, this.pillar, this.modifiers);
             }
 
             getSkillXPToAdd(skill, xp) {
@@ -142,7 +177,7 @@
 
             // get skill level from property instead of global `skillLevel`
             getSkillLevel(skillID) {
-                return this.skillLevel[skillID];
+                return Math.min(99, this.skillLevel[skillID]);
             }
 
             // don't render anything

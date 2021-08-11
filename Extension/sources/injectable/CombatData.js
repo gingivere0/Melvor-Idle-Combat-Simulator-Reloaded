@@ -23,7 +23,6 @@
     const reqs = [
         'statNames',
         'util',
-        'SimManager',
     ];
 
     const setup = () => {
@@ -37,21 +36,9 @@
             /**
              *
              */
-            constructor() {
-                this.manager = new MICSR.SimManager();
-                this.manager.initialize();
+            constructor(manager) {
+                this.manager = manager;
                 this.player = this.manager.player;
-                /** @type {Levels} */
-                this.virtualLevels = {
-                    Attack: 1,
-                    Strength: 1,
-                    Defence: 1,
-                    Hitpoints: 10,
-                    Ranged: 1,
-                    Magic: 1,
-                    Prayer: 1,
-                    Slayer: 1,
-                };
                 // auto eat data
                 this.autoEatData = [
                     SHOP["General"][CONSTANTS.shop.general.Auto_Eat_Tier_I],
@@ -89,12 +76,6 @@
                         selectedID: null,
                     },
                 };
-                // Pet Selection
-                this.petOwned = PETS.map(() => false);
-                // Agility course selection
-                this.course = Array(10).fill(-1);
-                this.courseMastery = Array(10).fill(false);
-                this.pillar = -1;
                 // Style Selection
                 this.attackStyle = {
                     Melee: 0,
@@ -594,13 +575,10 @@
                 }).forEach(itemID => this.modifiers.addModifiers(items[itemID].modifiers));
 
                 // mimic calculatePetModifiers
-                this.petIds.filter(id => this.petOwned[id]).forEach(id => this.modifiers.addModifiers(PETS[id].modifiers));
+                this.petIds.filter(id => this.player.petUnlocked[id]).forEach(id => this.modifiers.addModifiers(PETS[id].modifiers));
 
                 // mimic calculatePrayerModifiers
                 this.computePrayerBonus();
-
-                // mimic calculateAgilityModifiers
-                MICSR.addAgilityModifiers(this.course, this.courseMastery, this.pillar, this.modifiers);
 
                 // mimic calculateSummoningSynergyModifiers
                 this.modifiers.addModifiers(this.computeSynergyBonus());
@@ -924,7 +902,7 @@
                 if (playerStats.activeItems.firemakingSkillcape) {
                     playerStats.globalXPMult += 0.05;
                 }
-                if (this.petOwned[2]) {
+                if (this.player.petUnlocked[2]) {
                     playerStats.globalXPMult += 0.01;
                 }
                 // adjust prayer usage

@@ -92,7 +92,7 @@
                     prayerSelected: PRAYER.map((_, i) => [...player.activePrayers].includes(i)),
                     potionID: potionID,
                     potionTier: potionTier,
-                    petOwned: petUnlocked,
+                    petUnlocked: petUnlocked,
                     autoEatTier: autoEatTier,
                     foodSelected: food.id,
                     cookingPool: getMasteryPoolProgress(CONSTANTS.skill.Cooking) >= 95,
@@ -115,16 +115,16 @@
 
             exportSettings() {
                 const courseMastery = {};
-                this.app.combatData.course.forEach((o, i) => courseMastery[o] = this.app.combatData.courseMastery[i]);
+                this.app.player.course.forEach((o, i) => courseMastery[o] = this.app.player.courseMastery[i]);
                 return {
-                    // combatData: this.app.combatData,
-                    // TODO: all these should be in CombatData class?
+                    // combatData: this.app.player,
+                    // TODO: all these should be in SimPlayer class?
                     // lists
-                    equipment: [...this.app.equipmentSelected],
-                    petOwned: [...this.app.combatData.petOwned],
-                    course: [...this.app.combatData.course],
+                    equipment: this.app.player.equipment.slotArray.map(x => x.item.id),
+                    petUnlocked: [...this.app.player.petUnlocked],
+                    course: [...this.app.player.course],
                     // objects
-                    levels: {...this.app.combatData.virtualLevels},
+                    levels: {...this.app.player.skillLevel},
                     // simple values
                     meleeStyle: this.app.combatData.attackStyle.Melee,
                     rangedStyle: this.app.combatData.attackStyle.Ranged,
@@ -146,7 +146,7 @@
                     isAdventure: this.app.combatData.isAdventure,
                     useCombinationRunes: this.app.combatData.useCombinationRunes,
                     courseMastery: courseMastery,
-                    pillar: this.app.combatData.pillar,
+                    pillar: this.app.player.pillar,
                     summoningSynergy: this.app.combatData.summoningSynergy,
                 }
             }
@@ -159,7 +159,7 @@
                 this.importSpells(settings.ancient, settings.standard, settings.curse, settings.aurora);
                 this.importPrayers(settings.prayerSelected);
                 this.importPotion(settings.potionID, settings.potionTier);
-                this.importPets(settings.petOwned);
+                this.importPets(settings.petUnlocked);
                 this.importAutoEat(settings.autoEatTier, settings.foodSelected, settings.cookingPool, settings.cookingMastery);
                 this.importSlayerTask(settings.isSlayerTask);
                 this.importHardCore(settings.isHardcore);
@@ -180,7 +180,7 @@
             }
 
             importEquipment(equipment) {
-                this.app.combatData.player.equipment.unequipAll();
+                this.app.player.equipment.unequipAll();
                 MICSR.equipmentSlotKeys.forEach((_, slotID) => {
                     const itemID = equipment[slotID];
                     if (itemID === -1 && this.app.combatData.equipmentOccupiedBy(slotID) !== 'None') {
@@ -194,11 +194,9 @@
 
             importLevels(levels) {
                 this.app.skillKeys.forEach(key => {
-                    const virtualLevel = levels[CONSTANTS.skill[key]];
-                    document.getElementById(`MCS ${key} Input`).value = virtualLevel;
-                    this.app.combatData.virtualLevels[key] = virtualLevel;
+                    document.getElementById(`MCS ${key} Input`).value = levels[CONSTANTS.skill[key]];
                 });
-                this.app.combatData.player.skillLevel = levels.map(virtualLevel => Math.min(virtualLevel, 99));
+                this.app.player.skillLevel = [...levels];
             }
 
             importStyle(meleeStyle, rangedStyle, magicStyle) {
@@ -294,10 +292,10 @@
                 }
             }
 
-            importPets(petOwned) {
+            importPets(petUnlocked) {
                 // Import PETS
-                petOwned.forEach((owned, petID) => {
-                    this.app.combatData.petOwned[petID] = owned;
+                petUnlocked.forEach((owned, petID) => {
+                    this.app.player.petUnlocked[petID] = owned;
                     if (this.app.combatData.petIds.includes(petID)) {
                         if (owned) {
                             this.app.selectButton(document.getElementById(`MCS ${PETS[petID].name} Button`));

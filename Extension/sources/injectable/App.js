@@ -30,6 +30,7 @@
         'Loot',
         'Menu',
         'modifierNames',
+        'SimManager',
         'Simulator',
         'TabCard',
     ];
@@ -51,7 +52,10 @@
              */
             constructor(urls) {
                 // Combat Data Object
-                this.combatData = new MICSR.CombatData();
+                this.manager = new MICSR.SimManager()
+                this.manager.initialize();
+                this.player = this.manager.player;
+                this.combatData = new MICSR.CombatData(this.manager);
                 // slayer tasks
                 this.slayerTasks = SlayerTask.data;
                 // Plot Type Options
@@ -774,7 +778,7 @@
                     this.agilitySelectCard = this.mainTabCard.addTab('Agility', this.media.agility, '', '100px');
                     this.agilityCourse = new MICSR.AgilityCourse(
                         this,
-                        this.combatData,
+                        this.player,
                         [{tag: 'combat', text: 'Combat', media: this.media.combat}],
                     );
                 } else {
@@ -1441,16 +1445,16 @@
                     ]
                 }
                 slots.forEach(slotToOccupy => {
-                    const equipment = this.combatData.player.equipment;
+                    const equipment = this.player.equipment;
                     const prevSlot = equipment.getRootSlot(slotToOccupy);
                     equipment.slots[prevSlot].occupies.forEach(occupied => {
                         this.setEquipmentImage(MICSR.equipmentSlot[occupied], -1);
                     });
-                    this.combatData.player.unequipItem(0, prevSlot);
+                    this.player.unequipItem(0, prevSlot);
                     this.setEquipmentImage(MICSR.equipmentSlot[prevSlot], -1);
                 });
                 // equip new item
-                this.combatData.player.equipItem(itemId, 0, slot);
+                this.player.equipItem(itemId, 0, slot);
                 this.setEquipmentImage(slotID, itemId);
                 // update stats
                 this.updateStyleDropdowns();
@@ -1644,8 +1648,7 @@
             levelInputOnChange(event, skillName) {
                 const newLevel = parseInt(event.currentTarget.value);
                 if (newLevel >= 1) {
-                    this.combatData.player.skillLevel[CONSTANTS.skill[skillName]] = Math.min(newLevel, 99);
-                    this.combatData.virtualLevels[skillName] = newLevel;
+                    this.player.skillLevel[CONSTANTS.skill[skillName]] = newLevel;
                     // Update Spell and Prayer Button UIS, and deselect things if they become invalid
                     if (skillName === 'Magic') {
                         this.updateSpellOptions();
@@ -1677,7 +1680,7 @@
             prayerButtonOnClick(event, prayerID) {
                 // Escape if prayer level is not reached
                 const prayer = PRAYER[prayerID];
-                if (!this.combatData.prayerSelected[prayerID] && this.combatData.player.skillLevel[CONSTANTS.skill.Prayer] < prayer.prayerLevel) {
+                if (!this.combatData.prayerSelected[prayerID] && this.player.skillLevel[CONSTANTS.skill.Prayer] < prayer.prayerLevel) {
                     notifyPlayer(CONSTANTS.skill.Prayer, `${this.getPrayerName(prayerID)} requires level ${prayer.prayerLevel} Prayer.`, 'danger');
                     return;
                 }
@@ -1748,7 +1751,7 @@
                 const spellOpts = this.combatData.spells[spellType];
                 const spell = spellOpts.array[spellID];
                 // Escape for not meeting the level/item requirement
-                if (this.combatData.player.skillLevel[CONSTANTS.skill.Magic] < spell.magicLevelRequired) {
+                if (this.player.skillLevel[CONSTANTS.skill.Magic] < spell.magicLevelRequired) {
                     notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires level ${spell.magicLevelRequired} Magic.`, 'danger');
                     return;
                 }
@@ -1812,11 +1815,11 @@
              * @param {number} petID
              */
             petButtonOnClick(event, petID) {
-                if (this.combatData.petOwned[petID]) {
-                    this.combatData.petOwned[petID] = false;
+                if (this.player.petUnlocked[petID]) {
+                    this.player.petUnlocked[petID] = false;
                     this.unselectButton(event.currentTarget);
                 } else {
-                    this.combatData.petOwned[petID] = true;
+                    this.player.petUnlocked[petID] = true;
                     this.selectButton(event.currentTarget);
                 }
                 this.updateCombatStats();
@@ -2343,7 +2346,7 @@
              * Updates the list of options in the spell menus, based on if the player can use it
              */
             updateSpellOptions() {
-                const magicLevel = this.combatData.virtualLevels.Magic || 1;
+                const magicLevel = this.player.skillLevel[CONSTANTS.skill.Magic];
                 const setSpellsPerLevel = (spell, index, type) => {
                     const spellOption = this.combatData.spells[type];
                     if (spell.magicLevelRequired > magicLevel) {
@@ -2377,7 +2380,7 @@
                 const spellOption = this.combatData.spells.aurora;
                 AURORAS.forEach((spell, index) => {
                     if (spell.requiredItem !== -1) {
-                        if (this.equipmentIDs().includes(spell.requiredItem) && this.combatData.player.Level[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
+                        if (this.equipmentIDs().includes(spell.requiredItem) && this.player.Level[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                         } else {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
@@ -2396,7 +2399,7 @@
              * Updates the prayers that display in the prayer selection card, based on if the player can use it
              */
             updatePrayerOptions() {
-                const prayerLevel = this.combatData.virtualLevels.Prayer || 1;
+                const prayerLevel = this.player.skillLevel[CONSTANTS.skill.Prayer];
                 PRAYER.forEach((prayer, i) => {
                     if (prayer.prayerLevel > prayerLevel) {
                         document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = this.media.question;
