@@ -121,8 +121,6 @@
                 this.equipmentStats = {};
                 // combat stats
                 this.combatStats = {};
-                // enable summoning synergy
-                this.summoningSynergy = true;
                 // selected item drop
                 this.dropSelected = -1;
             }
@@ -498,9 +496,6 @@
                     return true;
                 }).forEach(itemID => this.modifiers.addModifiers(items[itemID].modifiers));
 
-                // mimic calculateSummoningSynergyModifiers
-                this.modifiers.addModifiers(this.computeSynergyBonus());
-
                 // mimic calculateShopModifiers
                 // implement other parts of this if they ever are relevant
                 for (let i = 0; i <= this.autoEatTier; i++) {
@@ -550,39 +545,6 @@
                             break;
                     }
                 }
-            }
-
-            computeSynergyBonus() {
-                if (!this.summoningSynergy) {
-                    return {};
-                }
-                const summons = [
-                    this.getEquipedItem('Summon1').summoningID,
-                    this.getEquipedItem('Summon2').summoningID,
-                ];
-                const synergies = SUMMONING.Synergies[Math.min(...summons)];
-                if (!synergies) {
-                    return {};
-                }
-                const synergy = synergies[Math.max(...summons)];
-                if (!synergy) {
-                    return {};
-                }
-                const modifiers = {...synergy.modifiers};
-                // convert summoningSynergy_x_y to modifiers
-                if (modifiers.summoningSynergy_1_12 && this.isSlayerTask) {
-                    modifiers.decreasedEnemyAccuracy = modifiers.summoningSynergy_1_12;
-                } else if (modifiers.summoningSynergy_2_6 && this.isMelee()) {
-                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_6;
-                } else if (modifiers.summoningSynergy_2_7 && this.isRanged()) {
-                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_7;
-                } else if (modifiers.summoningSynergy_2_8 && this.isMagic()) {
-                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_8;
-                } else if (modifiers.summoningSynergy_7_15 && this.isRanged()) {
-                    modifiers.increasedChanceToApplyBurn = modifiers.summoningSynergy_7_15;
-                }
-                // return the synergy modifiers
-                return modifiers;
             }
 
             /**
@@ -642,20 +604,6 @@
                     xp += getBaseSummoningXP(items[summ2].summoningID, true, 3000);
                 }
                 return xp;
-            }
-
-            getCurrentSynergy() {
-                if (!this.summoningSynergy) {
-                    return undefined;
-                }
-                const summLeft = this.equipmentID(MICSR.equipmentSlot.Summon1);
-                const summRight = this.equipmentID(MICSR.equipmentSlot.Summon2);
-                if (summLeft > 0 && summRight > 0 && summLeft !== summRight) {
-                    const min = Math.min(items[summLeft].summoningID, items[summRight].summoningID);
-                    const max = Math.max(items[summLeft].summoningID, items[summRight].summoningID);
-                    return SUMMONING.Synergies[min][max];
-                }
-                return undefined;
             }
 
             isMelee() {
@@ -729,7 +677,7 @@
                     },
                     foodHeal: 0,
                     // summoning
-                    synergy: this.getCurrentSynergy(),
+                    synergy: this.player.getCurrentSynergy(),
                 };
                 // MICSR.log({...playerStats});
 

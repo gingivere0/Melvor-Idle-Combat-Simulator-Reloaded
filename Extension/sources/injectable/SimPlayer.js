@@ -90,6 +90,8 @@
                 this.potionSelected = false;
                 this.potionTier = 0;
                 this.potionID = -1;
+                // isSynergyUnlocked
+                this.summoningSynergy = true;
             }
 
             resetGains() {
@@ -151,6 +153,57 @@
 
             addAgilityModifiers() {
                 MICSR.addAgilityModifiers(this.course, this.courseMastery, this.pillar, this.modifiers);
+            }
+
+            addShopModifiers() {
+                // shop modifiers are not relevant for combat sim at this point
+            }
+
+            addSummonSynergyModifiers() {
+                if (!this.summoningSynergy) {
+                    return {};
+                }
+                const summons = [
+                    this.getEquipedItem('Summon1').summoningID,
+                    this.getEquipedItem('Summon2').summoningID,
+                ];
+                const synergies = SUMMONING.Synergies[Math.min(...summons)];
+                if (!synergies) {
+                    return {};
+                }
+                const synergy = synergies[Math.max(...summons)];
+                if (!synergy) {
+                    return {};
+                }
+                const modifiers = {...synergy.modifiers};
+                // convert summoningSynergy_x_y to modifiers
+                if (modifiers.summoningSynergy_1_12 && this.isSlayerTask) {
+                    modifiers.decreasedEnemyAccuracy = modifiers.summoningSynergy_1_12;
+                } else if (modifiers.summoningSynergy_2_6 && this.isMelee()) {
+                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_6;
+                } else if (modifiers.summoningSynergy_2_7 && this.isRanged()) {
+                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_7;
+                } else if (modifiers.summoningSynergy_2_8 && this.isMagic()) {
+                    modifiers.increasedLifesteal = modifiers.summoningSynergy_2_8;
+                } else if (modifiers.summoningSynergy_7_15 && this.isRanged()) {
+                    modifiers.increasedChanceToApplyBurn = modifiers.summoningSynergy_7_15;
+                }
+                // return the synergy modifiers
+                return modifiers;
+            }
+
+            getCurrentSynergy() {
+                if (!this.summoningSynergy) {
+                    return undefined;
+                }
+                const summLeft = this.equipmentID(MICSR.equipmentSlot.Summon1);
+                const summRight = this.equipmentID(MICSR.equipmentSlot.Summon2);
+                if (summLeft > 0 && summRight > 0 && summLeft !== summRight) {
+                    const min = Math.min(items[summLeft].summoningID, items[summRight].summoningID);
+                    const max = Math.max(items[summLeft].summoningID, items[summRight].summoningID);
+                    return SUMMONING.Synergies[min][max];
+                }
+                return undefined;
             }
 
             getEquipedItem(slotName) {

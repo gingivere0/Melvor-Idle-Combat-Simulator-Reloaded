@@ -351,7 +351,7 @@
                 if (!img) {
                     return;
                 }
-                if (this.combatData.summoningSynergy) {
+                if (this.player.summoningSynergy) {
                     img.src = this.media.synergy;
                 } else {
                     img.src = this.media.synergyLock;
@@ -361,11 +361,11 @@
                 if (!text) {
                     return;
                 }
-                if (!this.combatData.summoningSynergy) {
+                if (!this.player.summoningSynergy) {
                     text.textContent = 'Synergy locked';
                     return;
                 }
-                const synergy = this.combatData.getCurrentSynergy();
+                const synergy = this.player.getCurrentSynergy();
                 if (synergy) {
                     text.textContent = synergy.description;
                     return;
@@ -409,7 +409,7 @@
                     this.media.synergyLock,
                     'Summoning Synergy',
                     () => {
-                        this.combatData.summoningSynergy = !this.combatData.summoningSynergy;
+                        this.player.summoningSynergy = !this.player.summoningSynergy;
                         this.setSummoningSynergyText();
                         this.updateCombatStats();
                     },

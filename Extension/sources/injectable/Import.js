@@ -104,7 +104,7 @@
                     potionTier: potionTier,
                     prayerSelected: PRAYER.map((_, i) => [...player.activePrayers].includes(i)),
                     standard: player.spellSelection.standard,
-                    summoningSynergy: this.app.combatData.summoningSynergy, // TODO: import mark levels
+                    summoningSynergy: this.app.player.summoningSynergy, // TODO: import mark levels
                     useCombinationRunes: useCombinationRunes,
                 };
 
@@ -145,7 +145,7 @@
                     potionID: this.app.player.potionID,
                     potionTier: this.app.player.potionTier,
                     standard: this.app.combatData.spells.standard.selectedID,
-                    summoningSynergy: this.app.combatData.summoningSynergy,
+                    summoningSynergy: this.app.player.summoningSynergy,
                     useCombinationRunes: this.app.combatData.useCombinationRunes,
                 }
             }
@@ -335,11 +335,7 @@
 
             importSummoningSynergy(summoningSynergy) {
                 // Update summoningSynergy
-                if (summoningSynergy) {
-                    this.app.combatData.summoningSynergy = true;
-                } else {
-                    this.app.combatData.summoningSynergy = false;
-                }
+                this.app.player.summoningSynergy = summoningSynergy;
             }
 
             importAdventure(isAdventure) {
