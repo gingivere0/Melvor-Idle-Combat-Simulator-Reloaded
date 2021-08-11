@@ -45,14 +45,6 @@
                     SHOP["General"][CONSTANTS.shop.general.Auto_Eat_Tier_II],
                     SHOP["General"][CONSTANTS.shop.general.Auto_Eat_Tier_III],
                 ];
-                // pet IDs
-                this.petIds = [
-                    2, // FM pet
-                    12, 13, 14, 15, 16, 17, 18, 19, 20, // cb skill pets
-                    22, 23, // slayer area pets
-                    25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, // dungeon pets
-                    45, // Mark
-                ];
                 // Spell Selection
                 this.spells = {
                     standard: {
@@ -573,9 +565,6 @@
                     duplicateCheck[itemID] = true;
                     return true;
                 }).forEach(itemID => this.modifiers.addModifiers(items[itemID].modifiers));
-
-                // mimic calculatePetModifiers
-                this.petIds.filter(id => this.player.petUnlocked[id]).forEach(id => this.modifiers.addModifiers(PETS[id].modifiers));
 
                 // mimic calculatePrayerModifiers
                 this.computePrayerBonus();

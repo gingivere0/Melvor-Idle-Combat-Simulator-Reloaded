@@ -296,7 +296,7 @@
                 // Import PETS
                 petUnlocked.forEach((owned, petID) => {
                     this.app.player.petUnlocked[petID] = owned;
-                    if (this.app.combatData.petIds.includes(petID)) {
+                    if (this.app.petIDs.includes(petID)) {
                         if (owned) {
                             this.app.selectButton(document.getElementById(`MCS ${PETS[petID].name} Button`));
                         } else {
