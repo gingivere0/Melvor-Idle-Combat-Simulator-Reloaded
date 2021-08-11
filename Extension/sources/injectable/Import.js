@@ -182,7 +182,7 @@
                 this.app.player.equipment.unequipAll();
                 MICSR.equipmentSlotKeys.forEach((_, slotID) => {
                     const itemID = equipment[slotID];
-                    if (itemID === -1 && this.app.combatData.equipmentOccupiedBy(slotID) !== 'None') {
+                    if (itemID === -1 && this.app.player.equipmentOccupiedBy(slotID) !== 'None') {
                         return;
                     }
                     this.app.equipItem(slotID, itemID);

@@ -1411,10 +1411,6 @@
                 return equipmentSelectPopup;
             }
 
-            getEquipedItem(slotName) {
-                return MICSR.getItem(this.equipmentID(MICSR.equipmentSlot[slotName]), slotName);
-            }
-
             // Callback Functions for equipment select card
             /**
              * Equips an item to an equipment slot
@@ -1605,20 +1601,12 @@
              * @memberof McsApp
              */
             updateStyleDropdowns() {
-                const itemID = this.equipmentID(MICSR.equipmentSlot.Weapon);
+                const itemID = this.player.equipmentID(MICSR.equipmentSlot.Weapon);
                 const item = MICSR.getItem(itemID, 'Weapon');
                 this.disableStyleDropdown('melee');
                 this.disableStyleDropdown('ranged');
                 this.disableStyleDropdown('magic');
                 this.enableStyleDropdown(item.attackType);
-            }
-
-            equipmentID(slotID) {
-                return this.combatData.equipmentID(slotID);
-            }
-
-            equipmentIDs() {
-                return this.combatData.equipmentIDs();
             }
 
             /**
@@ -1741,7 +1729,7 @@
                     notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires level ${spell.magicLevelRequired} Magic.`, 'danger');
                     return;
                 }
-                if (spell.requiredItem !== undefined && spell.requiredItem !== -1 && !this.equipmentIDs().includes(spell.requiredItem)) {
+                if (spell.requiredItem !== undefined && spell.requiredItem !== -1 && !this.player.equipmentIDs().includes(spell.requiredItem)) {
                     notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires ${this.getItemName(spell.requiredItem)}.`, 'danger');
                     return;
                 }
@@ -1874,8 +1862,8 @@
              * @param {boolean} single
              */
             simulateButtonOnClick(single) {
-                const weapon = this.getEquipedItem('Weapon');
-                const quiver = this.getEquipedItem('Quiver');
+                const weapon = this.player.getEquipedItem('Weapon');
+                const quiver = this.player.getEquipedItem('Quiver');
                 if ((weapon.type === 'Ranged Weapon' || weapon.isRanged)
                     && (weapon.ammoTypeRequired !== quiver.ammoType)) {
                     notifyPlayer(CONSTANTS.skill.Ranged, 'Incorrect Ammo type equipped for weapon.', 'danger');
@@ -2366,7 +2354,7 @@
                 const spellOption = this.combatData.spells.aurora;
                 AURORAS.forEach((spell, index) => {
                     if (spell.requiredItem !== -1) {
-                        if (this.equipmentIDs().includes(spell.requiredItem) && this.player.Level[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
+                        if (this.player.equipmentIDs().includes(spell.requiredItem) && this.player.Level[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                         } else {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;

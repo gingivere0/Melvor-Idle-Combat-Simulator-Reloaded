@@ -153,6 +153,22 @@
                 MICSR.addAgilityModifiers(this.course, this.courseMastery, this.pillar, this.modifiers);
             }
 
+            getEquipedItem(slotName) {
+                return MICSR.getItem(this.equipmentID(MICSR.equipmentSlot[slotName]), slotName);
+            }
+
+            equipmentID(slotID) {
+                return this.equipment.slotArray[slotID].item.id;
+            }
+
+            equipmentIDs() {
+                return this.equipment.slotArray.map(x => x.item.id);
+            }
+
+            equipmentOccupiedBy(slotID) {
+                return this.equipment.slotArray[slotID].occupiedBy;
+            }
+
             getSkillXPToAdd(skill, xp) {
                 let xpMultiplier = 1;
                 xpMultiplier += this.modifiers.getSkillModifierValue("increasedSkillXP", skill) / 100;
