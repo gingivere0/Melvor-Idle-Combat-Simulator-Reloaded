@@ -277,12 +277,12 @@
                 // multiplier gp increase
                 currentSim.gpBonus = combatData.combatStats.gpBonus;
                 // check for ARS drop
-                currentSim.canTopazDrop = combatData.equipmentSelected.includes(CONSTANTS.item.Gold_Topaz_Ring);
+                currentSim.canTopazDrop = combatData.player.equipmentIDs().includes(CONSTANTS.item.Gold_Topaz_Ring);
                 // loot bonus
                 currentSim.lootBonus = combatData.combatStats.lootBonus;
                 // misc
                 currentSim.herbConvertChance = combatData.luckyHerb / 100;
-                currentSim.doBonesAutoBury = (combatData.equipmentSelected.includes(CONSTANTS.item.Bone_Necklace));
+                currentSim.doBonesAutoBury = (combatData.player.equipmentIDs().includes(CONSTANTS.item.Bone_Necklace));
                 currentSim.isSlayerTask = combatData.isSlayerTask;
                 currentSim.playerStats.isSlayerTask = combatData.isSlayerTask;
                 Object.assign(currentSim.equipmentStats, combatData.equipmentStats);
