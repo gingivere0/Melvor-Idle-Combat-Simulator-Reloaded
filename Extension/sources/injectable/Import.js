@@ -128,6 +128,7 @@
                     petUnlocked: [...this.app.player.petUnlocked],
                     // objects
                     styles: {...this.app.player.attackStyles},
+                    prayerSelected: this.app.player.activePrayers,
                     // simple values
                     ancient: this.app.combatData.spells.ancient.selectedID,
                     aurora: this.app.combatData.spells.aurora.selectedID,
@@ -143,7 +144,6 @@
                     pillar: this.app.player.pillar,
                     potionID: this.app.player.potionID,
                     potionTier: this.app.player.potionTier,
-                    prayerSelected: this.app.combatData.prayerSelected,
                     standard: this.app.combatData.spells.standard.selectedID,
                     summoningSynergy: this.app.combatData.summoningSynergy,
                     useCombinationRunes: this.app.combatData.useCombinationRunes,
@@ -256,17 +256,18 @@
             }
 
             importPrayers(prayerSelected) {
+                // toggle old prayers off
+                this.app.player.activePrayers.forEach(prayerID => {
+                    this.activePrayers.delete(prayerID)
+                });
                 // Update prayers
-                this.app.combatData.activePrayers = 0;
-                for (let i = 0; i < PRAYER.length; i++) {
-                    const prayButton = document.getElementById(`MCS ${this.app.getPrayerName(i)} Button`);
-                    if (prayerSelected[i]) {
+                for (let prayerID = 0; prayerID < PRAYER.length; prayerID++) {
+                    const prayButton = document.getElementById(`MCS ${this.app.getPrayerName(prayerID)} Button`);
+                    if (prayerSelected[prayerID]) {
                         this.app.selectButton(prayButton);
-                        this.app.combatData.prayerSelected[i] = true;
-                        this.app.combatData.activePrayers++;
+                        this.app.player.activePrayers.add(prayerID);
                     } else {
                         this.app.unselectButton(prayButton);
-                        this.app.combatData.prayerSelected[i] = false;
                     }
                 }
             }

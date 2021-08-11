@@ -88,15 +88,6 @@
                     lootBonus: 0,
                     gpBonus: 0,
                 };
-                // Prayer Stats
-                /** @type {boolean[]} */
-                this.prayerSelected = [];
-                for (let i = 0; i < PRAYER.length; i++) {
-                    this.prayerSelected.push(false);
-                }
-                this.activePrayers = 0;
-                /** Computed Prayer Bonus From UI */
-                this.resetPrayerBonus();
                 /** Aurora Bonuses */
                 this.auroraBonus = {
                     attackSpeedBuff: 0,
@@ -496,44 +487,6 @@
             }
 
             /**
-             * Computes the prayer bonuses for the selected prayers
-             */
-            computePrayerBonus() {
-                this.resetPrayerBonus();
-                for (let i = 0; i < this.prayerSelected.length; i++) {
-                    if (this.prayerSelected[i]) {
-                        if (PRAYER[i].modifiers !== undefined) {
-                            this.modifiers.addModifiers(PRAYER[i].modifiers);
-                        }
-                        if (PRAYER[i].vars !== undefined) {
-                            let j = 0;
-                            for (const v of PRAYER[i].vars) {
-                                this.prayerBonus.vars[v] += PRAYER[i].values[j];
-                                j++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            /**
-             * Resets prayer bonuses to none
-             */
-            resetPrayerBonus() {
-                const prayerVars = {};
-                PRAYER.map(x => x.vars)
-                    .filter(x => x !== undefined)
-                    .forEach(vars => vars.forEach(v => {
-                        if (prayerVars[v] === undefined) {
-                            prayerVars[v] = 0;
-                        }
-                    }));
-                this.prayerBonus = {
-                    vars: prayerVars,
-                };
-            }
-
-            /**
              * Update this.modifiers
              * mimics updateAllPlayerModifiers
              */
@@ -556,9 +509,6 @@
                     duplicateCheck[itemID] = true;
                     return true;
                 }).forEach(itemID => this.modifiers.addModifiers(items[itemID].modifiers));
-
-                // mimic calculatePrayerModifiers
-                this.computePrayerBonus();
 
                 // mimic calculateSummoningSynergyModifiers
                 this.modifiers.addModifiers(this.computeSynergyBonus());
@@ -863,9 +813,7 @@
                     // modifiers
                     amt += this.numberMultiplier * MICSR.getModifierValue(this.modifiers, 'HPRegenFlat');
                     // rapid heal prayer
-                    if (this.prayerBonus.vars[prayerBonusHitpoints] !== undefined) {
-                        amt *= 2;
-                    }
+                    amt *= 1 + MICSR.getModifierValue(this.modifiers, 'HitpointRegeneration');
                     // Regeneration modifiers
                     applyModifier(
                         amt,
@@ -896,16 +844,14 @@
                     return pp;
                 }
                 // Compute prayer point usage and xp gain
-                for (let i = 0; i < PRAYER.length; i++) {
-                    if (this.prayerSelected[i]) {
-                        // Base PP Usage
-                        playerStats.prayerPointsPerAttack += adjustPP(PRAYER[i].pointsPerPlayer);
-                        playerStats.prayerPointsPerEnemy += adjustPP(PRAYER[i].pointsPerEnemy);
-                        playerStats.prayerPointsPerHeal += adjustPP(PRAYER[i].pointsPerRegen);
-                        // XP Gain
-                        playerStats.prayerXpPerDamage += PRAYER[i].pointsPerPlayer / this.numberMultiplier;
-                    }
-                }
+                this.player.activePrayers.forEach(i => {
+                    // Base PP Usage
+                    playerStats.prayerPointsPerAttack += adjustPP(PRAYER[i].pointsPerPlayer);
+                    playerStats.prayerPointsPerEnemy += adjustPP(PRAYER[i].pointsPerEnemy);
+                    playerStats.prayerPointsPerHeal += adjustPP(PRAYER[i].pointsPerRegen);
+                    // XP Gain
+                    playerStats.prayerXpPerDamage += PRAYER[i].pointsPerPlayer / this.numberMultiplier;
+                });
                 // Xp Bonuses
                 const globalXpBonus = MICSR.getModifierValue(this.modifiers, 'GlobalSkillXP');
                 playerStats.combatXpBonus = globalXpBonus;

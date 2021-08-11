@@ -99,6 +99,7 @@
                 this._slayercoins = 0;
                 this.selectedPotion = 0;
                 this.usedPotionCharges = 0;
+                this.usedPrayerPoints = 0;
             }
 
             getGains() {
@@ -218,6 +219,15 @@
                     if (item.modifiers !== undefined) {
                         this.modifiers.addModifiers(item.modifiers);
                     }
+                }
+            }
+
+            // track prayer point usage instead of consuming
+            consumePrayerPoints(amount) {
+                if (amount > 0) {
+                    amount = this.applyModifiersToPrayerCost(amount);
+                    this.consumePotionCharge("PrayerPointCost");
+                    this.usedPrayerPoints += amount;
                 }
             }
 

@@ -1663,25 +1663,23 @@
             /**
              * Callback for when a prayer image button is clicked
              * @param {MouseEvent} event The onclick event for a button
-             * @param {number} prayerID Index of prayerSelected
+             * @param {number} prayerID Index of PRAYERS
              */
             prayerButtonOnClick(event, prayerID) {
                 // Escape if prayer level is not reached
                 const prayer = PRAYER[prayerID];
-                if (!this.combatData.prayerSelected[prayerID] && this.player.skillLevel[CONSTANTS.skill.Prayer] < prayer.prayerLevel) {
+                if (!this.player.activePrayers.has(prayerID) && this.player.skillLevel[CONSTANTS.skill.Prayer] < prayer.prayerLevel) {
                     notifyPlayer(CONSTANTS.skill.Prayer, `${this.getPrayerName(prayerID)} requires level ${prayer.prayerLevel} Prayer.`, 'danger');
                     return;
                 }
                 let prayerChanged = false;
-                if (this.combatData.prayerSelected[prayerID]) {
-                    this.combatData.activePrayers--;
-                    this.combatData.prayerSelected[prayerID] = false;
+                if (this.player.activePrayers.has(prayerID)) {
+                    this.player.activePrayers.delete(prayerID);
                     this.unselectButton(event.currentTarget);
                     prayerChanged = true;
                 } else {
-                    if (this.combatData.activePrayers < 2) {
-                        this.combatData.activePrayers++;
-                        this.combatData.prayerSelected[prayerID] = true;
+                    if (this.player.activePrayers.length < 2) {
+                        this.player.activePrayers.add(prayerID);
                         this.selectButton(event.currentTarget);
                         prayerChanged = true;
                     } else {
@@ -2391,7 +2389,7 @@
                 PRAYER.forEach((prayer, i) => {
                     if (prayer.prayerLevel > prayerLevel) {
                         document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = this.media.question;
-                        if (this.combatData.prayerSelected[i]) {
+                        if (this.player.activePrayers.has(i)) {
                             this.prayerButtonOnClick({currentTarget: document.getElementById(`MCS ${this.getPrayerName(i)} Button`)}, i);
                             notifyPlayer(CONSTANTS.skill.Prayer, `${this.getPrayerName(i)} has been de-selected. It requires level ${prayer.prayerLevel} Prayer.`, 'danger');
                         }
