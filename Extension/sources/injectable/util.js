@@ -118,7 +118,10 @@
             Platebody: makeEmptyItem('assets/media/bank/armour_platebody.png', 'Platebody'),
             Platelegs: makeEmptyItem('assets/media/bank/armour_platelegs.png', 'Platelegs'),
             Boots: makeEmptyItem('assets/media/bank/armour_boots.png', 'Boots'),
-            Weapon: makeEmptyItem('assets/media/bank/weapon_sword.png', 'Weapon'),
+            Weapon: {
+                ...makeEmptyItem('assets/media/bank/weapon_sword.png', 'Weapon'),
+                attackType: 'melee',
+            },
             Shield: makeEmptyItem('assets/media/bank/armour_shield.png', 'Shield'),
             Amulet: makeEmptyItem('assets/media/bank/misc_amulet.png', 'Amulet'),
             Ring: makeEmptyItem('assets/media/bank/misc_ring.png', 'Ring'),

@@ -86,6 +86,10 @@
                 this.course = Array(10).fill(-1);
                 this.courseMastery = Array(10).fill(false);
                 this.pillar = -1;
+                // herbloreBonuses
+                this.potionSelected = false;
+                this.potionTier = 0;
+                this.potionID = -1;
             }
 
             resetGains() {
@@ -93,6 +97,8 @@
                 this.skillXP = skillLevel.map(_ => 0);
                 this.petRolls = {};
                 this._slayercoins = 0;
+                this.selectedPotion = 0;
+                this.usedPotionCharges = 0;
             }
 
             getGains() {
@@ -187,11 +193,32 @@
             render() {
             }
 
-            // don't consume potion charges
+            getPotion() {
+                return items[herbloreItemData[this.potionID].itemID[this.potionTier]];
+            }
+
+            // track potion usage instead of consuming
             consumePotionCharge(type) {
+                if (this.potionSelected) {
+                    const item = this.getPotion();
+                    if (type === herbloreItemData[item.masteryID[1]].consumesOn
+                        && !rollPercentage(this.modifiers.increasedChanceToPreservePotionCharge - this.modifiers.decreasedChanceToPreservePotionCharge)
+                    ) {
+                        this.usedPotionCharges++;
+                    }
+                }
             }
 
             reusePotion() {
+            }
+
+            addPotionModifiers() {
+                if (this.potionSelected) {
+                    const item = this.getPotion();
+                    if (item.modifiers !== undefined) {
+                        this.modifiers.addModifiers(item.modifiers);
+                    }
+                }
             }
 
             // TODO: override

@@ -68,12 +68,6 @@
                         selectedID: null,
                     },
                 };
-                // Style Selection
-                this.attackStyle = {
-                    Melee: 0,
-                    Ranged: 0,
-                    Magic: 0,
-                };
                 // Combat Stats
                 this.combatStats = {
                     attackSpeed: 4000,
@@ -121,10 +115,7 @@
                 this.numberMultiplier = 10;
                 // combination runes
                 this.useCombinationRunes = false;
-                // Herblore Bonuses
-                this.potionSelected = false;
-                this.potionTier = 0;
-                this.potionID = -1;
+                // lucky herb bonus
                 this.luckyHerb = 0;
                 // Food
                 this.autoEatTier = -1;
@@ -438,7 +429,7 @@
                 // attack speed without aurora
                 this.combatStats.attackSpeed = 4000;
                 this.combatStats.attackSpeed = this.equipmentStats.attackSpeed;
-                if (this.combatStats.attackType === CONSTANTS.attackType.Ranged && this.attackStyle.Ranged === 1) {
+                if (this.combatStats.attackType === CONSTANTS.attackType.Ranged && this.player.attackStyle.Ranged === 'Rapid') {
                     this.combatStats.attackSpeed -= 400;
                 }
                 this.combatStats.attackSpeed += MICSR.getModifierValue(modifiers, 'AttackInterval');
@@ -674,9 +665,8 @@
              * */
             computePotionBonus() {
                 this.luckyHerb = 0;
-                if (this.potionSelected) {
-                    const potion = items[herbloreItemData[this.potionID].itemID[this.potionTier]];
-                    this.modifiers.addModifiers(potion.modifiers);
+                if (this.player.potionSelected) {
+                    const potion = items[herbloreItemData[this.player.potionID].itemID[this.player.potionTier]];
                     if (potion.potionBonusID === 11) {
                         this.luckyHerb = potion.potionBonus;
                     }
@@ -920,21 +910,21 @@
                 const globalXpBonus = MICSR.getModifierValue(this.modifiers, 'GlobalSkillXP');
                 playerStats.combatXpBonus = globalXpBonus;
                 if (this.combatStats.attackType === CONSTANTS.attackType.Melee) {
-                    switch (this.attackStyle.Melee) {
-                        case 0:
+                    switch (this.player.attackStyle.melee) {
+                        case 'Stab':
                             playerStats.combatXpBonus += MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Attack);
                             break
-                        case 1:
+                        case 'Slash':
                             playerStats.combatXpBonus += MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Strength);
                             break
-                        case 2:
+                        case 'Block':
                             playerStats.combatXpBonus += MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Defence);
                             break
                     }
                 }
                 if (this.combatStats.attackType === CONSTANTS.attackType.Ranged) {
                     const xpBonus = MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Ranged);
-                    if (this.attackStyle.Ranged === 2) {
+                    if (this.player.attackStyle.ranged === 'Longrange') {
                         const defenceXpBonus = MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Defence);
                         playerStats.combatXpBonus += (xpBonus + defenceXpBonus) / 2;
                     } else {
@@ -943,7 +933,7 @@
                 }
                 if (this.combatStats.attackType === CONSTANTS.attackType.Magic) {
                     const xpBonus = MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Magic);
-                    if (this.attackStyle.Magic === 2) {
+                    if (this.player.attackStyle.magic === 'Defensive') {
                         const defenceXpBonus = MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Defence);
                         playerStats.combatXpBonus += (xpBonus + defenceXpBonus) / 2;
                     } else {

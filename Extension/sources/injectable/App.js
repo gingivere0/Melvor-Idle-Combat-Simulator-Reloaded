@@ -420,9 +420,9 @@
                 const combatStyleCCContainer = this.equipmentSelectCard.createCCContainer();
                 const combatStyleLabel = this.equipmentSelectCard.createLabel('Combat Style', '');
                 combatStyleLabel.classList.add('mb-1');
-                const meleeStyleDropdown = this.equipmentSelectCard.createDropdown(['Stab', 'Slash', 'Block'], [0, 1, 2], 'MCS Melee Style Dropdown', (event) => this.styleDropdownOnChange(event, 'Melee'));
-                const rangedStyleDropdown = this.equipmentSelectCard.createDropdown(['Accurate', 'Rapid', 'Longrange'], [0, 1, 2], 'MCS Ranged Style Dropdown', (event) => this.styleDropdownOnChange(event, 'Ranged'));
-                const magicStyleDropdown = this.equipmentSelectCard.createDropdown(['Magic', 'Defensive'], [0, 1], 'MCS Magic Style Dropdown', (event) => this.styleDropdownOnChange(event, 'Magic'));
+                const meleeStyleDropdown = this.equipmentSelectCard.createDropdown(['Stab', 'Slash', 'Block'], [0, 1, 2], 'MCS melee Style Dropdown', (event) => this.styleDropdownOnChange(event, 'melee'));
+                const rangedStyleDropdown = this.equipmentSelectCard.createDropdown(['Accurate', 'Rapid', 'Longrange'], [0, 1, 2], 'MCS ranged Style Dropdown', (event) => this.styleDropdownOnChange(event, 'ranged'));
+                const magicStyleDropdown = this.equipmentSelectCard.createDropdown(['Magic', 'Defensive'], [0, 1], 'MCS magic Style Dropdown', (event) => this.styleDropdownOnChange(event, 'magic'));
                 rangedStyleDropdown.style.display = 'none';
                 magicStyleDropdown.style.display = 'none';
                 combatStyleCCContainer.appendChild(combatStyleLabel);
@@ -1274,21 +1274,6 @@
             }
 
             /**
-             * Gets the weapon type of an item
-             * @param {Object} item
-             * @return {string}
-             */
-            getWeaponType(item) {
-                if ((item.type === 'Ranged Weapon') || item.isRanged) {
-                    return 'Ranged';
-                } else if (item.isMagic) {
-                    return 'Magic';
-                } else {
-                    return 'Melee';
-                }
-            }
-
-            /**
              * Filter by combat summon
              * @return {boolean}
              */
@@ -1622,23 +1607,10 @@
             updateStyleDropdowns() {
                 const itemID = this.equipmentID(MICSR.equipmentSlot.Weapon);
                 const item = MICSR.getItem(itemID, 'Weapon');
-                switch (this.getWeaponType(item)) {
-                    case 'Ranged':
-                        this.disableStyleDropdown('Magic');
-                        this.disableStyleDropdown('Melee');
-                        this.enableStyleDropdown('Ranged');
-                        break;
-                    case 'Magic':
-                        this.disableStyleDropdown('Ranged');
-                        this.disableStyleDropdown('Melee');
-                        this.enableStyleDropdown('Magic');
-                        break;
-                    case 'Melee':
-                        this.disableStyleDropdown('Magic');
-                        this.disableStyleDropdown('Ranged');
-                        this.enableStyleDropdown('Melee');
-                        break;
-                }
+                this.disableStyleDropdown('melee');
+                this.disableStyleDropdown('ranged');
+                this.disableStyleDropdown('magic');
+                this.enableStyleDropdown(item.attackType);
             }
 
             equipmentID(slotID) {
@@ -1676,7 +1648,14 @@
              * @param {string} combatType The key of styles to change
              */
             styleDropdownOnChange(event, combatType) {
-                this.combatData.attackStyle[combatType] = parseInt(event.currentTarget.selectedOptions[0].value);
+                let idx = parseInt(event.currentTarget.selectedOptions[0].value);
+                if (this.player.attackType === 'ranged') {
+                    idx += 3;
+                }
+                if (this.player.attackType === 'magic') {
+                    idx += 6;
+                }
+                this.player.setAttackStyle(combatType, AttackStyles[idx]);
                 this.updateCombatStats();
             }
 
@@ -1720,7 +1699,7 @@
              */
             potionTierDropDownOnChange(event) {
                 const potionTier = parseInt(event.currentTarget.selectedOptions[0].value);
-                this.combatData.potionTier = potionTier;
+                this.player.potionTier = potionTier;
                 this.updateCombatStats();
                 this.updatePotionTier(potionTier);
             }
@@ -1731,19 +1710,19 @@
              * @param {number} potionID The ID of the potion
              */
             potionImageButtonOnClick(event, potionID) {
-                if (this.combatData.potionSelected) {
-                    if (this.combatData.potionID === potionID) { // Deselect Potion
-                        this.combatData.potionSelected = false;
-                        this.combatData.potionID = -1;
+                if (this.player.potionSelected) {
+                    if (this.player.potionID === potionID) { // Deselect Potion
+                        this.player.potionSelected = false;
+                        this.player.potionID = -1;
                         this.unselectButton(event.currentTarget);
                     } else { // Change Potion
-                        this.unselectButton(document.getElementById(`MCS ${this.getPotionName(this.combatData.potionID)} Button`));
-                        this.combatData.potionID = potionID;
+                        this.unselectButton(document.getElementById(`MCS ${this.getPotionName(this.player.potionID)} Button`));
+                        this.player.potionID = potionID;
                         this.selectButton(event.currentTarget);
                     }
                 } else { // Select Potion
-                    this.combatData.potionSelected = true;
-                    this.combatData.potionID = potionID;
+                    this.player.potionSelected = true;
+                    this.player.potionID = potionID;
                     this.selectButton(event.currentTarget);
                 }
                 this.updateCombatStats();

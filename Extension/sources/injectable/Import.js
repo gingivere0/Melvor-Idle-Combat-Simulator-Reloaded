@@ -79,32 +79,33 @@
 
                 // create settings object
                 const settings = {
-                    equipment: player.equipmentSets[setID].slotArray.map(x => x.occupiedBy === 'None' ? x.item.id : -1),
-                    levels: skillXP.map(x => Math.max(1, exp.xp_to_level(x) - 1)),
-                    meleeStyle: player.attackStyles.melee,
-                    rangedStyle: player.attackStyles.ranged,
-                    magicStyle: player.attackStyles.magic,
-                    isAncient: player.spellSelection.ancient !== -1,
-                    ancient: player.spellSelection.ancient,
-                    standard: player.spellSelection.standard,
-                    curse: player.spellSelection.curse,
-                    aurora: player.spellSelection.aurora,
-                    prayerSelected: PRAYER.map((_, i) => [...player.activePrayers].includes(i)),
-                    potionID: potionID,
-                    potionTier: potionTier,
-                    petUnlocked: petUnlocked,
-                    autoEatTier: autoEatTier,
-                    foodSelected: food.id,
-                    cookingPool: getMasteryPoolProgress(CONSTANTS.skill.Cooking) >= 95,
-                    cookingMastery: cookingMastery,
-                    isSlayerTask: this.app.combatData.isSlayerTask,
-                    isHardcore: currentGamemode === 1,
-                    isAdventure: currentGamemode === 2,
-                    useCombinationRunes: useCombinationRunes,
+                    // lists
                     course: chosenAgilityObstacles,
                     courseMastery: MASTERY[CONSTANTS.skill.Agility].xp.map(x => x > 13034431),
+                    equipment: player.equipmentSets[setID].slotArray.map(x => x.occupiedBy === 'None' ? x.item.id : -1),
+                    levels: skillXP.map(x => Math.max(1, exp.xp_to_level(x) - 1)),
+                    petUnlocked: petUnlocked,
+                    // objects
+                    styles: {...player.attackStyles},
+                    // simple values
+                    ancient: player.spellSelection.ancient,
+                    aurora: player.spellSelection.aurora,
+                    autoEatTier: autoEatTier,
+                    cookingMastery: cookingMastery,
+                    cookingPool: getMasteryPoolProgress(CONSTANTS.skill.Cooking) >= 95,
+                    curse: player.spellSelection.curse,
+                    foodSelected: food.id,
+                    isAdventure: currentGamemode === 2,
+                    isAncient: player.spellSelection.ancient !== -1,
+                    isHardcore: currentGamemode === 1,
+                    isSlayerTask: this.app.combatData.isSlayerTask,
                     pillar: agilityPassivePillarActive,
+                    potionID: potionID,
+                    potionTier: potionTier,
+                    prayerSelected: PRAYER.map((_, i) => [...player.activePrayers].includes(i)),
+                    standard: player.spellSelection.standard,
                     summoningSynergy: this.app.combatData.summoningSynergy, // TODO: import mark levels
+                    useCombinationRunes: useCombinationRunes,
                 };
 
                 // import settings
@@ -120,34 +121,32 @@
                     // combatData: this.app.player,
                     // TODO: all these should be in SimPlayer class?
                     // lists
-                    equipment: this.app.player.equipment.slotArray.map(x => x.item.id),
-                    petUnlocked: [...this.app.player.petUnlocked],
                     course: [...this.app.player.course],
-                    // objects
-                    levels: {...this.app.player.skillLevel},
-                    // simple values
-                    meleeStyle: this.app.combatData.attackStyle.Melee,
-                    rangedStyle: this.app.combatData.attackStyle.Ranged,
-                    magicStyle: this.app.combatData.attackStyle.Magic,
-                    isAncient: this.app.combatData.spells.ancient.isSelected,
-                    ancient: this.app.combatData.spells.ancient.selectedID,
-                    standard: this.app.combatData.spells.standard.selectedID,
-                    curse: this.app.combatData.spells.curse.selectedID,
-                    aurora: this.app.combatData.spells.aurora.selectedID,
-                    prayerSelected: this.app.combatData.prayerSelected,
-                    potionID: this.app.combatData.potionID,
-                    potionTier: this.app.combatData.potionTier,
-                    autoEatTier: this.app.combatData.autoEatTier,
-                    foodSelected: this.app.combatData.foodSelected,
-                    cookingPool: this.app.combatData.cookingPool,
-                    cookingMastery: this.app.combatData.cookingMastery,
-                    isSlayerTask: this.app.combatData.isSlayerTask,
-                    isHardcore: this.app.combatData.isHardcore,
-                    isAdventure: this.app.combatData.isAdventure,
-                    useCombinationRunes: this.app.combatData.useCombinationRunes,
                     courseMastery: courseMastery,
+                    equipment: this.app.player.equipment.slotArray.map(x => x.item.id),
+                    levels: [...this.app.player.skillLevel],
+                    petUnlocked: [...this.app.player.petUnlocked],
+                    // objects
+                    styles: {...this.app.player.attackStyles},
+                    // simple values
+                    ancient: this.app.combatData.spells.ancient.selectedID,
+                    aurora: this.app.combatData.spells.aurora.selectedID,
+                    autoEatTier: this.app.combatData.autoEatTier,
+                    cookingMastery: this.app.combatData.cookingMastery,
+                    cookingPool: this.app.combatData.cookingPool,
+                    curse: this.app.combatData.spells.curse.selectedID,
+                    foodSelected: this.app.combatData.foodSelected,
+                    isAdventure: this.app.combatData.isAdventure,
+                    isAncient: this.app.combatData.spells.ancient.isSelected,
+                    isHardcore: this.app.combatData.isHardcore,
+                    isSlayerTask: this.app.combatData.isSlayerTask,
                     pillar: this.app.player.pillar,
+                    potionID: this.app.player.potionID,
+                    potionTier: this.app.player.potionTier,
+                    prayerSelected: this.app.combatData.prayerSelected,
+                    standard: this.app.combatData.spells.standard.selectedID,
                     summoningSynergy: this.app.combatData.summoningSynergy,
+                    useCombinationRunes: this.app.combatData.useCombinationRunes,
                 }
             }
 
@@ -155,7 +154,7 @@
                 // import settings
                 this.importEquipment(settings.equipment);
                 this.importLevels(settings.levels);
-                this.importStyle(settings.meleeStyle, settings.rangedStyle, settings.magicStyle);
+                this.importStyle(settings.styles);
                 this.importSpells(settings.ancient, settings.standard, settings.curse, settings.aurora);
                 this.importPrayers(settings.prayerSelected);
                 this.importPotion(settings.potionID, settings.potionTier);
@@ -199,13 +198,15 @@
                 this.app.player.skillLevel = [...levels];
             }
 
-            importStyle(meleeStyle, rangedStyle, magicStyle) {
-                this.app.combatData.attackStyle.Melee = meleeStyle;
-                document.getElementById('MCS Melee Style Dropdown').selectedIndex = meleeStyle;
-                this.app.combatData.attackStyle.Ranged = rangedStyle;
-                document.getElementById('MCS Ranged Style Dropdown').selectedIndex = rangedStyle;
-                this.app.combatData.attackStyle.Magic = magicStyle;
-                document.getElementById('MCS Magic Style Dropdown').selectedIndex = magicStyle;
+            importStyle(styles) {
+                [
+                    'melee',
+                    'ranged',
+                    'magic',
+                ].forEach(style => {
+                    this.app.player.setAttackStyle(style, styles[style]);
+                    document.getElementById(`MCS ${style} Style Dropdown`).selectedIndex = attackStyles[styles[style]].id % 3;
+                });
             }
 
             importSpells(ancient, standard, curse, aurora) {
@@ -272,20 +273,20 @@
 
             importPotion(potionID, potionTier) {
                 // Deselect potion if selected
-                if (this.app.combatData.potionSelected) {
-                    this.app.unselectButton(document.getElementById(`MCS ${this.app.getPotionName(this.app.combatData.potionID)} Button`));
-                    this.app.combatData.potionSelected = false;
-                    this.app.combatData.potionID = -1;
+                if (this.app.player.potionSelected) {
+                    this.app.unselectButton(document.getElementById(`MCS ${this.app.getPotionName(this.app.player.potionID)} Button`));
+                    this.app.player.potionSelected = false;
+                    this.app.player.potionID = -1;
                 }
                 // Select new potion if applicable
                 if (potionID !== -1) {
-                    this.app.combatData.potionSelected = true;
-                    this.app.combatData.potionID = potionID;
-                    this.app.selectButton(document.getElementById(`MCS ${this.app.getPotionName(this.app.combatData.potionID)} Button`));
+                    this.app.player.potionSelected = true;
+                    this.app.player.potionID = potionID;
+                    this.app.selectButton(document.getElementById(`MCS ${this.app.getPotionName(this.app.player.potionID)} Button`));
                 }
                 // Set potion tier if applicable
                 if (potionTier !== -1) {
-                    this.app.combatData.potionTier = potionTier;
+                    this.app.player.potionTier = potionTier;
                     this.app.updatePotionTier(potionTier);
                     // Set dropdown to correct option
                     document.getElementById('MCS Potion Tier Dropdown').selectedIndex = potionTier;
