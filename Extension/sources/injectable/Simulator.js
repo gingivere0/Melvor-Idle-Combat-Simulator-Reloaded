@@ -434,7 +434,18 @@
 
                 // setup combat data for simulation
                 this.setupCurrentSimCombatData(this.currentSim, this.parent.combatData);
-                const rawCombatData = JSON.parse(JSON.stringify(this.parent.combatData, null, 1));
+                let cache = [];
+                const rawCombatData = JSON.parse(JSON.stringify(this.parent.combatData, (key, value) => {
+                    if (typeof value === 'object' && value !== null) {
+                        // Duplicate reference found, discard key
+                        if (cache.includes(value)) return;
+
+                        // Store value in our collection
+                        cache.push(value);
+                    }
+                    return value;
+                }, 1));
+                cache = null;
                 this.currentSim.combatData = new MICSR.CombatData(this.parent.manager);
                 Object.getOwnPropertyNames(rawCombatData).forEach(prop => this.currentSim.combatData[prop] = rawCombatData[prop]);
 
