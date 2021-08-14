@@ -54,7 +54,7 @@
 
                 for (let i = 0; i < combatAreas.length; i++) {
                     totBars += combatAreas[i].monsters.length;
-                    this.barBottomNames.push(combatAreas[i].areaName);
+                    this.barBottomNames.push(combatAreas[i].name);
                     this.barBottomLength.push(combatAreas[i].monsters.length);
                     for (let j = 0; j < combatAreas[i].monsters.length; j++) {
                         this.barNames.push(this.parent.getMonsterName(combatAreas[i].monsters[j]));
@@ -69,7 +69,7 @@
                 this.barImageSrc.push(MONSTERS[bardID].media);
                 for (let i = 0; i < slayerAreas.length; i++) {
                     totBars += slayerAreas[i].monsters.length;
-                    this.barBottomNames.push(slayerAreas[i].areaName);
+                    this.barBottomNames.push(slayerAreas[i].name);
                     this.barBottomLength.push(slayerAreas[i].monsters.length);
                     for (let j = 0; j < slayerAreas[i].monsters.length; j++) {
                         this.barNames.push(this.parent.getMonsterName(slayerAreas[i].monsters[j]));
