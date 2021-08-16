@@ -2361,7 +2361,7 @@
                 const spellOption = this.combatData.spells.aurora;
                 AURORAS.forEach((spell, index) => {
                     if (spell.requiredItem !== -1) {
-                        if (this.player.equipmentIDs().includes(spell.requiredItem) && this.player.Level[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
+                        if (this.player.equipmentIDs().includes(spell.requiredItem) && this.player.skillLevel[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                         } else {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
