@@ -508,7 +508,14 @@
                 // import equipment and settings
                 const importSetCCContainer = this.equipmentSelectCard.createCCContainer();
                 importSetCCContainer.appendChild(this.equipmentSelectCard.createLabel('Import Set', ''));
-                this.equipmentSelectCard.addMultiButton(['1', '2', '3'], [() => this.import.importButtonOnClick(0), () => this.import.importButtonOnClick(1), () => this.import.importButtonOnClick(2)], importSetCCContainer);
+                // only create buttons for purchased equipment sets
+                let importButtonText = [];
+                let importButtonFunc = [];
+                for (let i = 0; i < player.equipmentSets.length; i++) {
+                    importButtonText.push(`${i + 1}`);
+                    importButtonFunc.push(() => this.import.importButtonOnClick(i));
+                }
+                this.equipmentSelectCard.addMultiButton(importButtonText, importButtonFunc, importSetCCContainer);
                 this.equipmentSelectCard.container.appendChild(importSetCCContainer);
                 // add button to show all modifiers
                 const modifierCCContainer = this.equipmentSelectCard.createCCContainer();
