@@ -138,7 +138,7 @@
                     curse: this.app.combatData.spells.curse.selectedID,
                     foodSelected: this.app.combatData.foodSelected,
                     isAdventure: this.app.combatData.isAdventure,
-                    isAncient: this.app.combatData.spells.ancient.isSelected,
+                    isAncient: this.app.combatData.spells.ancient.selectedID > -1,
                     isHardcore: this.app.combatData.isHardcore,
                     isSlayerTask: this.app.combatData.isSlayerTask,
                     pillar: this.app.player.pillar,
@@ -213,42 +213,33 @@
                 // Set all active spell UI to be disabled
                 Object.keys(this.app.combatData.spells).forEach((spellType) => {
                     const spellOpts = this.app.combatData.spells[spellType];
-                    if (spellOpts.isSelected) {
+                    if (spellOpts.selectedID > -1) {
                         this.app.unselectButton(document.getElementById(`MCS ${spellOpts.array[spellOpts.selectedID].name} Button`));
                     }
                 });
                 // import spells
                 if (ancient !== -1) {
-                    this.app.combatData.spells.ancient.isSelected = true;
                     this.app.combatData.spells.ancient.selectedID = ancient;
                     // clear standard and curse
-                    this.app.combatData.spells.standard.isSelected = false;
                     this.app.combatData.spells.standard.selectedID = -1;
-                    this.app.combatData.spells.curse.isSelected = false;
                     this.app.combatData.spells.curse.selectedID = -1;
                 } else {
-                    this.app.combatData.spells.standard.isSelected = true;
                     this.app.combatData.spells.standard.selectedID = standard;
-                    this.app.combatData.spells.ancient.isSelected = false;
                     this.app.combatData.spells.ancient.selectedID = -1;
                     if (curse !== -1) {
-                        this.app.combatData.spells.curse.isSelected = true;
                         this.app.combatData.spells.curse.selectedID = curse;
                     } else {
-                        this.app.combatData.spells.curse.isSelected = false;
                         this.app.combatData.spells.curse.selectedID = -1;
                     }
                 }
                 if (aurora !== -1) {
-                    this.app.combatData.spells.aurora.isSelected = true;
                     this.app.combatData.spells.aurora.selectedID = aurora;
                 } else {
-                    this.app.combatData.spells.aurora.isSelected = false;
                     this.app.combatData.spells.aurora.selectedID = -1;
                 }
                 // Update spell UI
                 Object.values(this.app.combatData.spells).forEach((spellOpts, i) => {
-                    if (spellOpts.isSelected) {
+                    if (spellOpts.selectedID > -1) {
                         this.app.selectButton(document.getElementById(`MCS ${spellOpts.array[spellOpts.selectedID].name} Button`));
                         this.app.spellSelectCard.onTabClick(i);
                     }

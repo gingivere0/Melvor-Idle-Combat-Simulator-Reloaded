@@ -1743,11 +1743,10 @@
                 // Special Cases: If Ancient or Standard deselect standard/anciennt
                 // If Ancient deselect curses
                 // If curse and ancient active, do not select
-                if (spellOpts.isSelected) {
+                if (spellOpts.selectedID > -1) {
                     // Spell of type already selected
                     if (spellOpts.selectedID === spellID && spellType !== 'standard' && spellType !== 'ancient') {
-                        spellOpts.isSelected = false;
-                        spellOpts.selectedID = null;
+                        spellOpts.selectedID = -1;
                         this.unselectButton(event.currentTarget);
                     } else {
                         this.unselectButton(document.getElementById(`MCS ${spellOpts.array[spellOpts.selectedID].name} Button`));
@@ -1758,29 +1757,25 @@
                     switch (spellType) {
                         case 'ancient':
                             const standardOpts = this.combatData.spells.standard;
-                            standardOpts.isSelected = false;
                             this.unselectButton(document.getElementById(`MCS ${standardOpts.array[standardOpts.selectedID].name} Button`));
-                            standardOpts.selectedID = null;
-                            if (this.combatData.spells.curse.isSelected) {
+                            standardOpts.selectedID = -1;
+                            if (this.combatData.spells.curse.selectedID > -1) {
                                 const curseOpts = this.combatData.spells.curse;
-                                curseOpts.isSelected = false;
                                 this.unselectButton(document.getElementById(`MCS ${curseOpts.array[curseOpts.selectedID].name} Button`));
-                                curseOpts.selectedID = null;
+                                curseOpts.selectedID = -1;
                                 notifyPlayer(CONSTANTS.skill.Magic, 'Curse Deselected, they cannot be used with Ancient Magicks', 'danger');
                             }
                             break;
                         case 'standard':
                             const ancientOpts = this.combatData.spells.ancient;
-                            ancientOpts.isSelected = false;
                             this.unselectButton(document.getElementById(`MCS ${ancientOpts.array[ancientOpts.selectedID].name} Button`));
-                            ancientOpts.selectedID = null;
+                            ancientOpts.selectedID = -1;
                             break;
                     }
                     // Spell of type not selected
-                    if (spellType === 'curse' && this.combatData.spells.ancient.isSelected) {
+                    if (spellType === 'curse' && this.combatData.spells.ancient.selectedID > -1) {
                         notifyPlayer(CONSTANTS.skill.Magic, 'Curses cannot be used with Ancient Magicks', 'danger');
                     } else {
-                        spellOpts.isSelected = true;
                         spellOpts.selectedID = spellID;
                         this.selectButton(event.currentTarget);
                     }
@@ -2333,11 +2328,9 @@
                     if (spell.magicLevelRequired > magicLevel) {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
                         if (spellOption.selectedID === index) {
-                            spellOption.selectedID = null;
-                            spellOption.isSelected = false;
+                            spellOption.selectedID = -1;
                             this.unselectButton(document.getElementById(`MCS ${spell.name} Button`));
                             if (type === 'standard' || type === 'ancient') {
-                                this.combatData.spells.standard.isSelected = true;
                                 this.combatData.spells.standard.selectedID = 0;
                                 this.selectButton(document.getElementById(`MCS ${SPELLS[0].name} Button`));
                             }
@@ -2366,8 +2359,7 @@
                         } else {
                             document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
                             if (spellOption.selectedID === index) {
-                                spellOption.selectedID = null;
-                                spellOption.isSelected = false;
+                                spellOption.selectedID = -1;
                                 this.unselectButton(document.getElementById(`MCS ${spell.name} Button`));
                                 notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} has been de-selected. It requires ${this.getItemName(spell.requiredItem)}.`, 'danger');
                             }

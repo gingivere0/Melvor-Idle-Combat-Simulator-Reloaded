@@ -49,23 +49,19 @@
                 this.spells = {
                     standard: {
                         array: SPELLS,
-                        isSelected: true,
                         selectedID: 0,
                     },
                     curse: {
                         array: CURSES,
-                        isSelected: false,
-                        selectedID: null,
+                        selectedID: -1,
                     },
                     aurora: {
                         array: AURORAS,
-                        isSelected: false,
-                        selectedID: null,
+                        selectedID: -1,
                     },
                     ancient: {
                         array: ANCIENT,
-                        isSelected: false,
-                        selectedID: null,
+                        selectedID: -1,
                     },
                 };
                 // Combat Stats
@@ -430,7 +426,7 @@
                 this.combatStats.increasedMinHit = 0;
                 if (this.combatStats.attackType === CONSTANTS.attackType.Magic) {
                     // Magic
-                    if (this.spells.standard.isSelected) {
+                    if (this.spells.standard.selectedID > -1) {
                         switch (SPELLS[this.spells.standard.selectedID].spellType) {
                             case CONSTANTS.spellType.Air:
                                 this.combatStats.increasedMinHit = MICSR.getModifierValue(modifiers, 'MinAirSpellDmg');
@@ -448,7 +444,7 @@
                         }
                     }
                 }
-                if (this.auroraBonus.increasedMinHit !== 0 && this.spells.standard.isSelected) {
+                if (this.auroraBonus.increasedMinHit !== 0 && this.spells.standard.selectedID > -1) {
                     this.combatStats.increasedMinHit += this.auroraBonus.increasedMinHit;
                 }
                 this.combatStats.increasedMinHit *= this.numberMultiplier;
@@ -517,7 +513,7 @@
              */
             computeAuroraBonus() {
                 this.resetAuroraBonus();
-                if ((this.combatStats.attackType === CONSTANTS.attackType.Magic || this.equipmentStats.canUseMagic) && this.spells.aurora.isSelected) {
+                if ((this.combatStats.attackType === CONSTANTS.attackType.Magic || this.equipmentStats.canUseMagic) && this.spells.aurora.selectedID > -1) {
                     const auroraID = this.spells.aurora.selectedID;
                     switch (auroraID) {
                         case CONSTANTS.aurora.Surge_I:
@@ -698,16 +694,16 @@
                     playerStats.usingMagic = true;
 
                     // Rune costs
-                    if (!this.spells.ancient.isSelected && this.spells.curse.isSelected) {
+                    if (!this.spells.ancient.selectedID > -1 && this.spells.curse.selectedID > -1) {
                         playerStats.runeCosts.curse = this.getRuneCostForSpell(CURSES[this.spells.curse.selectedID]);
                     }
-                    if (this.spells.aurora.isSelected) {
+                    if (this.spells.aurora.selectedID > -1) {
                         playerStats.runeCosts.aurora = this.getRuneCostForSpell(AURORAS[this.spells.aurora.selectedID], true);
                     }
                 }
                 // spells
                 if (this.combatStats.attackType === CONSTANTS.attackType.Magic) {
-                    if (this.spells.ancient.isSelected) {
+                    if (this.spells.ancient.selectedID > -1) {
                         playerStats.runeCosts.spell = this.getRuneCostForSpell(ANCIENT[this.spells.ancient.selectedID]);
                     } else {
                         playerStats.runeCosts.spell = this.getRuneCostForSpell(SPELLS[this.spells.standard.selectedID]);
@@ -716,7 +712,7 @@
 
                 // Special Attack and Ancient Magicks
                 playerStats.specialData = [];
-                if (this.combatStats.attackType === CONSTANTS.attackType.Magic && this.spells.ancient.isSelected) {
+                if (this.combatStats.attackType === CONSTANTS.attackType.Magic && this.spells.ancient.selectedID > -1) {
                     playerStats.usingAncient = true;
                     playerStats.specialData.push(ANCIENT[this.spells.ancient.selectedID].specialAttack);
                 } else {
@@ -735,7 +731,7 @@
                 // MICSR.log({...playerStats.specialData});
 
                 // Curses
-                if (this.spells.curse.isSelected && (this.combatStats.attackType === CONSTANTS.attackType.Magic && !this.spells.ancient.isSelected || this.equipmentStats.canUseMagic)) {
+                if (this.spells.curse.selectedID > -1 && (this.combatStats.attackType === CONSTANTS.attackType.Magic && !this.spells.ancient.selectedID > -1 || this.equipmentStats.canUseMagic)) {
                     playerStats.canCurse = true;
                     playerStats.curseID = this.spells.curse.selectedID;
                     playerStats.curseData = CURSES[this.spells.curse.selectedID];
