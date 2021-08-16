@@ -1673,7 +1673,7 @@
                     this.unselectButton(event.currentTarget);
                     prayerChanged = true;
                 } else {
-                    if (this.player.activePrayers.length < 2) {
+                    if (this.player.activePrayers.size < 2) {
                         this.player.activePrayers.add(prayerID);
                         this.selectButton(event.currentTarget);
                         prayerChanged = true;
