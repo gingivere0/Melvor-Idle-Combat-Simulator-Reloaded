@@ -245,14 +245,14 @@
          * Get the combined modifier value
          */
         MICSR.getModifierValue = (...args) => {
-            MICSR.showModifiersInstance.getModifierValue(...args)
+            return MICSR.showModifiersInstance.getModifierValue(...args);
         }
 
         /**
          * Apply modifier without rounding
          */
         MICSR.averageDoubleMultiplier = (modifier) => {
-            return 1 + modifier / 100
+            return 1 + modifier / 100;
         }
 
         /**
