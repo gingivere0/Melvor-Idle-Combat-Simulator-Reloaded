@@ -98,7 +98,7 @@
                     isAdventure: currentGamemode === 2,
                     isAncient: player.spellSelection.ancient !== -1,
                     isHardcore: currentGamemode === 1,
-                    isSlayerTask: this.app.combatData.isSlayerTask,
+                    isSlayerTask: this.app.manager.isSlayerTask,
                     pillar: agilityPassivePillarActive,
                     potionID: potionID,
                     potionTier: potionTier,
@@ -140,7 +140,7 @@
                     isAdventure: this.app.combatData.isAdventure,
                     isAncient: this.app.combatData.spells.ancient.selectedID > -1,
                     isHardcore: this.app.combatData.isHardcore,
-                    isSlayerTask: this.app.combatData.isSlayerTask,
+                    isSlayerTask: this.app.manager.isSlayerTask,
                     pillar: this.app.player.pillar,
                     potionID: this.app.player.potionID,
                     potionTier: this.app.player.potionTier,
@@ -314,7 +314,7 @@
             importSlayerTask(isSlayerTask) {
                 // Update slayer task mode
                 this.checkRadio('MCS Slayer Task', isSlayerTask);
-                this.app.combatData.isSlayerTask = isSlayerTask;
+                this.app.manager.isSlayerTask = isSlayerTask;
                 this.app.slayerTaskSimsToggle();
             }
 

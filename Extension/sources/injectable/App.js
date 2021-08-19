@@ -489,7 +489,17 @@
                     'cookingMastery',
                 );
                 // Slayer task and hardcore mode
-                this.equipmentSelectCard.addRadio('Slayer Task', 25, 'slayerTask', ['Yes', 'No'], [(e) => this.slayerTaskRadioOnChange(e, true), (e) => this.slayerTaskRadioOnChange(e, false)], 1);
+                this.equipmentSelectCard.addRadio(
+                    'Slayer Task',
+                    25,
+                    'slayerTask',
+                    ['Yes', 'No'],
+                    [
+                        (e) => this.slayerTaskRadioOnChange(e, true),
+                        (e) => this.slayerTaskRadioOnChange(e, false),
+                    ],
+                    1,
+                );
                 /*
                 this.equipmentSelectCard.addToggleRadio(
                     'Hardcore Mode',
@@ -1936,7 +1946,7 @@
              * @param {boolean} newState The new value for the option
              */
             slayerTaskRadioOnChange(event, newState) {
-                this.combatData.isSlayerTask = newState;
+                this.manager.isSlayerTask = newState;
                 this.slayerTaskSimsToggle();
                 this.updatePlotForSlayerXP();
                 this.updatePlotForSlayerCoins();
@@ -1944,11 +1954,11 @@
 
             slayerTaskSimsToggle() {
                 // toggle dungeon sims off if slayer task is on
-                if (this.combatData.isSlayerTask) {
+                if (this.manager.isSlayerTask) {
                     this.toggleDungeonSims(false, true);
                 }
                 // toggle auto slayer sims off if slayer task is off
-                if (!this.combatData.isSlayerTask) {
+                if (!this.manager.isSlayerTask) {
                     this.toggleSlayerSims(false, true);
                 }
             }
@@ -2135,7 +2145,7 @@
                 let newState;
                 if (this.barIsDungeon(imageID)) {
                     newState = !this.simulator.dungeonSimFilter[this.barMonsterIDs[imageID]];
-                    if (newState && this.combatData.isSlayerTask) {
+                    if (newState && this.manager.isSlayerTask) {
                         this.notify('no dungeon simulation on slayer task', 'danger');
                         newState = false;
                     }
@@ -2143,7 +2153,7 @@
                 } else if (this.barIsTask(imageID)) {
                     const taskID = this.barMonsterIDs[imageID] - MICSR.dungeons.length;
                     newState = !this.simulator.slayerSimFilter[taskID];
-                    if (newState && !this.combatData.isSlayerTask) {
+                    if (newState && !this.manager.isSlayerTask) {
                         this.notify('no auto slayer simulation off slayer task', 'danger');
                         newState = false;
                     }
@@ -2171,7 +2181,7 @@
              * Callback to toggle the simulation of dungeons
              */
             toggleDungeonSims(newState, silent) {
-                if (newState && this.combatData.isSlayerTask) {
+                if (newState && this.manager.isSlayerTask) {
                     if (!silent) {
                         this.notify('no dungeon simulation on slayer task', 'danger')
                     }
@@ -2189,7 +2199,7 @@
              * Callback to toggle the simulation of dungeons
              */
             toggleSlayerSims(newState, silent) {
-                if (newState && !this.combatData.isSlayerTask) {
+                if (newState && !this.manager.isSlayerTask) {
                     if (!silent) {
                         this.notify('no auto slayer simulation off slayer task', 'danger');
                     }

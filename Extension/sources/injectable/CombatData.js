@@ -88,8 +88,6 @@
                     meleeEvasionBuff: 0,
                     increasedMinHit: 0,
                 };
-                // Slayer Variables
-                this.isSlayerTask = false;
                 // Game Mode Settings
                 this.isHardcore = currentGamemode === 1;
                 this.isAdventure = currentGamemode === 2;
@@ -293,7 +291,7 @@
                         baseStats.attackBonusRanged += Math.floor(102 * (1 + (MONSTERS[monsterID].magicLevel * 6) / 5500));
                     } else if (this.equipmentStats.activeItems.slayerCrossbow
                         // && !isDungeon // TODO: implement this check by duplicating certain sims? see issue #10
-                        && (MONSTERS[monsterID].slayerXP !== undefined || this.isSlayerTask)) {
+                        && (MONSTERS[monsterID].slayerXP !== undefined || this.manager.isSlayerTask)) {
                         baseStats.strengthBonusRanged = Math.floor(baseStats.strengthBonusRanged * items[CONSTANTS.item.Slayer_Crossbow].slayerStrengthMultiplier);
                     } else if (this.equipmentStats.activeItems.bigRon && MONSTERS[monsterID].isBoss) {
                         baseStats.strengthBonus = Math.floor(baseStats.strengthBonus * items[CONSTANTS.item.Big_Ron].bossStrengthMultiplier);
@@ -318,7 +316,7 @@
                 // apply synergies
                 if (this.modifiers.summoningSynergy_1_8) {
                     baseStats.defenceBonusMagic += this.modifiers.summoningSynergy_1_8;
-                } else if (this.modifiers.summoningSynergy_12_13 && this.isSlayerTask) {
+                } else if (this.modifiers.summoningSynergy_12_13 && this.manager.isSlayerTask) {
                     baseStats.damageReduction += this.modifiers.summoningSynergy_12_13;
                 }
                 return baseStats;
@@ -382,7 +380,7 @@
                 this.combatStats.gpBonus = MICSR.averageDoubleMultiplier(
                     MICSR.getModifierValue(this.modifiers, 'GPFromMonsters')
                     + MICSR.getModifierValue(this.modifiers, 'GPGlobal')
-                    + (this.isSlayerTask ? this.modifiers.summoningSynergy_0_12 : 0)
+                    + (this.manager.isSlayerTask ? this.modifiers.summoningSynergy_0_12 : 0)
                 );
 
                 // set enemy spawn timer

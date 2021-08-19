@@ -50,6 +50,7 @@
 
             initialize() {
                 super.initialize();
+                this.isSlayerTask = false;
             }
 
             // detach globals attached by parent constructor
@@ -127,6 +128,10 @@
                 const processingTime = performance.now() - startTimeStamp;
                 MICSR.log(`Took ${processingTime / 1000}s to process ${this.simStats.killCount} kills and ${this.simStats.deathCount} deaths in ${this.tickCount} ticks. ${processingTime / this.tickCount}ms per tick.`);
                 return this.getSimStats();
+            }
+
+            get onSlayerTask() {
+                return this.isSlayerTask && this.areaType !== 'Dungeon' && this.areaType !== 'None';
             }
         }
     }
