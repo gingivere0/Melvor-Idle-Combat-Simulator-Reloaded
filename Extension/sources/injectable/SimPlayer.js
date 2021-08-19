@@ -117,6 +117,7 @@
                 this.petRolls = {};
                 this._slayercoins = 0;
                 this.usedAmmo = 0;
+                this.usedRunes = {};
                 this.usedPotionCharges = 0;
                 this.usedPrayerPoints = 0;
                 this.chargesUsed = {
@@ -128,12 +129,27 @@
 
             getGainsPerSecond(ticks) {
                 const seconds = ticks / 20;
+                const usedRunesBreakdown = {};
+                let usedRunes = 0;
+                let usedCombinationRunes = 0;
+                for (const id in this.usedRunes) {
+                    const amt = this.usedRunes[id] / seconds;
+                    usedRunesBreakdown[id] = amt;
+                    if (items[id].providesRune) {
+                        usedCombinationRunes += amt;
+                    } else {
+                        usedRunes += amt;
+                    }
+                }
                 return {
                     gp: this.gp / seconds,
                     skillXP: this.skillXP.map(x => x / seconds),
                     petRolls: this.petRolls,
                     slayercoins: this.slayercoins / seconds,
                     usedAmmo: this.usedAmmo / seconds,
+                    usedRunesBreakdown: usedRunesBreakdown,
+                    usedRunes: usedRunes,
+                    usedCombinationRunes: usedCombinationRunes,
                     usedFood: (this.foodLimit - this.food.currentSlot.quantity) / seconds,
                     usedPotionCharges: this.usedPotionCharges / seconds,
                     usedPrayerPoints: this.usedPrayerPoints / seconds,
@@ -324,6 +340,19 @@
             consumeAmmo() {
                 if (!rollPercentage(this.modifiers.ammoPreservationChance)) {
                     this.usedAmmo++;
+                }
+            }
+
+
+            // track rune usage instead of consuming
+            consumeRunes(costs) {
+                if (!rollPercentage(this.modifiers.runePreservationChance)) {
+                    costs.forEach((cost) => {
+                        if (this.usedRunes[cost.itemID] === undefined) {
+                            this.usedRunes[cost.itemID] = 0;
+                        }
+                        this.usedRunes[cost.itemID] += cost.qty;
+                    });
                 }
             }
 

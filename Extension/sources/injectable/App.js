@@ -1888,9 +1888,11 @@
                 // consumables
                 data.ppConsumedPerSecond = gps.usedPrayerPoints;
                 data.ammoUsedPerSecond = gps.usedAmmo;
-                data.runesUsedPerSecond = NaN;
-                data.combinationRunesUsedPerSecond = NaN;
-                data.potionsUsedPerSecond = gps.usedPotionCharges; // TODO: divide by potion capacity
+                data.runesUsedPerSecond = gps.usedRunes;
+                data.combinationRunesUsedPerSecond = gps.usedCombinationRunes;
+                const potion = items[herbloreItemData[this.player.potionID].itemID[this.player.potionTier]];
+                const potionCharges = potion.potionCharges + MICSR.getModifierValue(this.player.modifiers, 'PotionChargesFlat');
+                data.potionsUsedPerSecond = gps.usedPotionCharges / potionCharges; // TODO: divide by potion capacity
                 data.tabletsUsedPerSecond = gps.usedSummoningCharges;
                 data.atePerSecond = gps.usedFood;
                 data.hpPerSecond = NaN;

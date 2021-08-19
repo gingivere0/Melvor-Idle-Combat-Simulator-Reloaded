@@ -772,8 +772,8 @@
 
             /** Performs all data analysis post queue completion */
             performPostSimAnalysis() {
-                this.computeAllRuneUsage();
-                this.computePotionUsage(this.currentSim.combatData, this.monsterSimData);
+                // this.computeAllRuneUsage();
+                // this.computePotionUsage(this.currentSim.combatData, this.monsterSimData);
                 // Perform calculation of dungeon stats
                 for (let dungeonId = 0; dungeonId < MICSR.dungeons.length; dungeonId++) {
                     this.computeAverageSimData(this.dungeonSimFilter[dungeonId], this.dungeonSimData[dungeonId], MICSR.dungeons[dungeonId].monsters);
