@@ -109,6 +109,8 @@
                 // cooking MASTERY
                 this.cookingPool = false;
                 this.cookingMastery = false;
+                // useCombinationRunes
+                this.useCombinationRunes = false;
             }
 
             resetGains() {
@@ -137,7 +139,7 @@
                 for (const id in this.usedRunes) {
                     const amt = this.usedRunes[id] / seconds;
                     usedRunesBreakdown[id] = amt;
-                    if (items[id].providesRune) {
+                    if (combinations.includes(Number(id))) {
                         usedCombinationRunes += amt;
                     } else {
                         usedRunes += amt;
@@ -347,6 +349,23 @@
                 }
             }
 
+            //
+            getRuneCosts(spell) {
+                let runeCost = spell.runesRequired;
+                const spellCost = [];
+                if (this.useCombinationRunes && spell.runesRequiredAlt !== undefined)
+                    runeCost = spell.runesRequiredAlt;
+                runeCost.forEach((cost) => {
+                    const reducedCost = cost.qty - (this.runesProvided.get(cost.id) | 0);
+                    if (reducedCost > 0) {
+                        spellCost.push({
+                            itemID: cost.id,
+                            qty: reducedCost,
+                        });
+                    }
+                });
+                return spellCost;
+            }
 
             // track rune usage instead of consuming
             consumeRunes(costs) {

@@ -684,7 +684,7 @@
                 this.spellSelectCard.addToggleRadio(
                     'Use Combination Runes',
                     'combinationRunes',
-                    this.combatData,
+                    this.player,
                     'useCombinationRunes',
                 );
             }

@@ -146,7 +146,7 @@
                     potionTier: this.app.player.potionTier,
                     standard: this.app.player.spellSelection.standard,
                     summoningSynergy: this.app.player.summoningSynergy,
-                    useCombinationRunes: this.app.combatData.useCombinationRunes,
+                    useCombinationRunes: this.app.player.useCombinationRunes,
                 }
             }
 
@@ -340,7 +340,7 @@
             importUseCombinationRunes(useCombinationRunes) {
                 // Update hardcore mode
                 this.checkRadio('MCS Use Combination Runes', useCombinationRunes);
-                this.app.combatData.useCombinationRunes = useCombinationRunes;
+                this.app.player.useCombinationRunes = useCombinationRunes;
             }
 
             importAgilityCourse(course, masteries, pillar) {

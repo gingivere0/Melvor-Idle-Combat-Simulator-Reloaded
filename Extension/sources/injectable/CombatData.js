@@ -80,8 +80,6 @@
                 this.isHardcore = currentGamemode === 1;
                 this.isAdventure = currentGamemode === 2;
                 this.numberMultiplier = numberMultiplier;
-                // combination runes
-                this.useCombinationRunes = false;
                 // lucky herb bonus
                 this.luckyHerb = 0;
                 // player modifiers
