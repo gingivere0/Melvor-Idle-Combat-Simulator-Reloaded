@@ -657,7 +657,6 @@
                     'potionsUsedPerSecond',
                     'tabletsUsedPerSecond',
                     'atePerSecond',
-                    'hpPerSecond',
                     // survivability
                     // 'deathRate',
                     // 'highestDamageTaken',
@@ -675,11 +674,6 @@
                     'dmgPerSecond',
                     'attacksMadePerSecond',
                     'attacksTakenPerSecond',
-                    // not displayed -> TODO: remove?
-                    'xpPerHit',
-                    'hpPerSecond',
-                    'avgHitDmg',
-                    'gpFromDamagePerSecond',
                     // 'simulationTime',
                 ].forEach(tag => computeAvg(tag));
             }

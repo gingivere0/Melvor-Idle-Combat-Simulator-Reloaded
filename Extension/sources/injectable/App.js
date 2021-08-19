@@ -82,7 +82,6 @@
                 addPlotOption('Potions per ', true, 'potionsUsedPerSecond', 'Potions/');
                 addPlotOption('Tablets per type per ', true, 'tabletsUsedPerSecond', 'Tablets per type/');
                 addPlotOption('Food per', true, 'atePerSecond', 'Food/');
-                addPlotOption('HP Loss per ', true, 'hpPerSecond', 'HP Lost/');
                 // survivability
                 addPlotOption('Estimated Death Rate', false, 'deathRate', 'Est. Death Rate');
                 addPlotOption('Highest Hit Taken', false, 'highestDamageTaken', 'Highest Hit Taken');
@@ -96,10 +95,6 @@
                 addPlotOption('Chance for Signet Part B(%)', false, 'signetChance', 'Signet Chance (%)');
                 addPlotOption('Pet Chance per ', true, 'petChance', ' Pet Chance/');
                 addPlotOption('Slayer Coins per ', true, 'slayerCoinsPerSecond', 'Slayer Coins/');
-                // unsorted
-                addPlotOption('Damage per ', true, 'dmgPerSecond', 'Damage/');
-                addPlotOption('Attacks Made per ', true, 'attacksMadePerSecond', 'Attacks Made/');
-                addPlotOption('Attacks Taken per ', true, 'attacksTakenPerSecond', 'Attacks Taken/');
                 // addPlotOption('Simulation Time', false, 'simulationTime', 'Sim Time');
                 // Time unit options
                 this.timeOptions = ['Kill', 'Second', 'Minute', 'Hour', 'Day'];
@@ -1890,35 +1885,30 @@
                 data.ammoUsedPerSecond = gps.usedAmmo;
                 data.runesUsedPerSecond = gps.usedRunes;
                 data.combinationRunesUsedPerSecond = gps.usedCombinationRunes;
-                const potion = items[herbloreItemData[this.player.potionID].itemID[this.player.potionTier]];
-                const potionCharges = potion.potionCharges + MICSR.getModifierValue(this.player.modifiers, 'PotionChargesFlat');
+                let potionCharges = 1;
+                if (this.player.potionID > -1) {
+                    const potion = items[herbloreItemData[this.player.potionID].itemID[this.player.potionTier]];
+                    potionCharges = potion.potionCharges + MICSR.getModifierValue(this.player.modifiers, 'PotionChargesFlat');
+                }
                 data.potionsUsedPerSecond = gps.usedPotionCharges / potionCharges; // TODO: divide by potion capacity
                 data.tabletsUsedPerSecond = gps.usedSummoningCharges;
                 data.atePerSecond = gps.usedFood;
-                data.hpPerSecond = NaN;
                 // survivability
                 data.deathRate = simResult.deathCount / trials;
-                data.highestDamageTaken = NaN;
-                data.lowestHitpoints = NaN;
+                data.highestDamageTaken = gps.highestDamageTaken;
+                data.lowestHitpoints = gps.lowestHitpoints;
                 // kill time
                 data.killTimeS = simResult.tickCount / ticksPerSecond / trials;
                 data.killsPerSecond = 1 / data.killTimeS;
                 // loot gains
-                data.gpPerSecond = gps.gpPerSecond + NaN; // TODO: add loot sale value
+                data.gpPerSecond = gps.gp;
                 data.dropChance = NaN;
                 data.signetChance = NaN;
                 data.petChance = NaN;
                 data.slayerCoinsPerSecond = gps.slayercoins;
-                // unsorted
-                data.dmgPerSecond = NaN;
-                data.attacksMadePerSecond = NaN;
-                data.attacksTakenPerSecond = NaN;
                 // not displayed -> TODO: remove?
-                data.xpPerHit = NaN;
-                data.hpPerSecond = NaN;
-                data.avgHitDmg = NaN;
-                data.gpFromDamagePerSecond = NaN;
                 data.simulationTime = NaN;
+                data.tooManyActions = MICSR.trials - trials;
             }
 
             exportSettingButtonOnClick() {

@@ -208,9 +208,9 @@
                 this.updateGPData();
                 this.updateSignetChance();
                 this.updateDropChance();
-                this.updateSlayerXP();
-                this.updateSlayerCoins();
-                this.updatePetChance();
+                // this.updateSlayerXP();
+                // this.updateSlayerCoins();
+                // this.updatePetChance();
             }
 
             /**
@@ -235,7 +235,7 @@
                                     gpPerKill += boneQty * this.currentSim.lootBonus * items[shardID].sellsFor;
                                 }
                             }
-                            this.monsterSimData[monsterID].gpPerSecond = this.monsterSimData[monsterID].gpFromDamagePerSecond + gpPerKill / this.monsterSimData[monsterID].killTimeS;
+                            this.monsterSimData[monsterID].gpPerSecond += gpPerKill / this.monsterSimData[monsterID].killTimeS;
                         } else {
                             this.monsterSimData[monsterID].gpPerSecond = 0;
                         }
@@ -245,7 +245,6 @@
                         if (!this.monsterSimData[monsterID]) {
                             return;
                         }
-                        this.monsterSimData[monsterID].gpPerSecond = this.monsterSimData[monsterID].gpFromDamagePerSecond;
                         if (this.monsterSimData[monsterID].simSuccess && this.monsterSimData[monsterID].tooManyActions === 0) {
                             this.monsterSimData[monsterID].gpPerSecond += this.computeMonsterValue(monsterID) / this.monsterSimData[monsterID].killTimeS;
                         }
@@ -267,7 +266,6 @@
                             return;
                         }
                         if (this.dungeonSimData[i].simSuccess) {
-                            this.dungeonSimData[i].gpPerSecond = this.dungeonSimData[i].gpFromDamagePerSecond;
                             this.dungeonSimData[i].gpPerSecond += this.computeDungeonValue(i) / this.dungeonSimData[i].killTimeS;
                         }
                     }
@@ -500,7 +498,7 @@
             getAverageBoneDropAmt(monsterId) {
                 const monsterData = MONSTERS[monsterId];
                 const boneID = monsterData.bones;
-                if (boneID === undefined || boneID === null) {
+                if (boneID === -1) {
                     return 0;
                 }
                 const amt = monsterData.boneQty ? monsterData.boneQty : 1;

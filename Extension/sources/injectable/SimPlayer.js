@@ -125,6 +125,8 @@
                     Summon2: 0,
                 };
                 this.food.currentSlot.quantity = this.foodLimit;
+                this.highestDamageTaken = 0;
+                this.lowestHitpoints = Infinity;
             }
 
             getGainsPerSecond(ticks) {
@@ -154,6 +156,8 @@
                     usedPotionCharges: this.usedPotionCharges / seconds,
                     usedPrayerPoints: this.usedPrayerPoints / seconds,
                     usedSummoningCharges: (this.chargesUsed.Summon1 + this.chargesUsed.Summon2) / 2 / seconds,
+                    highestDamageTaken: this.highestDamageTaken,
+                    lowestHitpoints: this.lowestHitpoints,
                 }
             }
 
@@ -436,6 +440,26 @@
 
             rollToHit(target, attack) {
                 return this.checkRequirements(this.manager.areaRequirements) && this.characterRollToHit(target, attack);
+            }
+
+            // get grandparent damage
+            get characterDamage() {
+                return Character.prototype.damage;
+            }
+
+            damage(amount, source, thieving = false) {
+                this.characterDamage(amount, source);
+                if (this.hitpoints > 0) {
+                    this.autoEat();
+                    if (this.hitpoints < (this.stats.maxHitpoints * this.modifiers.increasedRedemptionThreshold) / 100) {
+                        this.heal(applyModifier(this.stats.maxHitpoints, this.modifiers.increasedRedemptionPercent));
+                    }
+                    if (this.hitpoints < (this.stats.maxHitpoints * this.modifiers.increasedCombatStoppingThreshold) / 100) {
+                        this.manager.stopCombat();
+                    }
+                }
+                this.highestDamageTaken = Math.max(this.highestDamageTaken, amount);
+                this.lowestHitpoints = Math.min(this.lowestHitpoints, this.hitpoints);
             }
 
             checkRequirements(reqs, notifyOnFailure = false, failureMessage = 'do that.') {
