@@ -319,9 +319,14 @@
             }
 
             importHardCore(isHardcore) {
+                if (isHardcore !== this.app.combatData.isHardcore) {
+                    this.app.notify('Imported game mode does not match selected game mode!', 'danger');
+                }
+                /* TODO
                 // Update hardcore mode
                 this.checkRadio('MCS Hardcore Mode', isHardcore);
                 this.app.combatData.isHardcore = isHardcore;
+                */
             }
 
             importSummoningSynergy(summoningSynergy) {
@@ -330,10 +335,15 @@
             }
 
             importAdventure(isAdventure) {
+                if (isAdventure !== this.app.combatData.isAdventure) {
+                    this.app.notify('Imported game mode does not match selected game mode!', 'danger');
+                }
+                /* TODO
                 // Update adventure mode
                 this.checkRadio('MCS Adventure Mode', isAdventure);
                 this.app.combatData.isAdventure = isAdventure;
                 this.app.updateCombatStats();
+                */
             }
 
             importUseCombinationRunes(useCombinationRunes) {

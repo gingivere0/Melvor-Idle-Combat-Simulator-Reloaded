@@ -490,6 +490,7 @@
                 );
                 // Slayer task and hardcore mode
                 this.equipmentSelectCard.addRadio('Slayer Task', 25, 'slayerTask', ['Yes', 'No'], [(e) => this.slayerTaskRadioOnChange(e, true), (e) => this.slayerTaskRadioOnChange(e, false)], 1);
+                /*
                 this.equipmentSelectCard.addToggleRadio(
                     'Hardcore Mode',
                     'hardcore',
@@ -505,6 +506,7 @@
                     25, // default
                     () => this.updateCombatStats(),
                 );
+                */
                 // import equipment and settings
                 const importSetCCContainer = this.equipmentSelectCard.createCCContainer();
                 importSetCCContainer.appendChild(this.equipmentSelectCard.createLabel('Import Set', ''));

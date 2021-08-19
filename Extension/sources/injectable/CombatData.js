@@ -97,9 +97,9 @@
                 // Slayer Variables
                 this.isSlayerTask = false;
                 // Game Mode Settings
-                this.isHardcore = false;
-                this.isAdventure = false;
-                this.numberMultiplier = 10;
+                this.isHardcore = currentGamemode === 1;
+                this.isAdventure = currentGamemode === 2;
+                this.numberMultiplier = numberMultiplier;
                 // combination runes
                 this.useCombinationRunes = false;
                 // lucky herb bonus
