@@ -1855,14 +1855,68 @@
             slowSimulateButtonOnClick() {
                 const startTimeStamp = performance.now();
                 // queue the desired monsters
-                const dungeonID = this.simulator.resetSingleSimulation();
+                this.simulator.setupCurrentSim(true);
+                const ids = this.simulator.currentSim.ids;
                 this.simulator.simulationQueue.forEach(queueItem => {
-                    console.log(queueItem.monsterID)
-                    const simResult = this.manager.runTrials(queueItem.monsterID, dungeonID, MICSR.trials, MICSR.maxTicks);
-                    MICSR.log(simResult);
+                    const simResult = this.manager.runTrials(queueItem.monsterID, ids.dungeonID, MICSR.trials, MICSR.maxTicks);
+                    this.convertSlowSimToResult(simResult, queueItem.monsterID);
                 });
+                this.simulator.performPostSimAnalysis();
+                this.updateDisplayPostSim();
                 const processingTime = performance.now() - startTimeStamp;
                 MICSR.log(`Simulation took ${processingTime / 1000}s.`);
+            }
+
+            convertSlowSimToResult(simResult, monsterID) {
+                const data = this.simulator.monsterSimData[monsterID];
+                const gps = simResult.gainsPerSecond
+                const ticksPerSecond = 1000 / TICK_INTERVAL
+                const trials = simResult.killCount + simResult.deathCount;
+                // success
+                data.simSuccess = true;
+                data.reason = undefined;
+                // xp rates
+                data.xpPerSecond = gps.skillXP[CONSTANTS.skill.Attack]
+                    + gps.skillXP[CONSTANTS.skill.Strength]
+                    + gps.skillXP[CONSTANTS.skill.Defence]
+                    + gps.skillXP[CONSTANTS.skill.Ranged]
+                    + gps.skillXP[CONSTANTS.skill.Magic]; // TODO: this depends on attack style
+                data.hpXpPerSecond = gps.skillXP[CONSTANTS.skill.Hitpoints];
+                data.slayerXpPerSecond = gps.skillXP[CONSTANTS.skill.Slayer];
+                data.prayerXpPerSecond = gps.skillXP[CONSTANTS.skill.Prayer];
+                data.summoningXpPerSecond = gps.skillXP[CONSTANTS.skill.Summoning];
+                // consumables
+                data.ppConsumedPerSecond = gps.usedPrayerPoints;
+                data.ammoUsedPerSecond = gps.usedAmmo;
+                data.runesUsedPerSecond = NaN;
+                data.combinationRunesUsedPerSecond = NaN;
+                data.potionsUsedPerSecond = gps.usedPotionCharges; // TODO: divide by potion capacity
+                data.tabletsUsedPerSecond = gps.usedSummoningCharges;
+                data.atePerSecond = gps.usedFood;
+                data.hpPerSecond = NaN;
+                // survivability
+                data.deathRate = simResult.deathCount / trials;
+                data.highestDamageTaken = NaN;
+                data.lowestHitpoints = NaN;
+                // kill time
+                data.killTimeS = simResult.tickCount / ticksPerSecond / trials;
+                data.killsPerSecond = 1 / data.killTimeS;
+                // loot gains
+                data.gpPerSecond = gps.gpPerSecond + NaN; // TODO: add loot sale value
+                data.dropChance = NaN;
+                data.signetChance = NaN;
+                data.petChance = NaN;
+                data.slayerCoinsPerSecond = gps.slayercoins;
+                // unsorted
+                data.dmgPerSecond = NaN;
+                data.attacksMadePerSecond = NaN;
+                data.attacksTakenPerSecond = NaN;
+                // not displayed -> TODO: remove?
+                data.xpPerHit = NaN;
+                data.hpPerSecond = NaN;
+                data.avgHitDmg = NaN;
+                data.gpFromDamagePerSecond = NaN;
+                data.simulationTime = NaN;
             }
 
             exportSettingButtonOnClick() {
@@ -2576,9 +2630,9 @@
                     this.setPlotToGeneral();
                     this.setPlotToDungeon(this.barMonsterIDs[this.selectedBar]);
                 }
-                document.getElementById('MCS Simulate Button').disabled = false;
-                document.getElementById('MCS Simulate Button').textContent = 'Simulate';
-                document.getElementById('MCS Simulate Selected Button').style.display = 'block';
+                // document.getElementById('MCS Simulate Button').disabled = false;
+                // document.getElementById('MCS Simulate Button').textContent = 'Simulate';
+                // document.getElementById('MCS Simulate Selected Button').style.display = 'block';
             }
 
             destroy() {

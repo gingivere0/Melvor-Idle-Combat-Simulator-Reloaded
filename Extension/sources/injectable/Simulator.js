@@ -68,7 +68,6 @@
                         lowestHitpoints: Infinity,
                         atePerSecond: 0,
                         dmgPerSecond: 0,
-                        avgKillTime: 0,
                         avgHitDmg: 0,
                         killTimeS: 0,
                         killsPerSecond: 0,
@@ -305,7 +304,7 @@
                 // check selection
                 if (!this.parent.barSelected) {
                     this.parent.notify('There is nothing selected!', 'danger');
-                    return -1;
+                    return {};
                 }
                 // area monster
                 if (!this.parent.isViewingDungeon && this.parent.barIsMonster(this.parent.selectedBar)) {
@@ -315,7 +314,7 @@
                     } else {
                         this.parent.notify('The selected monster is filtered!', 'danger');
                     }
-                    return -1;
+                    return {};
                 }
                 // dungeon
                 let dungeonID = undefined;
@@ -329,10 +328,10 @@
                         MICSR.dungeons[dungeonID].monsters.forEach(monsterID => {
                             this.pushMonsterToQueue(monsterID);
                         });
-                    } else {
-                        this.parent.notify('The selected dungeon is filtered!', 'danger');
+                        return {dungeonID: dungeonID};
                     }
-                    return dungeonID;
+                    this.parent.notify('The selected dungeon is filtered!', 'danger');
+                    return {};
                 }
                 // slayer area
                 let taskID = undefined;
@@ -344,11 +343,13 @@
                 if (taskID !== undefined) {
                     if (this.slayerSimFilter[taskID]) {
                         this.queueSlayerTask(taskID);
-                    } else {
-                        this.parent.notify('The selected task list is filtered!', 'danger');
+                        return {taskID: taskID};
                     }
+                    this.parent.notify('The selected task list is filtered!', 'danger');
+                    return {};
                 }
-                return -1;
+                // can't be reached
+                return {};
             }
 
             queueSlayerTask(i) {
@@ -387,7 +388,7 @@
                 // Set up simulation queue
                 this.simulationQueue = [];
                 if (single) {
-                    this.resetSingleSimulation();
+                    this.currentSim.ids = this.resetSingleSimulation();
                     return;
                 }
                 // Queue simulation of monsters in combat areas
@@ -621,74 +622,66 @@
                     return;
                 }
                 data.simSuccess = true;
-                // compute averages
-                let totXp = 0;
-                let totHpXp = 0;
-                let totPrayXP = 0;
-                let totSummoningXP = 0;
-                let totHP = 0;
-                let totEnemyHP = 0;
-                let totPrayerPoints = 0;
-                let totTime = 0;
-                let totalGPFromDamage = 0;
-                let totalAttacksMade = 0;
-                let totalAttacksTaken = 0;
-                let totalAmmoUsed = 0;
-                let totalRunesUsed = 0;
-                let totalCombinationRunesUsed = 0;
-                let totalPotionsUsed = 0;
-                let totalTabletsUsed = 0;
+
+                // not time-weighted averages
+                data.killTimeS = 0;
                 data.deathRate = 0;
                 data.highestDamageTaken = 0;
                 data.lowestHitpoints = Infinity;
-                let totalAte = 0;
-                let totalSimTime = 0;
+                data.simulationTime = 0;
                 for (const monsterID of monsterIDs) {
-                    totXp += this.monsterSimData[monsterID].xpPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totHpXp += this.monsterSimData[monsterID].hpXpPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totPrayXP += this.monsterSimData[monsterID].prayerXpPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totSummoningXP += this.monsterSimData[monsterID].summoningXpPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totHP += this.monsterSimData[monsterID].hpPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totEnemyHP += this.monsterSimData[monsterID].dmgPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totPrayerPoints += this.monsterSimData[monsterID].ppConsumedPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalGPFromDamage += this.monsterSimData[monsterID].gpFromDamagePerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalAttacksMade += this.monsterSimData[monsterID].attacksMadePerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalAttacksTaken += this.monsterSimData[monsterID].attacksTakenPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalAmmoUsed += this.monsterSimData[monsterID].ammoUsedPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalRunesUsed += this.monsterSimData[monsterID].runesUsedPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalCombinationRunesUsed += this.monsterSimData[monsterID].combinationRunesUsedPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalPotionsUsed += this.monsterSimData[monsterID].potionsUsedPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalTabletsUsed += this.monsterSimData[monsterID].tabletsUsedPerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totTime += this.monsterSimData[monsterID].avgKillTime;
+                    data.killTimeS += this.monsterSimData[monsterID].killTimeS;
                     data.deathRate = 1 - (1 - data.deathRate) * (1 - this.monsterSimData[monsterID].deathRate);
                     data.highestDamageTaken = Math.max(data.highestDamageTaken, this.monsterSimData[monsterID].highestDamageTaken);
                     data.lowestHitpoints = Math.min(data.lowestHitpoints, this.monsterSimData[monsterID].lowestHitpoints);
-                    totalAte += this.monsterSimData[monsterID].atePerSecond * this.monsterSimData[monsterID].killTimeS;
-                    totalSimTime += this.monsterSimData[monsterID].simulationTime;
+                    data.simulationTime += this.monsterSimData[monsterID].simulationTime;
                 }
-                const dungeonTime = totTime / 1000;
-                data.xpPerSecond = totXp / dungeonTime;
-                data.xpPerHit = totXp / totalAttacksMade;
-                data.hpXpPerSecond = totHpXp / dungeonTime;
-                data.prayerXpPerSecond = totPrayXP / dungeonTime;
-                data.summoningXpPerSecond = totSummoningXP / dungeonTime;
-                data.hpPerSecond = totHP / dungeonTime;
-                data.dmgPerSecond = totEnemyHP / dungeonTime;
-                data.avgKillTime = totTime;
-                data.avgHitDmg = totEnemyHP / totalAttacksMade;
-                data.killTimeS = dungeonTime;
-                data.killsPerSecond = 1 / dungeonTime;
-                data.ppConsumedPerSecond = totPrayerPoints / dungeonTime;
-                data.gpFromDamagePerSecond = totalGPFromDamage / dungeonTime;
-                data.attacksTakenPerSecond = totalAttacksTaken / dungeonTime;
-                data.attacksMadePerSecond = totalAttacksMade / dungeonTime;
-                data.ammoUsedPerSecond = totalAmmoUsed / dungeonTime;
-                data.runesUsedPerSecond = totalRunesUsed / dungeonTime;
-                data.combinationRunesUsedPerSecond = totalCombinationRunesUsed / dungeonTime;
-                data.potionsUsedPerSecond = totalPotionsUsed / dungeonTime;
-                data.tabletsUsedPerSecond = totalTabletsUsed / dungeonTime;
-                data.atePerSecond = totalAte / dungeonTime;
-                data.simulationTime = totalSimTime;
+
+                // time-weighted averages
+                const computeAvg = (tag) => {
+                    data[tag] = this.monsterSimData.filter((_, i) => monsterIDs.includes(i))
+                        .reduce((avgData, mData) => avgData + mData[tag] * mData.killTimeS, 0) / data.killTimeS;
+                }
+                [
+                    // xp rates
+                    'xpPerSecond',
+                    'hpXpPerSecond',
+                    'slayerXpPerSecond',
+                    'prayerXpPerSecond',
+                    'summoningXpPerSecond',
+                    // consumables
+                    'ppConsumedPerSecond',
+                    'ammoUsedPerSecond',
+                    'runesUsedPerSecond',
+                    'combinationRunesUsedPerSecond',
+                    'potionsUsedPerSecond',
+                    'tabletsUsedPerSecond',
+                    'atePerSecond',
+                    'hpPerSecond',
+                    // survivability
+                    // 'deathRate',
+                    // 'highestDamageTaken',
+                    // 'lowestHitpoints',
+                    // kill time
+                    // 'killTimeS',
+                    'killsPerSecond',
+                    // loot gains
+                    'gpPerSecond',
+                    'dropChance',
+                    'signetChance',
+                    'petChance',
+                    'slayerCoinsPerSecond',
+                    // unsorted
+                    'dmgPerSecond',
+                    'attacksMadePerSecond',
+                    'attacksTakenPerSecond',
+                    // not displayed -> TODO: remove?
+                    'xpPerHit',
+                    'hpPerSecond',
+                    'avgHitDmg',
+                    'gpFromDamagePerSecond',
+                    // 'simulationTime',
+                ].forEach(tag => computeAvg(tag));
             }
 
             computeRuneUsage(runes, combinationRunes, runeCosts, castsPerSecond, preservation) {
@@ -790,7 +783,6 @@
                     // correct average kps for auto slayer
                     this.slayerSimData[slayerTaskID].killsPerSecond *= this.slayerTaskMonsters[slayerTaskID].length;
                     // correct average kill time for auto slayer
-                    this.slayerSimData[slayerTaskID].avgKillTime /= this.slayerTaskMonsters[slayerTaskID].length;
                     this.slayerSimData[slayerTaskID].killTimeS /= this.slayerTaskMonsters[slayerTaskID].length;
                     // log monster IDs
                     if (this.slayerTaskMonsters[slayerTaskID].length) {

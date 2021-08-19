@@ -2148,12 +2148,10 @@
         // stats depending on kills
         if (tooManyActions === 0 && successes) {
             // kill time
-            simResult.avgKillTime = totalTime / successes;
-            simResult.killTimeS = simResult.avgKillTime / 1000;
+            simResult.killTimeS = totalTime / successes / 1000;
             simResult.killsPerSecond = 1 / simResult.killTimeS;
         } else {
             // kill time
-            simResult.avgKillTime = NaN;
             simResult.killTimeS = NaN;
             simResult.killsPerSecond = 0;
         }

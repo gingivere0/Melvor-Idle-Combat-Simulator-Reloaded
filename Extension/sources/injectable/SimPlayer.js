@@ -399,6 +399,16 @@
                     this.chargesUsed[slot] += charges;
                 }
             }
+
+            // get grandparent rollToHit
+            get characterRollToHit() {
+                return Character.prototype.rollToHit;
+            }
+
+            rollToHit(target, attack) {
+                return this.checkRequirements(this.manager.areaRequirements) && this.characterRollToHit(target, attack);
+            }
+
             checkRequirements(reqs, notifyOnFailure = false, failureMessage = 'do that.') {
                 return reqs.every(req => this.checkRequirement(req, notifyOnFailure, failureMessage));
             }

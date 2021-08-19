@@ -160,6 +160,17 @@
                     this.player.addXP(CONSTANTS.skill.Slayer, slayerXPReward);
             }
 
+            selectMonster(monsterID, areaData) {
+                if (!this.player.checkRequirements(areaData.entryRequirements, true, 'fight this monster.')) {
+                    return;
+                }
+                this.preSelection();
+                this.areaType = areaData.type;
+                this.areaData = areaData;
+                this.selectedMonster = monsterID;
+                this.onSelection();
+            }
+
             preSelection() {
                 this.stopCombat(true, true);
             }
@@ -188,15 +199,15 @@
                 this.resetSimStats();
                 const startTimeStamp = performance.now();
                 let areaData = getMonsterArea(monsterID);
-                if (dungeonID > -1) {
+                if (dungeonID !== undefined) {
                     areaData = DUNGEONS[dungeonID];
                     this.dungeonProgress = 0;
                     while (areaData.monsters[this.dungeonProgress] !== monsterID) {
                         this.dungeonProgress++;
                     }
                 }
-                this.selectMonster(monsterID, areaData);
                 if (this.player.checkRequirements(areaData.entryRequirements, true, 'fight this monster.')) {
+                    this.selectMonster(monsterID, areaData);
                     while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < tickLimit) {
                         if (!this.isInCombat && !this.spawnTimer.active) {
                             this.selectMonster(monsterID, areaData);
