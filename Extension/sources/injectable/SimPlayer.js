@@ -117,9 +117,11 @@
                     gp: this.gp / seconds,
                     skillXP: this.skillXP.map(x => x / seconds),
                     petRolls: this.petRolls,
-                    slayercoins: this.slayercoins,
+                    slayercoins: this.slayercoins / seconds,
                     usedAmmo: this.usedAmmo / seconds,
                     usedFood: (this.foodLimit - this.food.currentSlot.quantity) / seconds,
+                    usedPotionCharges: this.usedPotionCharges / seconds,
+                    usedPrayerPoints: this.usedPrayerPoints / seconds,
                 }
             }
 
