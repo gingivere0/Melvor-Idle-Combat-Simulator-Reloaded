@@ -50,6 +50,7 @@
 
             initialize() {
                 super.initialize();
+                this.renderCombat = false;
                 this.isSlayerTask = false;
             }
 
