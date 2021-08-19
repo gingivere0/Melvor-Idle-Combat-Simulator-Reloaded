@@ -74,10 +74,6 @@
             addCombatStat() {
             }
 
-            onSelection() {
-                this.loadNextEnemy();
-            }
-
             setCallbacks() {
             }
 
@@ -98,6 +94,7 @@
                     deathCount: 0,
                 }
                 this.player.resetGains();
+                this.player.processDeath();
             }
 
             getSimStats() {
@@ -161,11 +158,26 @@
                     this.player.addXP(CONSTANTS.skill.Slayer, slayerXPReward);
             }
 
-            runTrials(trials, tickLimit) {
+            preSelection() {
+                this.stopCombat(true, true);
+            }
+
+            onSelection() {
+                this.isInCombat = true;
+                this.loadNextEnemy();
+            }
+
+            runTrials(monsterID, trials, tickLimit) {
                 this.resetSimStats();
                 const startTimeStamp = performance.now();
-                while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < tickLimit) {
-                    this.tick();
+                const areaData = getMonsterArea(monsterID);
+                if (checkRequirements(areaData.entryRequirements, true, 'fight this monster.')) {
+                    while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < tickLimit) {
+                        if (!this.isInCombat && !this.spawnTimer.active) {
+                            this.selectMonster(monsterID, areaData);
+                        }
+                        this.tick();
+                    }
                 }
                 const processingTime = performance.now() - startTimeStamp;
                 MICSR.log(`Took ${processingTime / 1000}s to process ${this.simStats.killCount} kills and ${this.simStats.deathCount} deaths in ${this.tickCount} ticks. ${processingTime / this.tickCount}ms per tick.`);

@@ -1909,8 +1909,7 @@
                     this.notify('Only the simulation of a single selected monster is supported for now.', 'danger');
                     return;
                 }
-                this.manager.selectMonster(monsterID, getMonsterArea(monsterID));
-                const simResult = this.manager.runTrials(MICSR.trials, MICSR.maxTicks);
+                const simResult = this.manager.runTrials(monsterID, MICSR.trials, MICSR.maxTicks);
                 MICSR.log(simResult);
             }
 

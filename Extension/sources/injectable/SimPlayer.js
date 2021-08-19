@@ -76,6 +76,12 @@
             setCallbacks() {
             }
 
+            processDeath() {
+                this.removeAllEffects(true);
+                this.computeAllStats();
+                this.setHitpoints(this.stats.maxHitpoints);
+            }
+
             // replace globals with properties
             replaceGlobals() {
                 // skillLevel
