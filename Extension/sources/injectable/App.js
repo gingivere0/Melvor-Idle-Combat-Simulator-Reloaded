@@ -568,7 +568,7 @@
                 this.combatStatCard = new MICSR.Card(this.topContent, '', '60px', true);
                 this.combatStatCard.addSectionTitle('Combat Stats');
                 const combatStatNames = [
-                    'Attack Speed',
+                    'Attack Interval',
                     'Min Hit',
                     'Max Hit',
                     'Summoning Max Hit',
@@ -596,7 +596,7 @@
                     '',
                 ];
                 this.combatStatKeys = [
-                    'attackSpeed',
+                    'attackInterval',
                     'minHit',
                     'maxHit',
                     'summoningMaxHit',

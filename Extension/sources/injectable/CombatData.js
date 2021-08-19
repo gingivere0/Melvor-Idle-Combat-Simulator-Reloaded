@@ -60,7 +60,7 @@
                 };
                 // Combat Stats
                 this.combatStats = {
-                    attackSpeed: 4000,
+                    attackInterval: 4000,
                     maxHit: 0,
                     minHit: 0,
                     increasedMinHit: 0,
@@ -328,13 +328,6 @@
             }
 
             /**
-             * mimic calculatePlayerDamageReduction
-             */
-            calculatePlayerDamageReduction() {
-                return this.baseStats.damageReduction + MICSR.getModifierValue(this.modifiers, 'DamageReduction');
-            }
-
-            /**
              * Calculates the combat stats from equipment, combat style, spell selection and player levels and stores them in `this.combatStats`
              */
             updateCombatStats() {
@@ -387,16 +380,7 @@
                 this.enemySpawnTimer = 3000 + MICSR.getModifierValue(modifiers, 'MonsterRespawnTimer');
 
                 // attack speed without aurora
-                this.combatStats.attackSpeed = 4000;
-                this.combatStats.attackSpeed = this.equipmentStats.attackSpeed;
-                if (this.combatStats.attackType === CONSTANTS.attackType.Ranged && this.player.attackStyle.Ranged === 'Rapid') {
-                    this.combatStats.attackSpeed -= 400;
-                }
-                this.combatStats.attackSpeed += MICSR.getModifierValue(modifiers, 'AttackInterval');
-                this.combatStats.attackSpeed = applyModifier(
-                    this.combatStats.attackSpeed,
-                    MICSR.getModifierValue(modifiers, 'AttackIntervalPercent')
-                );
+                this.combatStats.attackInterval = this.player.stats.attackInterval;
 
                 // preservation
                 this.combatStats.ammoPreservation = MICSR.getModifierValue(this.modifiers, 'AmmoPreservation');
@@ -438,7 +422,7 @@
                 this.combatStats.minHit = this.player.stats.minHit;
 
                 // max summ roll
-                this.combatStats.summoningMaxHit = this.getSMH();
+                this.combatStats.summoningMaxHit = this.player.equipmentStats.summoningMaxhit * this.numberMultiplier;
                 this.summoningXPPerHit = this.getSummoningXP();
 
                 // max defence roll
@@ -447,12 +431,12 @@
                 this.combatStats.maxMagDefRoll = this.player.stats.evasion.magic;
 
                 // Calculate damage reduction
-                this.combatStats.damageReduction = this.calculatePlayerDamageReduction();
+                this.combatStats.damageReduction = this.player.stats.damageReduction;
 
                 // Max Hitpoints
                 this.combatStats.baseMaxHitpoints = this.player.levels.Hitpoints;
                 this.combatStats.baseMaxHitpoints += MICSR.getModifierValue(modifiers, 'MaxHitpoints');
-                this.combatStats.maxHitpoints = this.combatStats.baseMaxHitpoints * this.numberMultiplier;
+                this.combatStats.maxHitpoints = this.player.stats.maxHitpoints
             }
 
             /**
@@ -554,20 +538,6 @@
 
             decreasedAttackSpeed() {
                 return this.auroraBonus.attackSpeedBuff;
-            }
-
-            getSMH() {
-                const summ1 = this.player.equipmentID(MICSR.equipmentSlot.Summon1);
-                const summ2 = this.player.equipmentID(MICSR.equipmentSlot.Summon2);
-                let smh1 = 0;
-                if (summ1 >= 0) {
-                    smh1 = items[summ1].summoningMaxHit | 0;
-                }
-                let smh2 = 0;
-                if (summ2 >= 0) {
-                    smh2 = items[summ2].summoningMaxHit | 0;
-                }
-                return Math.max(smh1, smh2);
             }
 
             getSummoningXP() {
