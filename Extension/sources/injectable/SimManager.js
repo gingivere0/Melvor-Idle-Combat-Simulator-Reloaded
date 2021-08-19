@@ -116,8 +116,49 @@
             }
 
             onEnemyDeath() {
+                this.player.rewardGPForKill();
+                if (this.areaData.type === 'Dungeon') {
+                    this.progressDungeon();
+                } else {
+                    this.rewardForEnemyDeath();
+                }
+                // from baseManager
                 this.enemy.processDeath();
                 this.simStats.killCount++;
+            }
+
+            progressDungeon() {
+                this.dungeonProgress++;
+                if (this.areaData.dropBones)
+                    this.dropEnemyBones();
+                if (this.dungeonProgress === this.areaData.monsters.length) {
+                    this.dungeonProgress = 0;
+                    const lootQty = rollPercentage(this.player.modifiers.combatLootDoubleChance) ? 2 : 1;
+                    this.areaData.rewards.forEach((itemID) => {
+                        this.bank.addItem(itemID, lootQty);
+                    });
+                    this.dropEnemyGP();
+                    this.dropSignetHalfB();
+                    if (this.player.modifiers.bonusCoalOnDungeonCompletion) {
+                        if (rollPercentage(1))
+                            this.bank.addItem(CONSTANTS.item.Coal_Ore, this.player.modifiers.bonusCoalOnDungeonCompletion);
+                    }
+                    // TODO: handle ITM gear change
+                }
+            }
+
+            rewardForEnemyDeath() {
+                this.dropEnemyBones();
+                this.dropSignetHalfB();
+                this.dropEnemyLoot();
+                this.dropEnemyGP();
+                let slayerXPReward = this.enemy.data.slayerXP | 0;
+                if (this.onSlayerTask) {
+                    this.player.rewardSlayerCoins();
+                    slayerXPReward += this.enemy.stats.maxHitpoints / numberMultiplier;
+                }
+                if (slayerXPReward > 0)
+                    this.player.addXP(CONSTANTS.skill.Slayer, slayerXPReward);
             }
 
             runTrials(trials, tickLimit) {
