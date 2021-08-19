@@ -46,6 +46,8 @@
                     },
                 };
                 this.effectRenderer = {
+                    queueRemoval: () => {
+                    },
                     queueRemoveAll: () => {
                     },
                     removeEffects: () => {

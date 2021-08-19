@@ -125,9 +125,10 @@
             }
 
             progressDungeon() {
-                this.dungeonProgress++;
+                // this.dungeonProgress++;
                 if (this.areaData.dropBones)
                     this.dropEnemyBones();
+                /*
                 if (this.dungeonProgress === this.areaData.monsters.length) {
                     this.dungeonProgress = 0;
                     const lootQty = rollPercentage(this.player.modifiers.combatLootDoubleChance) ? 2 : 1;
@@ -140,8 +141,9 @@
                         if (rollPercentage(1))
                             this.bank.addItem(CONSTANTS.item.Coal_Ore, this.player.modifiers.bonusCoalOnDungeonCompletion);
                     }
-                    // TODO: handle ITM gear change
                 }
+                */
+                // TODO: handle ITM gear change
             }
 
             rewardForEnemyDeath() {
@@ -167,11 +169,34 @@
                 this.loadNextEnemy();
             }
 
-            runTrials(monsterID, trials, tickLimit) {
+            stopCombat(fled = true, areaChange = false) {
+                this.isInCombat = false;
+                this.endFight();
+                if (this.spawnTimer.isActive)
+                    this.spawnTimer.stop();
+                if (this.enemy.state !== "Dead")
+                    this.enemy.processDeath();
+                this.hideMinibar();
+                this.loot.removeAll();
+                this.areaType = 'None';
+                if (this.paused) {
+                    this.paused = false;
+                }
+            }
+
+            runTrials(monsterID, dungeonID, trials, tickLimit) {
                 this.resetSimStats();
                 const startTimeStamp = performance.now();
-                const areaData = getMonsterArea(monsterID);
-                if (checkRequirements(areaData.entryRequirements, true, 'fight this monster.')) {
+                let areaData = getMonsterArea(monsterID);
+                if (dungeonID > -1) {
+                    areaData = DUNGEONS[dungeonID];
+                    this.dungeonProgress = 0;
+                    while (areaData.monsters[this.dungeonProgress] !== monsterID) {
+                        this.dungeonProgress++;
+                    }
+                }
+                this.selectMonster(monsterID, areaData);
+                if (this.player.checkRequirements(areaData.entryRequirements, true, 'fight this monster.')) {
                     while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < tickLimit) {
                         if (!this.isInCombat && !this.spawnTimer.active) {
                             this.selectMonster(monsterID, areaData);
@@ -179,6 +204,7 @@
                         this.tick();
                     }
                 }
+                this.stopCombat();
                 const processingTime = performance.now() - startTimeStamp;
                 MICSR.log(`Took ${processingTime / 1000}s to process ${this.simStats.killCount} kills and ${this.simStats.deathCount} deaths in ${this.tickCount} ticks. ${processingTime / this.tickCount}ms per tick.`);
                 return this.getSimStats();

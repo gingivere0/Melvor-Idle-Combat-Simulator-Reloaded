@@ -615,7 +615,7 @@
                 this.combatStatCard.addSectionTitle('Plot Options');
                 this.plotter.addToggles(this.combatStatCard);
                 this.combatStatCard.addSectionTitle('');
-                this.combatStatCard.addButton('Simulate Selected Monster', () => this.slowSimulateButtonOnClick());
+                this.combatStatCard.addButton('Simulate Selected (slow)', () => this.slowSimulateButtonOnClick());
                 // this.combatStatCard.addButton('Simulate', () => this.simulateButtonOnClick(false));
                 // this.combatStatCard.addButton('Simulate Selected', () => this.simulateButtonOnClick(true));
             }
@@ -1897,20 +1897,16 @@
             }
 
             slowSimulateButtonOnClick() {
-                let monsterID;
-                if (!this.isViewingDungeon && this.barSelected && this.barIsMonster(this.selectedBar)) {
-                    monsterID = this.barMonsterIDs[this.selectedBar];
-                    if (!this.simulator.monsterSimFilter[monsterID]) {
-                        this.notify('The selected monster is filtered!', 'danger');
-                        return;
-                    }
-                }
-                if (monsterID === undefined) {
-                    this.notify('Only the simulation of a single selected monster is supported for now.', 'danger');
-                    return;
-                }
-                const simResult = this.manager.runTrials(monsterID, MICSR.trials, MICSR.maxTicks);
-                MICSR.log(simResult);
+                const startTimeStamp = performance.now();
+                // queue the desired monsters
+                const dungeonID = this.simulator.resetSingleSimulation();
+                this.simulator.simulationQueue.forEach(queueItem => {
+                    console.log(queueItem.monsterID)
+                    const simResult = this.manager.runTrials(queueItem.monsterID, dungeonID, MICSR.trials, MICSR.maxTicks);
+                    MICSR.log(simResult);
+                });
+                const processingTime = performance.now() - startTimeStamp;
+                MICSR.log(`Simulation took ${processingTime / 1000}s.`);
             }
 
             exportSettingButtonOnClick() {

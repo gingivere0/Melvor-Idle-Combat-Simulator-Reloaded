@@ -299,16 +299,23 @@
             }
 
             resetSingleSimulation() {
+                // clear queue
+                this.simulationQueue = [];
+                this.resetSimDone();
+                // check selection
                 if (!this.parent.barSelected) {
-                    return;
+                    this.parent.notify('There is nothing selected!', 'danger');
+                    return -1;
                 }
                 // area monster
                 if (!this.parent.isViewingDungeon && this.parent.barIsMonster(this.parent.selectedBar)) {
                     const monsterID = this.parent.barMonsterIDs[this.parent.selectedBar];
                     if (this.monsterSimFilter[monsterID]) {
                         this.pushMonsterToQueue(monsterID);
-                        return;
+                    } else {
+                        this.parent.notify('The selected monster is filtered!', 'danger');
                     }
+                    return -1;
                 }
                 // dungeon
                 let dungeonID = undefined;
@@ -322,8 +329,10 @@
                         MICSR.dungeons[dungeonID].monsters.forEach(monsterID => {
                             this.pushMonsterToQueue(monsterID);
                         });
+                    } else {
+                        this.parent.notify('The selected dungeon is filtered!', 'danger');
                     }
-                    return;
+                    return dungeonID;
                 }
                 // slayer area
                 let taskID = undefined;
@@ -335,8 +344,11 @@
                 if (taskID !== undefined) {
                     if (this.slayerSimFilter[taskID]) {
                         this.queueSlayerTask(taskID);
+                    } else {
+                        this.parent.notify('The selected task list is filtered!', 'danger');
                     }
                 }
+                return -1;
             }
 
             queueSlayerTask(i) {
