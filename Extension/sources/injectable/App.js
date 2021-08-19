@@ -603,8 +603,9 @@
                 this.combatStatCard.addSectionTitle('Plot Options');
                 this.plotter.addToggles(this.combatStatCard);
                 this.combatStatCard.addSectionTitle('');
-                this.combatStatCard.addButton('Simulate', () => this.simulateButtonOnClick(false));
-                this.combatStatCard.addButton('Simulate Selected', () => this.simulateButtonOnClick(true));
+                this.combatStatCard.addButton('Simulate Selected Monster', () => this.slowSimulateButtonOnClick());
+                // this.combatStatCard.addButton('Simulate', () => this.simulateButtonOnClick(false));
+                // this.combatStatCard.addButton('Simulate Selected', () => this.simulateButtonOnClick(true));
             }
 
             createIndividualInfoCard() {
@@ -1881,6 +1882,24 @@
                         this.simulator.simulateCombat(single);
                     }
                 }
+            }
+
+            slowSimulateButtonOnClick() {
+                let monsterID;
+                if (!this.isViewingDungeon && this.barSelected && this.barIsMonster(this.selectedBar)) {
+                    monsterID = this.barMonsterIDs[this.selectedBar];
+                    if (!this.simulator.monsterSimFilter[monsterID]) {
+                        this.notify('The selected monster is filtered!', 'danger');
+                        return;
+                    }
+                }
+                if (monsterID === undefined) {
+                    this.notify('Only the simulation of a single selected monster is supported for now.', 'danger');
+                    return;
+                }
+                this.manager.selectMonster(monsterID, getMonsterArea(monsterID));
+                const simResult = this.manager.runTrials(MICSR.trials, MICSR.maxTicks);
+                MICSR.log(simResult);
             }
 
             exportSettingButtonOnClick() {

@@ -90,6 +90,7 @@
 
             // reset sim stats
             resetSimStats() {
+                this.tickCount = 0;
                 this.simStats = {
                     killCount: 0,
                     deathCount: 0,
@@ -99,8 +100,10 @@
 
             getSimStats() {
                 return {
+                    monsterID: this.selectedMonster,
+                    tickCount: this.tickCount,
                     ...this.simStats,
-                    gains: this.player.getGains(),
+                    gainsPerSecond: this.player.getGainsPerSecond(this.tickCount),
                 };
             }
 
@@ -115,6 +118,16 @@
                 this.simStats.killCount++;
             }
 
+            runTrials(trials, tickLimit) {
+                this.resetSimStats();
+                const startTimeStamp = performance.now();
+                while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < tickLimit) {
+                    this.tick();
+                }
+                const processingTime = performance.now() - startTimeStamp;
+                MICSR.log(`Took ${processingTime / 1000}s to process ${this.simStats.killCount} kills and ${this.simStats.deathCount} deaths in ${this.tickCount} ticks. ${processingTime / this.tickCount}ms per tick.`);
+                return this.getSimStats();
+            }
         }
     }
 

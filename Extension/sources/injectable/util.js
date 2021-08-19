@@ -81,7 +81,8 @@
 
         // simulation settings
         MICSR.maxActions = 300;
-        MICSR.trials = 10000;
+        MICSR.trials = 1e4;
+        MICSR.maxTicks = 1e7;
 
         // equipmentSlot enum
         MICSR.equipmentSlot = {
