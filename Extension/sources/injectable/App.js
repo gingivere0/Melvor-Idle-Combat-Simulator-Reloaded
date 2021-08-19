@@ -465,12 +465,12 @@
                 // auto eat dropdown
                 let autoEatTierNames = ['Manual Eating'];
                 let autoEatTierValues = [-1];
-                for (let i = 0; i < this.combatData.autoEatData.length; i++) {
-                    autoEatTierNames.push(this.combatData.autoEatData[i].name);
+                for (let i = 1; i < 4; i++) {
+                    autoEatTierNames.push(SHOP.General[i].name);
                     autoEatTierValues.push(i);
                 }
                 const autoEatTierDropdown = this.equipmentSelectCard.createDropdown(autoEatTierNames, autoEatTierValues, 'MCS Auto Eat Tier Dropdown', (event) => {
-                    this.combatData.autoEatTier = parseInt(event.currentTarget.selectedOptions[0].value);
+                    this.player.autoEatTier = parseInt(event.currentTarget.selectedOptions[0].value);
                     this.updateCombatStats();
                 });
                 foodCCContainer.appendChild(autoEatTierDropdown);
@@ -479,13 +479,13 @@
                 this.equipmentSelectCard.addToggleRadio(
                     '95% Cooking Pool',
                     'cookingPool',
-                    this.combatData,
+                    this.player,
                     'cookingPool',
                 );
                 this.equipmentSelectCard.addToggleRadio(
                     '99 Cooking Mastery',
                     'cookingMastery',
-                    this.combatData,
+                    this.player,
                     'cookingMastery',
                 );
                 // Slayer task and hardcore mode
@@ -524,7 +524,7 @@
             }
 
             equipFood(itemID) {
-                this.combatData.foodSelected = itemID;
+                this.player.equipFood(itemID);
                 const img = document.getElementById('MCS Food Image');
                 if (itemID === -1) {
                     img.src = 'assets/media/skills/combat/food_empty.svg';

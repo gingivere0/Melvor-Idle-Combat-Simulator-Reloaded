@@ -36,6 +36,7 @@
                 super(simManager);
                 this.detachGlobals();
                 this.replaceGlobals();
+                this.foodLimit = 1e15;
             }
 
             // detach globals attached by parent constructor
@@ -92,6 +93,11 @@
                 this.potionID = -1;
                 // isSynergyUnlocked
                 this.summoningSynergy = true;
+                // shopItemsPurchased
+                this.autoEatTier = -1;
+                // cooking MASTERY
+                this.cookingPool = false;
+                this.cookingMastery = false;
             }
 
             resetGains() {
@@ -102,14 +108,17 @@
                 this.selectedPotion = 0;
                 this.usedPotionCharges = 0;
                 this.usedPrayerPoints = 0;
+                this.food.currentSlot.quantity = this.foodLimit;
             }
 
-            getGains() {
+            getGainsPerSecond(ticks) {
+                const seconds = ticks / 20;
                 return {
-                    gp: this.gp,
-                    skillXP: this.skillXP,
+                    gp: this.gp / seconds,
+                    skillXP: this.skillXP.map(x => x / seconds),
                     petRolls: this.petRolls,
                     slayercoins: this.slayercoins,
+                    usedFood: (this.foodLimit - this.food.currentSlot.quantity) / seconds,
                 }
             }
 
@@ -156,7 +165,12 @@
             }
 
             addShopModifiers() {
-                // shop modifiers are not relevant for combat sim at this point
+                // auto eat modifiers
+                for (let tier = 0; tier <= this.autoEatTier; tier++) {
+                    this.modifiers.addModifiers(SHOP.General[1 + tier].contains.modifiers);
+                }
+
+                // other shop modifiers are not relevant for combat sim at this point
             }
 
             addSummonSynergyModifiers() {
@@ -311,10 +325,31 @@
                 equipment.unequipItem(slot);
             }
 
-            equipFood(itemID, quantity) {
+            equipFood(itemID, quantity = this.foodLimit) {
+                if (itemID === -1) {
+                    this.unequipFood();
+                    return;
+                }
+                // Unequip previous food
+                this.food.unequipSelected();
+                // Proceed to equip the food
+                this.food.equip(items[itemID], quantity);
             }
 
             unequipFood() {
+                this.food.unequipSelected();
+            }
+
+            getFoodHealingBonus(item) {
+                let bonus = this.modifiers.increasedFoodHealingValue - this.modifiers.decreasedFoodHealingValue;
+                const sID = CONSTANTS.skill.Cooking;
+                if (item.masteryID !== undefined && item.masteryID[0] === sID && this.cookingMastery) {
+                    bonus += 20;
+                }
+                if (this.cookingPool) {
+                    bonus += 10;
+                }
+                return bonus;
             }
         }
     }

@@ -104,11 +104,6 @@
                 this.useCombinationRunes = false;
                 // lucky herb bonus
                 this.luckyHerb = 0;
-                // Food
-                this.autoEatTier = -1;
-                this.foodSelected = -1;
-                this.cookingPool = false;
-                this.cookingMastery = false;
                 // player modifiers
                 this.modifiers = new PlayerModifiers();
                 // base stats
@@ -492,12 +487,6 @@
                     return true;
                 }).forEach(itemID => this.modifiers.addModifiers(items[itemID].modifiers));
 
-                // mimic calculateShopModifiers
-                // implement other parts of this if they ever are relevant
-                for (let i = 0; i <= this.autoEatTier; i++) {
-                    this.modifiers.addModifiers(this.autoEatData[i].contains.modifiers);
-                }
-
                 // mimic calculateMiscModifiers
                 // implement this if it ever is relevant
 
@@ -678,16 +667,14 @@
                 // MICSR.log({...playerStats});
 
                 // set auto eat
-                if (this.autoEatTier >= 0) {
+                if (this.player.autoEatTier >= 0) {
                     playerStats.autoEat.eatAt = MICSR.getModifierValue(this.modifiers, 'AutoEatThreshold');
                     playerStats.autoEat.efficiency = MICSR.getModifierValue(this.modifiers, 'AutoEatEfficiency');
                     playerStats.autoEat.maxHP = MICSR.getModifierValue(this.modifiers, 'AutoEatHPLimit');
                 } else {
                     playerStats.autoEat.manual = true;
                 }
-                if (this.foodSelected > -1) {
-                    playerStats.foodHeal = this.getFoodHealAmt();
-                }
+                playerStats.foodHeal = this.player.getFoodHealing(this.player.food.currentSlot.item);
 
                 // Magic curses and auroras
                 if (this.combatStats.attackType === CONSTANTS.attackType.Magic || this.equipmentStats.canUseMagic) {
@@ -862,24 +849,6 @@
                     return false;
                 }
                 return true;
-            }
-
-            getFoodHealAmt() {
-                if (this.foodSelected === -1) {
-                    return 0;
-                }
-                let amt = items[this.foodSelected].healsFor;
-                amt *= this.numberMultiplier;
-                let multiplier = 1;
-                if (this.cookingPool) {
-                    multiplier += .1;
-                }
-                if (this.cookingMastery && items[this.foodSelected].masteryID && items[this.foodSelected].masteryID[0] === CONSTANTS.skill.Cooking) {
-                    multiplier += .2;
-                }
-                multiplier += MICSR.getModifierValue(this.modifiers, 'FoodHealingValue') / 100;
-                amt *= multiplier;
-                return amt;
             }
         }
     }

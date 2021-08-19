@@ -58,11 +58,11 @@
                         }
                     }
                 }
-                // get food
-                const food = player.food.slots[player.food.selectedSlot].item;
-                // get cooking mastery for food
-                const foodMastery = food.masteryID;
-                const cookingMastery = this.app.combatData.foodSelected && foodMastery && foodMastery[0] === CONSTANTS.skill.Cooking
+                // get foodSelected
+                const foodSelected = player.food.currentSlot.item;
+                // get cooking mastery for foodSelected
+                const foodMastery = foodSelected.masteryID;
+                const cookingMastery = foodSelected.id > -1 && foodMastery && foodMastery[0] === CONSTANTS.skill.Cooking
                     && exp.xp_to_level(MASTERY[CONSTANTS.skill.Cooking].xp[foodMastery[1]]) > 99;
 
                 // get the player's auto eat tier
@@ -94,7 +94,7 @@
                     cookingMastery: cookingMastery,
                     cookingPool: getMasteryPoolProgress(CONSTANTS.skill.Cooking) >= 95,
                     curse: player.spellSelection.curse,
-                    foodSelected: food.id,
+                    foodSelected: foodSelected.id,
                     isAdventure: currentGamemode === 2,
                     isAncient: player.spellSelection.ancient !== -1,
                     isHardcore: currentGamemode === 1,
@@ -132,11 +132,11 @@
                     // simple values
                     ancient: this.app.combatData.spells.ancient.selectedID,
                     aurora: this.app.combatData.spells.aurora.selectedID,
-                    autoEatTier: this.app.combatData.autoEatTier,
-                    cookingMastery: this.app.combatData.cookingMastery,
-                    cookingPool: this.app.combatData.cookingPool,
+                    autoEatTier: this.app.player.autoEatTier,
+                    cookingMastery: this.app.player.cookingMastery,
+                    cookingPool: this.app.player.cookingPool,
                     curse: this.app.combatData.spells.curse.selectedID,
-                    foodSelected: this.app.combatData.foodSelected,
+                    foodSelected: this.app.player.food.currentSlot.item.id,
                     isAdventure: this.app.combatData.isAdventure,
                     isAncient: this.app.combatData.spells.ancient.selectedID > -1,
                     isHardcore: this.app.combatData.isHardcore,
@@ -302,13 +302,13 @@
 
             importAutoEat(autoEatTier, foodSelected, cookingPool, cookingMastery) {
                 // Import Food Settings
-                this.app.combatData.autoEatTier = autoEatTier;
+                this.app.player.autoEatTier = autoEatTier;
                 document.getElementById('MCS Auto Eat Tier Dropdown').selectedIndex = autoEatTier + 1;
                 this.app.equipFood(foodSelected);
                 this.checkRadio('MCS 95% Cooking Pool', cookingPool);
-                this.app.combatData.cookingPool = cookingPool;
+                this.app.player.cookingPool = cookingPool;
                 this.checkRadio('MCS 99 Cooking Mastery', cookingMastery);
-                this.app.combatData.cookingMastery = cookingMastery;
+                this.app.player.cookingMastery = cookingMastery;
             }
 
             importSlayerTask(isSlayerTask) {
