@@ -108,6 +108,10 @@
                 this.usedAmmo = 0;
                 this.usedPotionCharges = 0;
                 this.usedPrayerPoints = 0;
+                this.chargesUsed = {
+                    Summon1: 0,
+                    Summon2: 0,
+                };
                 this.food.currentSlot.quantity = this.foodLimit;
             }
 
@@ -122,6 +126,7 @@
                     usedFood: (this.foodLimit - this.food.currentSlot.quantity) / seconds,
                     usedPotionCharges: this.usedPotionCharges / seconds,
                     usedPrayerPoints: this.usedPrayerPoints / seconds,
+                    usedSummoningCharges: (this.chargesUsed.Summon1 + this.chargesUsed.Summon2) / 2 / seconds,
                 }
             }
 
@@ -360,6 +365,28 @@
                     bonus += 10;
                 }
                 return bonus;
+            }
+
+            isSynergyActive(summonID1, summonID2) {
+                if (!this.isSynergyUnlocked(summonID1, summonID2)) {
+                    return false;
+                }
+                return this.equipment.checkForItemID(summoningItems[summonID1].itemID) && this.equipment.checkForItemID(summoningItems[summonID2].itemID);
+            }
+
+            isSynergyUnlocked(summon1, summon2) {
+                if (!this.summoningSynergy) {
+                    return false;
+                }
+                const minID = Math.min(summon1, summon2);
+                const maxID = Math.max(summon1, summon2);
+                return SUMMONING.Synergies[minID][maxID] !== undefined;
+            }
+
+            removeSummonCharge(slot, charges = 1) {
+                if (!rollPercentage(this.modifiers.increasedSummoningChargePreservation - this.modifiers.decreasedSummoningChargePreservation)) {
+                    this.chargesUsed[slot] += charges;
+                }
             }
         }
     }
