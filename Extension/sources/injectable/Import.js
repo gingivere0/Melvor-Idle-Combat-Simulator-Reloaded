@@ -173,8 +173,6 @@
                 this.app.updateSpellOptions();
                 this.app.checkForElisAss();
                 this.app.updatePrayerOptions();
-                this.app.combatData.updateEquipmentStats();
-                this.app.updateEquipmentStats();
                 this.app.updateCombatStats();
             }
 

@@ -243,7 +243,6 @@
                 this.createPetSelectCard();
                 this.createAgilitySelectCard();
                 this.createLootOptionsCard();
-                this.createEquipmentStatCard();
                 this.createSimulationAndExportCard();
                 this.createCompareCard();
                 // Add Combat Stat Display Card
@@ -328,7 +327,6 @@
                 // Set up spells
                 const standardOpts = this.combatData.spells.standard;
                 this.selectButton(document.getElementById(`MCS ${standardOpts.array[standardOpts.selectedID].name} Button`));
-                this.updateEquipmentStats();
                 this.updateCombatStats();
                 this.updatePlotData();
                 // slayer sim is off by default, so toggle auto slayer off
@@ -966,47 +964,6 @@
                 return `${this.getItemName(this.combatData.dropSelected)}/${this.selectedTimeShorthand}`;
             }
 
-            createEquipmentStatCard() {
-                this.equipStatCard = this.mainTabCard.addTab('Equipment Stats', MICSR.emptyItems.Helmet.media, '', '50px');
-                this.equipStatCard.addSectionTitle('Equipment Stats');
-                this.equipKeys = [
-                    'attackSpeed',
-                    // melee
-                    ['attackBonus', 0],
-                    ['attackBonus', 1],
-                    ['attackBonus', 2],
-                    'strengthBonus',
-                    // ranged
-                    'rangedAttackBonus',
-                    'rangedStrengthBonus',
-                    // magic
-                    'magicAttackBonus',
-                    'magicDamageBonus',
-                    // defence
-                    'damageReduction',
-                    'defenceBonus',
-                    'rangedDefenceBonus',
-                    'magicDefenceBonus',
-                ];
-                for (let i = 0; i < this.equipKeys.length; i++) {
-                    const key = this.equipKeys[i];
-                    let stat;
-                    if (Array.isArray(key)) {
-                        stat = MICSR.equipmentStatNames[key[0]][key[1]];
-                    } else {
-                        stat = MICSR.equipmentStatNames[key];
-                    }
-                    this.equipStatCard.addNumberOutput(stat.name, 0, 20, this.media[stat.icon], `MCS ${this.equipKeys[i]} ES Output`);
-                }
-                // level requirements
-                this.equipStatCard.addSectionTitle('Level Requirements');
-                this.requiredKeys = Object.getOwnPropertyNames(MICSR.requiredStatNames);
-                for (const key of this.requiredKeys) {
-                    const stat = MICSR.requiredStatNames[key];
-                    this.equipStatCard.addNumberOutput('Level Required', 1, 20, this.media[stat.icon], `MCS ${key} ES Output`);
-                }
-            }
-
             createSimulationAndExportCard() {
                 this.simOptionsCard = this.mainTabCard.addTab('Sim. Options', this.media.settings, '', '150px');
                 this.simOptionsCard.addSectionTitle('Simulation Options');
@@ -1469,7 +1426,6 @@
                 // update stats
                 this.updateStyleDropdowns();
                 this.checkForElisAss();
-                this.updateEquipmentStats();
                 this.updateCombatStats();
             }
 
@@ -2408,26 +2364,6 @@
                         }
                     } else {
                         document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = prayer.media;
-                    }
-                });
-            }
-
-            /**
-             * Updates the text fields for the stats provided by equipment
-             */
-            updateEquipmentStats() {
-                // first update the values
-                this.combatData.updateEquipmentStats();
-                let newStatValue;
-                [this.equipKeys, this.requiredKeys].forEach(keys => {
-                    for (let i = 0; i < keys.length; i++) {
-                        const key = keys[i];
-                        if (Array.isArray(key)) {
-                            newStatValue = this.combatData.equipmentStats[key[0]][key[1]];
-                        } else {
-                            newStatValue = this.combatData.equipmentStats[key];
-                        }
-                        document.getElementById(`MCS ${keys[i]} ES Output`).textContent = newStatValue.toLocaleString();
                     }
                 });
             }

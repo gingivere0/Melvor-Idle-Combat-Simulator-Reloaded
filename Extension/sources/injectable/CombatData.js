@@ -98,133 +98,12 @@
                 this.luckyHerb = 0;
                 // player modifiers
                 this.modifiers = new PlayerModifiers();
-                // base stats
-                this.baseStats = this.resetPlayerBaseStats();
                 // equipment stats
-                this.equipmentStats = {};
+                this.equipmentStats = this.player.equipmentStats;
                 // combat stats
                 this.combatStats = {};
                 // selected item drop
                 this.dropSelected = -1;
-            }
-
-            /**
-             * Calculates the equipment's combined stats and stores them in `this.equipmentStats`
-             */
-            updateEquipmentStats() {
-                this.setAttackType();
-                const maxCape = this.player.equipmentIDs().includes(CONSTANTS.item.Max_Skillcape) || this.player.equipmentIDs().includes(CONSTANTS.item.Cape_of_Completion);
-                /** @type {EquipmentStats} */
-                const equipmentStats = {
-                    runesProvidedByWeapon: {},
-                    runesProvidedByShield: {},
-                    activeItems: {
-                        // TODO: check which of these items are passive slot items
-                        //   also check any other use of `CONSTANTS.item` and `items`
-                        hitpointsSkillcape: this.player.equipmentIDs().includes(CONSTANTS.item.Hitpoints_Skillcape) || maxCape,
-                        magicSkillcape: this.player.equipmentIDs().includes(CONSTANTS.item.Magic_Skillcape) || maxCape,
-                        prayerSkillcape: this.player.equipmentIDs().includes(CONSTANTS.item.Prayer_Skillcape) || maxCape,
-                        slayerSkillcape: this.player.equipmentIDs().includes(CONSTANTS.item.Slayer_Skillcape) || maxCape,
-                        firemakingSkillcape: this.player.equipmentIDs().includes(CONSTANTS.item.Firemaking_Skillcape) || maxCape,
-                        capeOfArrowPreservation: this.player.equipmentIDs().includes(CONSTANTS.item.Cape_of_Arrow_Preservation),
-                        skullCape: this.player.equipmentIDs().includes(CONSTANTS.item.Skull_Cape),
-                        goldDiamondRing: this.player.equipmentIDs().includes(CONSTANTS.item.Gold_Diamond_Ring),
-                        goldEmeraldRing: this.player.equipmentIDs().includes(CONSTANTS.item.Gold_Emerald_Ring),
-                        goldSapphireRing: this.player.equipmentIDs().includes(CONSTANTS.item.Gold_Sapphire_Ring),
-                        fighterAmulet: this.player.equipmentIDs().includes(CONSTANTS.item.Fighter_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Melee,
-                        warlockAmulet: this.player.equipmentIDs().includes(CONSTANTS.item.Warlock_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Magic,
-                        guardianAmulet: this.player.equipmentIDs().includes(CONSTANTS.item.Guardian_Amulet),
-                        deadeyeAmulet: this.player.equipmentIDs().includes(CONSTANTS.item.Deadeye_Amulet) && this.combatStats.attackType === CONSTANTS.attackType.Ranged,
-                        confettiCrossbow: this.player.equipmentIDs().includes(CONSTANTS.item.Confetti_Crossbow),
-                        stormsnap: this.player.equipmentIDs().includes(CONSTANTS.item.Stormsnap),
-                        slayerCrossbow: this.player.equipmentIDs().includes(CONSTANTS.item.Slayer_Crossbow),
-                        bigRon: this.player.equipmentIDs().includes(CONSTANTS.item.Big_Ron),
-                        aorpheatsSignetRing: this.player.equipmentIDs().includes(CONSTANTS.item.Aorpheats_Signet_Ring),
-                        elderCrown: this.player.equipmentIDs().includes(CONSTANTS.item.Elder_Crown),
-                        // slayer gear
-                        mirrorShield: this.player.equipmentIDs().includes(CONSTANTS.item.Mirror_Shield),
-                        magicalRing: this.player.equipmentIDs().includes(CONSTANTS.item.Magical_Ring),
-                    },
-                };
-
-                // set defaults based on known item stats
-                Object.getOwnPropertyNames(MICSR.equipmentStatNames).forEach(stat => {
-                    equipmentStats[stat] = 0;
-                });
-                Object.getOwnPropertyNames(MICSR.passiveStatNames).forEach(stat => {
-                    equipmentStats[stat] = 0;
-                });
-                Object.getOwnPropertyNames(MICSR.requiredStatNames).forEach(stat => {
-                    equipmentStats[stat] = 1;
-                });
-
-                // set custom defaults
-                equipmentStats.attackSpeed = 4000;
-                equipmentStats.attackBonus = [0, 0, 0];
-
-                // iterate over gear
-                for (let equipmentSlot = 0; equipmentSlot < MICSR.equipmentSlotKeys.length; equipmentSlot++) {
-                    const itemID = this.player.equipmentID(equipmentSlot);
-                    if (itemID === -1) {
-                        continue;
-                    }
-                    const item = items[itemID];
-
-                    // passive stats
-                    Object.getOwnPropertyNames(MICSR.passiveStatNames).forEach(stat => {
-                        if (equipmentSlot === MICSR.equipmentSlot.Weapon && item.isAmmo) {
-                            return;
-                        }
-                        equipmentStats[stat] += item[stat] || 0;
-                    });
-
-                    // level requirements
-                    Object.getOwnPropertyNames(MICSR.requiredStatNames).forEach(stat => {
-                        const itemStat = item[stat];
-                        if (itemStat === undefined || itemStat === null) {
-                            return;
-                        }
-                        equipmentStats[stat] = Math.max(equipmentStats[stat], item[stat] || 0);
-                    });
-
-                    // equipment stats
-                    if (equipmentSlot !== MICSR.equipmentSlot.Passive) {
-                        Object.getOwnPropertyNames(MICSR.equipmentStatNames).forEach(stat => {
-                            const itemStat = item[stat];
-                            if (itemStat === undefined || itemStat === null) {
-                                return;
-                            }
-                            // special cases
-                            switch (stat) {
-                                case 'attackBonus':
-                                    for (let j = 0; j < 3; j++) {
-                                        equipmentStats[stat][j] += itemStat[j];
-                                    }
-                                    return;
-                                case 'attackSpeed':
-                                    if (equipmentSlot === MICSR.equipmentSlot.Weapon) {
-                                        equipmentStats.attackSpeed = item.attackSpeed || 4000;
-                                    }
-                                    return;
-                                case 'providesRuneQty':
-                                    if (equipmentSlot === MICSR.equipmentSlot.Weapon) {
-                                        item.providesRune.forEach((rune) => equipmentStats.runesProvidedByWeapon[rune] = itemStat * (equipmentStats.activeItems.magicSkillcape ? 2 : 1));
-                                    } else if (equipmentSlot === MICSR.equipmentSlot.Shield) {
-                                        item.providesRune.forEach((rune) => equipmentStats.runesProvidedByShield[rune] = itemStat * (equipmentStats.activeItems.magicSkillcape ? 2 : 1));
-                                    } else {
-                                        console.error(`Runes provided by ${item.name} are not taken into account!`)
-                                    }
-                                    return;
-                            }
-                            if (equipmentSlot === MICSR.equipmentSlot.Weapon && item.isAmmo) {
-                                return;
-                            }
-                            // standard stats
-                            equipmentStats[stat] += itemStat || 0;
-                        });
-                    }
-                }
-                this.equipmentStats = equipmentStats;
             }
 
             setAttackType() {
@@ -247,84 +126,6 @@
              */
             getNumberMultiplierValue(value) {
                 return value * this.numberMultiplier;
-            }
-
-            /**
-             * mimic resetPlayerBaseStats
-             */
-            resetPlayerBaseStats() {
-                return {
-                    attackBonus: [0, 0, 0],
-                    defenceBonus: 0,
-                    strengthBonus: 0,
-                    damageReduction: 0,
-                    attackBonusRanged: 0,
-                    defenceBonusRanged: 0,
-                    strengthBonusRanged: 0,
-                    attackBonusMagic: 0,
-                    defenceBonusMagic: 0,
-                    damageBonusMagic: 0,
-                };
-            }
-
-            /**
-             * mimic updatePlayerBaseStats
-             */
-            updatePlayerBaseStats(monsterID = undefined) {
-                const baseStats = this.resetPlayerBaseStats();
-                for (let i = 0; i < 3; i++) {
-                    baseStats.attackBonus[i] += this.equipmentStats.attackBonus[i];
-                }
-                baseStats.defenceBonus += this.equipmentStats.defenceBonus;
-                baseStats.strengthBonus += this.equipmentStats.strengthBonus;
-                baseStats.damageReduction += this.equipmentStats.damageReduction;
-                baseStats.attackBonusRanged += this.equipmentStats.rangedAttackBonus;
-                baseStats.defenceBonusRanged += this.equipmentStats.rangedDefenceBonus;
-                baseStats.strengthBonusRanged += this.equipmentStats.rangedStrengthBonus;
-                baseStats.attackBonusMagic += this.equipmentStats.magicAttackBonus;
-                baseStats.defenceBonusMagic += this.equipmentStats.magicDefenceBonus;
-                baseStats.damageBonusMagic += this.equipmentStats.magicDamageBonus;
-                if (monsterID !== undefined) {
-                    // changes for items that have different formulas in combat
-                    if (this.equipmentStats.activeItems.stormsnap) {
-                        baseStats.strengthBonusRanged += Math.floor(110 + (1 + (MONSTERS[monsterID].magicLevel * 6) / 33));
-                        baseStats.attackBonusRanged += Math.floor(102 * (1 + (MONSTERS[monsterID].magicLevel * 6) / 5500));
-                    } else if (this.equipmentStats.activeItems.slayerCrossbow
-                        // && !isDungeon // TODO: implement this check by duplicating certain sims? see issue #10
-                        && (MONSTERS[monsterID].slayerXP !== undefined || this.manager.isSlayerTask)) {
-                        baseStats.strengthBonusRanged = Math.floor(baseStats.strengthBonusRanged * items[CONSTANTS.item.Slayer_Crossbow].slayerStrengthMultiplier);
-                    } else if (this.equipmentStats.activeItems.bigRon && MONSTERS[monsterID].isBoss) {
-                        baseStats.strengthBonus = Math.floor(baseStats.strengthBonus * items[CONSTANTS.item.Big_Ron].bossStrengthMultiplier);
-                    }
-                    // synergy 6 7 and synergy 7 8
-                    if (this.modifiers.summoningSynergy_6_7 && MONSTERS[monsterID].attackType === CONSTANTS.attackType.Ranged) {
-                        baseStats.attackBonus[0] += this.modifiers.summoningSynergy_6_7;
-                        baseStats.attackBonus[1] += this.modifiers.summoningSynergy_6_7;
-                        baseStats.attackBonus[2] += this.modifiers.summoningSynergy_6_7;
-                        baseStats.strengthBonus += this.modifiers.summoningSynergy_6_7;
-                    } else if (this.modifiers.summoningSynergy_7_8 && MONSTERS[monsterID].attackType === CONSTANTS.attackType.Magic) {
-                        baseStats.attackBonusRanged += this.modifiers.summoningSynergy_7_8;
-                        baseStats.strengthBonusRanged += this.modifiers.summoningSynergy_7_8;
-                    } else if (this.modifiers.summoningSynergy_6_13 && MONSTERS[monsterID].attackType === CONSTANTS.attackType.Ranged) {
-                        baseStats.damageReduction += this.modifiers.summoningSynergy_6_13;
-                    } else if (this.modifiers.summoningSynergy_7_13 && MONSTERS[monsterID].attackType === CONSTANTS.attackType.Magic) {
-                        baseStats.damageReduction += this.modifiers.summoningSynergy_7_13;
-                    } else if (this.modifiers.summoningSynergy_8_13 && MONSTERS[monsterID].attackType === CONSTANTS.attackType.Melee) {
-                        baseStats.damageReduction += this.modifiers.summoningSynergy_8_13;
-                    }
-                }
-                // apply synergies
-                if (this.modifiers.summoningSynergy_1_8) {
-                    baseStats.defenceBonusMagic += this.modifiers.summoningSynergy_1_8;
-                } else if (this.modifiers.summoningSynergy_12_13 && this.manager.isSlayerTask) {
-                    baseStats.damageReduction += this.modifiers.summoningSynergy_12_13;
-                }
-                return baseStats;
-            }
-
-            baseMeleeMaxHit(baseStats) {
-                const effectiveStrengthLevel = this.player.levels.Strength;
-                return Math.floor(this.numberMultiplier * (1.3 + effectiveStrengthLevel / 10 + baseStats.strengthBonus / 80 + (effectiveStrengthLevel * baseStats.strengthBonus) / 640));
             }
 
             /**
@@ -353,9 +154,6 @@
 
                 // update aurora bonuses //TODO: are some of these modifiers?
                 this.computeAuroraBonus();
-
-                // set base stats
-                this.baseStats = this.updatePlayerBaseStats();
 
                 /*
                 Second, start computing and configuring TODO: extract this
@@ -390,7 +188,6 @@
                 this.combatStats.maxAttackRoll = this.player.stats.accuracy;
 
                 // max hit roll
-                this.combatStats.baseMeleeMaxHit = this.baseMeleeMaxHit(this.baseStats);
                 this.combatStats.maxHit = this.player.stats.maxHit;
 
                 // min hit roll
