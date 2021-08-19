@@ -136,19 +136,14 @@
 
             getObstacleTooltip(category, obstacle) {
                 let passives = `<div class="text-center">${obstacle.name}</div>`;
-                for (let prop in obstacle.modifiers) {
-                    let divider = 1;
-                    if (this.data.courseMastery[category]
-                        && printPlayerModifier(prop, obstacle.modifiers[prop])[1] === 'text-danger') {
-                        divider = 2;
-                    }
-                    let value = obstacle.modifiers[prop];
-                    if (value.length === undefined) {
-                        value /= divider;
-                    } else {
-                        value = value.map(x => [x[0], x[1] / divider]);
-                    }
-                    MICSR.showModifiersInstance.printRelevantModifiers({[prop]: value}, this.filter.tag).forEach(toPrint => {
+                const modifiers = new PlayerModifiers();
+                if (this.data.courseMastery[category]) {
+                    modifiers.addModifiers(obstacle.modifiers, 0.5);
+                } else {
+                    modifiers.addModifiers(obstacle.modifiers);
+                }
+                for (let prop in modifiers) {
+                    MICSR.showModifiersInstance.printRelevantModifiers({[prop]: modifiers[prop]}, this.filter.tag).forEach(toPrint => {
                         passives += `<div class="${toPrint[1]}">${toPrint[0]}</div>`;
                     });
                 }
