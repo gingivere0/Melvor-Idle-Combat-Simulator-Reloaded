@@ -51,6 +51,9 @@
 
                 /** Number of hours to farm for signet ring */
                 this.signetFarmTime = 1;
+
+                // ids of god dungeons
+                this.godDungeonIDs = [8, 9, 10, 11];
             }
 
 
@@ -169,7 +172,7 @@
                     }
                 });
                 // Shards
-                if (godDungeonID.includes(dungeonID)) {
+                if (this.godDungeonIDs.includes(dungeonID)) {
                     let shardCount = 0;
                     const shardID = MONSTERS[MICSR.dungeons[dungeonID].monsters[0]].bones;
                     MICSR.dungeons[dungeonID].monsters.forEach((monsterID) => {
@@ -222,7 +225,7 @@
                         }
                         if (this.monsterSimData[monsterID].simSuccess && this.monsterSimData[monsterID].tooManyActions === 0) {
                             let gpPerKill = 0;
-                            if (godDungeonID.includes(this.app.viewedDungeonID)) {
+                            if (this.godDungeonIDs.includes(this.app.viewedDungeonID)) {
                                 const boneQty = MONSTERS[monsterID].boneQty || 1;
                                 const shardID = MONSTERS[monsterID].bones;
                                 if (this.convertShards) {
@@ -410,7 +413,7 @@
                     // compute dungeon drop rates
                     for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
                         const monsterList = MICSR.dungeons[dungeonID].monsters;
-                        if (godDungeonID.includes(dungeonID)) {
+                        if (this.godDungeonIDs.includes(dungeonID)) {
                             MICSR.dungeons[dungeonID].monsters.forEach(monsterID => {
                                 updateMonsterDropChance(monsterID, this.monsterSimData[monsterID]);
                             });
