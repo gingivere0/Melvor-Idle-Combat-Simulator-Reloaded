@@ -963,8 +963,9 @@
             createSimulationAndExportCard() {
                 this.simOptionsCard = this.mainTabCard.addTab('Sim. Options', this.media.settings, '', '150px');
                 this.simOptionsCard.addSectionTitle('Simulation Options');
-                this.simOptionsCard.addNumberInput('Max Actions', MICSR.maxActions, 1, 10000, (event) => this.maxActionsInputOnChange(event));
-                this.simOptionsCard.addNumberInput('# Trials', MICSR.trials, 1, 100000, (event) => this.numTrialsInputOnChange(event));
+                this.simOptionsCard.addNumberInput('Max Actions', MICSR.maxActions, 1, 1e4, (event) => this.maxActionsInputOnChange(event));
+                this.simOptionsCard.addNumberInput('# Trials', MICSR.trials, 1, 1e5, (event) => this.numTrialsInputOnChange(event));
+                this.simOptionsCard.addNumberInput('Max Kiloticks', MICSR.maxTicks / 1000, 1, 1e5, (event) => this.maxKiloTicksInputOnChange(event));
                 this.simOptionsCard.addToggleRadio(
                     'Force full simulation',
                     'forceFullSim',
@@ -1788,6 +1789,17 @@
                 const newNumTrials = parseInt(event.currentTarget.value);
                 if (newNumTrials > 0) {
                     MICSR.trials = newNumTrials;
+                }
+            }
+
+            /**
+             * Callback for when the number of trials input is changed
+             * @param {Event} event The change event for an input
+             */
+            maxKiloTicksInputOnChange(event) {
+                const maxKiloTicks = parseInt(event.currentTarget.value);
+                if (maxKiloTicks > 0) {
+                    MICSR.maxTicks = maxKiloTicks * 1000;
                 }
             }
 
