@@ -39,12 +39,6 @@
             constructor(manager) {
                 this.manager = manager;
                 this.player = this.manager.player;
-                // auto eat data
-                this.autoEatData = [
-                    SHOP["General"][CONSTANTS.shop.general.Auto_Eat_Tier_I],
-                    SHOP["General"][CONSTANTS.shop.general.Auto_Eat_Tier_II],
-                    SHOP["General"][CONSTANTS.shop.general.Auto_Eat_Tier_III],
-                ];
                 // Spell Selection
                 this.spells = {
                     standard: {

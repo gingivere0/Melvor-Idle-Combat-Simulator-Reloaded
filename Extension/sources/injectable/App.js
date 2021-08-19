@@ -1812,7 +1812,7 @@
             maxActionsInputOnChange(event) {
                 const newMaxActions = parseInt(event.currentTarget.value);
                 if (newMaxActions > 0) {
-                    this.simulator.maxActions = newMaxActions;
+                    MICSR.maxActions = newMaxActions;
                 }
             }
 
@@ -1823,7 +1823,7 @@
             numTrialsInputOnChange(event) {
                 const newNumTrials = parseInt(event.currentTarget.value);
                 if (newNumTrials > 0) {
-                    this.simulator.trials = newNumTrials;
+                    MICSR.trials = newNumTrials;
                 }
             }
 

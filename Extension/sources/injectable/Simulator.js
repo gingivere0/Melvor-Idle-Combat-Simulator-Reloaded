@@ -451,8 +451,8 @@
 
                 // add sim options
                 this.currentSim.options = {
-                    trials: this.trials,
-                    maxActions: this.maxActions,
+                    trials: MICSR.trials,
+                    maxActions: MICSR.maxActions,
                     forceFullSim: this.forceFullSim,
                 };
 
