@@ -397,6 +397,28 @@
                     this.chargesUsed[slot] += charges;
                 }
             }
+            checkRequirements(reqs, notifyOnFailure = false, failureMessage = 'do that.') {
+                return reqs.every(req => this.checkRequirement(req, notifyOnFailure, failureMessage));
+            }
+
+            checkRequirement(requirement, notifyOnFailure = false, failureMessage = 'do that.') {
+                let met = false;
+                switch (requirement.type) {
+                    case 'Level':
+                        met = requirement.levels.every(levelReq => this.skillLevel[levelReq.skill] >= levelReq.level);
+                        break;
+                    case 'Dungeon':
+                        met = true;
+                        break;
+                    case 'Completion':
+                        met = true;
+                        break;
+                    case 'SlayerItem':
+                        met = this.modifiers.bypassSlayerItems > 0 || this.equipment.checkForItemID(requirement.itemID);
+                        break;
+                }
+                return met;
+            }
         }
     }
 

@@ -791,27 +791,6 @@
                     };
                 });
             }
-
-            /**
-             * Check if we can enter the slayer area `area` with current settings
-             */
-            canAccessArea(area) {
-                // check level requirement
-                if (area.slayerLevel !== undefined && this.player.skillLevel[CONSTANTS.skill.Slayer] < area.slayerLevel) {
-                    return false;
-                }
-                // check clear requirement
-                if (area.dungeonCompleted >= 0 && dungeonCompleteCount[area.dungeonCompleted] < 1) {
-                    return false
-                }
-                // check gear requirement
-                if (area.slayerItem > 0
-                    && !this.equipmentStats.activeItems.slayerSkillcape
-                    && !this.player.equipmentIDs().includes(area.slayerItem)) {
-                    return false;
-                }
-                return true;
-            }
         }
     }
 

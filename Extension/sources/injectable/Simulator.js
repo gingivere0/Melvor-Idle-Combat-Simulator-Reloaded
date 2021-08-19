@@ -359,8 +359,8 @@
                     }
                     // check if the area is accessible, this only works for auto slayer
                     // without auto slayer you can get some tasks for which you don't wear/own the gear
-                    let area = findEnemyArea(monsterID, false);
-                    if (area[0] === 1 && !this.parent.combatData.canAccessArea(slayerAreas[area[1]])) {
+                    let area = getMonsterArea(monsterID);
+                    if (!this.parent.player.checkRequirements(area.entryRequirements)) {
                         continue;
                     }
                     // all checks passed
@@ -393,7 +393,7 @@
                 }
                 // Queue simulation of monsters in slayer areas
                 slayerAreas.forEach((area) => {
-                    if (!this.parent.combatData.canAccessArea(area)) {
+                    if (!this.parent.player.checkRequirements(area.entryRequirements)) {
                         const tryToSim = area.monsters.reduce((sim, monsterID) => (this.monsterSimFilter[monsterID] && !this.monsterSimData[monsterID].inQueue) || sim, false);
                         if (tryToSim) {
                             this.parent.notify(`Can't access ${area.areaName}`, 'danger');
@@ -934,14 +934,15 @@
                 if (combatData.isSlayerTask) {
                     dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToSlayerTasks', CONSTANTS.skill.Slayer);
                 }
-                switch (findEnemyArea(monsterID, false)[0]) {
-                    case 0:
+                switch (getMonsterArea(monsterID).areaType) {
+                    // TODO: this does not work
+                    case 'Combat':
                         dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToCombatAreaMonsters', CONSTANTS.skill.Slayer);
                         break;
-                    case 1:
+                    case 'Slayer':
                         dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToSlayerAreaMonsters', CONSTANTS.skill.Slayer);
                         break;
-                    case 2:
+                    case 'Dungeon':
                         dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToDungeonMonsters', CONSTANTS.skill.Slayer);
                         break;
                 }
@@ -1228,7 +1229,7 @@
                 for (const area of slayerAreas) {
                     // push `canEnter` for every monster in this zone
                     for (let j = 0; j < area.monsters.length; j++) {
-                        enterSet.push(this.parent.combatData.canAccessArea(area));
+                        enterSet.push(this.parent.player.checkRequirements(area.entryRequirements));
                     }
                 }
                 // Perform simulation of monsters in dungeons and auto slayer
