@@ -105,7 +105,7 @@
                 this.skillXP = skillLevel.map(_ => 0);
                 this.petRolls = {};
                 this._slayercoins = 0;
-                this.selectedPotion = 0;
+                this.usedAmmo = 0;
                 this.usedPotionCharges = 0;
                 this.usedPrayerPoints = 0;
                 this.food.currentSlot.quantity = this.foodLimit;
@@ -118,6 +118,7 @@
                     skillXP: this.skillXP.map(x => x / seconds),
                     petRolls: this.petRolls,
                     slayercoins: this.slayercoins,
+                    usedAmmo: this.usedAmmo / seconds,
                     usedFood: (this.foodLimit - this.food.currentSlot.quantity) / seconds,
                 }
             }
@@ -298,6 +299,13 @@
                     amount = this.applyModifiersToPrayerCost(amount);
                     this.consumePotionCharge("PrayerPointCost");
                     this.usedPrayerPoints += amount;
+                }
+            }
+
+            // track ammo usage instead of consuming
+            consumeAmmo() {
+                if (!rollPercentage(this.modifiers.ammoPreservationChance)) {
+                    this.usedAmmo++;
                 }
             }
 
