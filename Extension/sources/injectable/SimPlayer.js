@@ -70,6 +70,9 @@
                 this.summonBar = undefined;
             }
 
+            addItemStat() {
+            }
+
             setCallbacks() {
             }
 
