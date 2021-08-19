@@ -41,22 +41,10 @@
                 this.player = this.manager.player;
                 // Spell Selection
                 this.spells = {
-                    standard: {
-                        array: SPELLS,
-                        selectedID: 0,
-                    },
-                    curse: {
-                        array: CURSES,
-                        selectedID: -1,
-                    },
-                    aurora: {
-                        array: AURORAS,
-                        selectedID: -1,
-                    },
-                    ancient: {
-                        array: ANCIENT,
-                        selectedID: -1,
-                    },
+                    standard: SPELLS,
+                    curse: CURSES,
+                    aurora: AURORAS,
+                    ancient: ANCIENT,
                 };
                 // Combat Stats
                 this.combatStats = {

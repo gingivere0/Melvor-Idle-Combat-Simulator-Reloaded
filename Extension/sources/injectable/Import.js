@@ -130,21 +130,21 @@
                     styles: {...this.app.player.attackStyles},
                     prayerSelected: this.app.player.activePrayers,
                     // simple values
-                    ancient: this.app.combatData.spells.ancient.selectedID,
-                    aurora: this.app.combatData.spells.aurora.selectedID,
+                    ancient: this.player.spellSelection.ancient,
+                    aurora: this.app.player.spellSelection.aurora,
                     autoEatTier: this.app.player.autoEatTier,
                     cookingMastery: this.app.player.cookingMastery,
                     cookingPool: this.app.player.cookingPool,
-                    curse: this.app.combatData.spells.curse.selectedID,
+                    curse: this.app.player.spellSelection.curse,
                     foodSelected: this.app.player.food.currentSlot.item.id,
                     isAdventure: this.app.combatData.isAdventure,
-                    isAncient: this.app.combatData.spells.ancient.selectedID > -1,
+                    isAncient: this.app.player.spellSelection.ancient > -1,
                     isHardcore: this.app.combatData.isHardcore,
                     isSlayerTask: this.app.manager.isSlayerTask,
                     pillar: this.app.player.pillar,
                     potionID: this.app.player.potionID,
                     potionTier: this.app.player.potionTier,
-                    standard: this.app.combatData.spells.standard.selectedID,
+                    standard: this.app.player.spellSelection.standard,
                     summoningSynergy: this.app.player.summoningSynergy,
                     useCombinationRunes: this.app.combatData.useCombinationRunes,
                 }
@@ -210,35 +210,28 @@
             importSpells(ancient, standard, curse, aurora) {
                 // Set all active spell UI to be disabled
                 Object.keys(this.app.combatData.spells).forEach((spellType) => {
-                    const spellOpts = this.app.combatData.spells[spellType];
-                    if (spellOpts.selectedID > -1) {
-                        this.app.unselectButton(document.getElementById(`MCS ${spellOpts.array[spellOpts.selectedID].name} Button`));
+                    const spellList = this.app.combatData.spells[spellType];
+                    const selectedID = this.app.player.spellSelection[spellType];
+                    if (selectedID > -1) {
+                        this.app.unselectButton(document.getElementById(`MCS ${spellList[selectedID].name} Button`));
                     }
                 });
+                this.app.player.spellSelection.ancient = ancient;
+                this.app.player.spellSelection.standard = standard;
+                this.app.player.spellSelection.curse = curse;
+                this.app.player.spellSelection.aurora = aurora;
                 // import spells
                 if (ancient !== -1) {
-                    this.app.combatData.spells.ancient.selectedID = ancient;
                     // clear standard and curse
-                    this.app.combatData.spells.standard.selectedID = -1;
-                    this.app.combatData.spells.curse.selectedID = -1;
-                } else {
-                    this.app.combatData.spells.standard.selectedID = standard;
-                    this.app.combatData.spells.ancient.selectedID = -1;
-                    if (curse !== -1) {
-                        this.app.combatData.spells.curse.selectedID = curse;
-                    } else {
-                        this.app.combatData.spells.curse.selectedID = -1;
-                    }
-                }
-                if (aurora !== -1) {
-                    this.app.combatData.spells.aurora.selectedID = aurora;
-                } else {
-                    this.app.combatData.spells.aurora.selectedID = -1;
+                    this.app.player.spellSelection.standard = -1;
+                    this.app.player.spellSelection.curse = -1;
                 }
                 // Update spell UI
-                Object.values(this.app.combatData.spells).forEach((spellOpts, i) => {
-                    if (spellOpts.selectedID > -1) {
-                        this.app.selectButton(document.getElementById(`MCS ${spellOpts.array[spellOpts.selectedID].name} Button`));
+                Object.keys(this.app.combatData.spells).forEach((spellType, i) => {
+                    const spellList = this.app.combatData.spells[spellType];
+                    const selectedID = this.app.player.spellSelection[spellType];
+                    if (selectedID > -1) {
+                        this.app.selectButton(document.getElementById(`MCS ${spellList[selectedID].name} Button`));
                         this.app.spellSelectCard.onTabClick(i);
                     }
                 });
