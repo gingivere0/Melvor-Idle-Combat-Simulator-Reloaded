@@ -468,6 +468,7 @@
 
             damage(amount, source, thieving = false) {
                 this.characterDamage(amount, source);
+                this.highestDamageTaken = Math.max(this.highestDamageTaken, amount);
                 if (this.hitpoints > 0) {
                     this.autoEat();
                     if (this.hitpoints < (this.stats.maxHitpoints * this.modifiers.increasedRedemptionThreshold) / 100) {
@@ -476,9 +477,8 @@
                     if (this.hitpoints < (this.stats.maxHitpoints * this.modifiers.increasedCombatStoppingThreshold) / 100) {
                         this.manager.stopCombat();
                     }
+                    this.lowestHitpoints = Math.min(this.lowestHitpoints, this.hitpoints);
                 }
-                this.highestDamageTaken = Math.max(this.highestDamageTaken, amount);
-                this.lowestHitpoints = Math.min(this.lowestHitpoints, this.hitpoints);
             }
 
             checkRequirements(reqs, notifyOnFailure = false, failureMessage = 'do that.') {
