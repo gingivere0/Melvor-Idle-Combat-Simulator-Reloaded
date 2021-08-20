@@ -461,7 +461,7 @@
                 let autoEatTierValues = [-1];
                 for (let i = 1; i < 4; i++) {
                     autoEatTierNames.push(SHOP.General[i].name);
-                    autoEatTierValues.push(i);
+                    autoEatTierValues.push(i - 1);
                 }
                 const autoEatTierDropdown = this.equipmentSelectCard.createDropdown(autoEatTierNames, autoEatTierValues, 'MCS Auto Eat Tier Dropdown', (event) => {
                     this.player.autoEatTier = parseInt(event.currentTarget.selectedOptions[0].value);
