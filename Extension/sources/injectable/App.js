@@ -345,8 +345,8 @@
                         classNames += ' ';
                     }
                     classNames += toPrint[1] + '"';
-                    const style = options.style ? `style="options.style"` : '';
-                    passives += `<${tag} ${classNames} ${style}>${toPrint[0]}</{tag}>`;
+                    const style = options.style ? `style="${options.style}"` : '';
+                    passives += `<${tag} ${classNames} ${style}>${toPrint[0]}</${tag}>`;
                 });
                 return {header: header, passives: passives};
             }
@@ -1532,24 +1532,24 @@
                         ['Attack Speed', 'attackSpeed'],
                         ['Strength', 'strengthBonus'],
                         ['Strength', 'strengthBonus'],
-                    ['Stab', 'stabAttackBonus'],
-                    ['Slash', 'slashAttackBonus'],
-                    ['Block', 'blockAttackBonus'],
-                    ['Strength', 'rangedStrengthBonus'],
-                    ['Attack', 'rangedAttackBonus'],
-                    ['Damage', 'magicDamageBonus', '%'],
-                    ['Attack', 'magicAttackBonus'],
-                ],
+                        ['Stab', 'stabAttackBonus'],
+                        ['Slash', 'slashAttackBonus'],
+                        ['Block', 'blockAttackBonus'],
+                        ['Strength', 'rangedStrengthBonus'],
+                        ['Attack', 'rangedAttackBonus'],
+                        ['Damage', 'magicDamageBonus', '%'],
+                        ['Attack', 'magicAttackBonus'],
+                    ],
                     `<div>Offence:</div><span>`,
                     '</span>',
                 );
 
                 pushBonus(
                     [
-                    ['Damage Reduction', 'damageReduction', '%'],
-                    ['Melee Defence', 'defenceBonus'],
-                    ['Ranged Defence', 'rangedDefenceBonus'],
-                    ['Magic Defence', 'magicDefenceBonus'],
+                        ['Damage Reduction', 'damageReduction', '%'],
+                        ['Melee Defence', 'defenceBonus'],
+                        ['Ranged Defence', 'rangedDefenceBonus'],
+                        ['Magic Defence', 'magicDefenceBonus'],
                     ],
                     `<div>Defence:</div><span>`,
                     '</span>',
