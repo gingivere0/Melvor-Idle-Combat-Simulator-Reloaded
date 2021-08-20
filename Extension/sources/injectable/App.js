@@ -482,6 +482,22 @@
                     this.player,
                     'cookingMastery',
                 );
+                // heal after death
+                this.equipmentSelectCard.addRadio(
+                    'Heal After Death',
+                    25,
+                    'healAfterDeath',
+                    ['Yes', 'No'],
+                    [
+                        () => {
+                            this.player.healAfterDeath = true;
+                        },
+                        () => {
+                            this.player.healAfterDeath = false;
+                        },
+                    ],
+                    0,
+                );
                 // Slayer task and hardcore mode
                 this.equipmentSelectCard.addRadio(
                     'Slayer Task',

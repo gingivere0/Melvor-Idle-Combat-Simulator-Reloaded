@@ -36,7 +36,11 @@
                 super(simManager);
                 this.detachGlobals();
                 this.replaceGlobals();
-                this.foodLimit = 1e15;
+                this.healAfterDeath = true;
+                // overwrite food consumption
+                this.food.consume = (quantity = 1) => {
+                    this.usedFood += quantity;
+                }
             }
 
             // detach globals attached by parent constructor
@@ -81,7 +85,10 @@
             processDeath() {
                 this.removeAllEffects(true);
                 this.computeAllStats();
-                this.setHitpoints(this.stats.maxHitpoints);
+                this.setHitpoints(Math.floor(this.stats.maxHitpoints * 0.2));
+                while (this.healAfterDeath && this.hitpoints < this.stats.maxHitpoints && this.food.currentSlot.quantity > 0) {
+                    this.eatFood();
+                }
             }
 
             // replace globals with properties
@@ -119,6 +126,7 @@
                 this.petRolls = {};
                 this._slayercoins = 0;
                 this.usedAmmo = 0;
+                this.usedFood = 0;
                 this.usedRunes = {};
                 this.usedPotionCharges = 0;
                 this.usedPrayerPoints = 0;
@@ -126,9 +134,11 @@
                     Summon1: 0,
                     Summon2: 0,
                 };
-                this.food.currentSlot.quantity = this.foodLimit;
                 this.highestDamageTaken = 0;
                 this.lowestHitpoints = Infinity;
+                // hack to avoid auto eating infinite birthday cakes
+                const autoHealAmt = Math.floor(this.getFoodHealing(this.food.currentSlot.item) * this.autoEatEfficiency / 100);
+                this.emptyAutoHeal = this.autoEatThreshold > 0 && autoHealAmt === 0;
             }
 
             getGainsPerSecond(ticks) {
@@ -154,7 +164,7 @@
                     usedRunesBreakdown: usedRunesBreakdown,
                     usedRunes: usedRunes,
                     usedCombinationRunes: usedCombinationRunes,
-                    usedFood: (this.foodLimit - this.food.currentSlot.quantity) / seconds,
+                    usedFood: this.usedFood / seconds,
                     usedPotionCharges: this.usedPotionCharges / seconds,
                     usedPrayerPoints: this.usedPrayerPoints / seconds,
                     usedSummoningCharges: (this.chargesUsed.Summon1 + this.chargesUsed.Summon2) / 2 / seconds,
@@ -403,7 +413,7 @@
                 equipment.unequipItem(slot);
             }
 
-            equipFood(itemID, quantity = this.foodLimit) {
+            equipFood(itemID) {
                 if (itemID === -1) {
                     this.unequipFood();
                     return;
@@ -411,7 +421,7 @@
                 // Unequip previous food
                 this.food.unequipSelected();
                 // Proceed to equip the food
-                this.food.equip(items[itemID], quantity);
+                this.food.equip(items[itemID], Infinity);
             }
 
             unequipFood() {
@@ -478,6 +488,14 @@
                         this.manager.stopCombat();
                     }
                     this.lowestHitpoints = Math.min(this.lowestHitpoints, this.hitpoints);
+                }
+            }
+
+            autoEat() {
+                if (this.emptyAutoHeal) {
+                    this.usedFood = Infinity;
+                } else {
+                    super.autoEat();
                 }
             }
 
