@@ -27,7 +27,7 @@
         const MICSR = window.MICSR;
 
         /**
-         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.0, latest version can be found at:
+         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.1, latest version can be found at:
          * https://raw.githubusercontent.com/gmiclotte/melvor-scripts/master/Show-Modifiers/Show-Modifiers.js
          * TODO: instead of copying it, pull it as a required file or something? No idea how to go about that.
          */
@@ -206,7 +206,8 @@
                     smithing: [
                         'SeeingGoldChance',
                     ],
-                    summoning: [
+                    summoning: [],
+                    nonCBSummoning: [
                         'SummoningShardCost',
                         'SummoningCreationCharges',
                     ],
@@ -391,6 +392,7 @@
                         'summoningSynergy_17_19',
                     ],
                     summoning: [],
+                    nonCBSummoning: [],
                     thieving: [
                         'increasedThievingSuccessRate',
                         'increasedThievingSuccessCap',
@@ -563,13 +565,17 @@
                 // production skills
                 this.productionSkills = ['Firemaking', 'Cooking', 'Smithing', 'Fletching', 'Crafting', 'Runecrafting', 'Herblore', 'Summoning'];
                 this.productionSkills.forEach(name => {
+                    const setNames = [
+                        'skilling',
+                        'nonCombat',
+                        'production',
+                        'mastery',
+                    ];
+                    if (name === 'Summoning') {
+                        setNames.push('nonCBSummoning');
+                    }
                     this.relevantModifiers[name] = this.getModifierNames(
-                        [
-                            'skilling',
-                            'nonCombat',
-                            'production',
-                            'mastery',
-                        ],
+                        setNames,
                         [
                             CONSTANTS.skill[name]
                         ],
