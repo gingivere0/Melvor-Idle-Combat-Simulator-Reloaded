@@ -946,7 +946,13 @@
             // apply special attack modifiers to player, or apply special effect to enemy
             if (currentSpecial.modifiers !== undefined && player.activeSpecialAttacks.fromEnemy[currentSpecial.id] === undefined) {
                 // apply the effect
-                const turnsLeft = currentSpecial.attackSpeedDebuffTurns | currentSpecial.applyDebuffTurns | 2;
+                let turnsLeft = 2;
+                if (currentSpecial.attackSpeedDebuffTurns) {
+                    turnsLeft = currentSpecial.attackSpeedDebuffTurns
+                }
+                if (currentSpecial.applyDebuffTurns) {
+                    turnsLeft = currentSpecial.applyDebuffTurns;
+                }
                 player.activeSpecialAttacks.fromEnemy[currentSpecial.id] = {turnsLeft: turnsLeft};
                 computeTempModifiers(stats, player, enemy);
             }
@@ -2088,7 +2094,10 @@
                 * successes;
         }
         // other post processing
-        stats.gpGained += stats.player.inflictedHits * (mergePlayerModifiers(player, 'GPOnEnemyHit') | 0);
+        const gpOnEnemyHit = mergePlayerModifiers(player, 'GPOnEnemyHit');
+        if (gpOnEnemyHit) {
+            stats.gpGained += stats.player.inflictedHits * gpOnEnemyHit;
+        }
         simResult.burningEnemyKilledRate = stats.burningEnemyKilled / trials;
 
         // convert gains to average rates
