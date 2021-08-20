@@ -130,7 +130,7 @@
                     styles: {...this.app.player.attackStyles},
                     prayerSelected: [...this.app.player.activePrayers],
                     // simple values
-                    ancient: this.player.spellSelection.ancient,
+                    ancient: this.app.player.spellSelection.ancient,
                     aurora: this.app.player.spellSelection.aurora,
                     autoEatTier: this.app.player.autoEatTier,
                     cookingMastery: this.app.player.cookingMastery,
