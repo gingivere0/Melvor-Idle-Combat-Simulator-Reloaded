@@ -26,17 +26,23 @@
 
         const MICSR = window.MICSR;
 
-        // over write CombatLoot
+        // overwrite CombatLoot
         CombatLoot = class {
-            constructor() {
-            }
-
             add() {
             }
 
             removeAll() {
             }
         }
+
+        // overwrite SlayerTask
+        const slayerTaskData = SlayerTask.data;
+        SlayerTask = class {
+            tick() {
+            }
+        }
+        SlayerTask.data = slayerTaskData;
+
         /**
          * SimManager class, allows creation of a functional Player object without affecting the game
          */
