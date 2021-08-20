@@ -102,7 +102,7 @@
                     pillar: agilityPassivePillarActive,
                     potionID: potionID,
                     potionTier: potionTier,
-                    prayerSelected: PRAYER.map((_, i) => [...player.activePrayers].includes(i)),
+                    prayerSelected: [...player.activePrayers],
                     standard: player.spellSelection.standard,
                     summoningSynergy: this.app.player.summoningSynergy, // TODO: import mark levels
                     useCombinationRunes: useCombinationRunes,
@@ -128,7 +128,7 @@
                     petUnlocked: [...this.app.player.petUnlocked],
                     // objects
                     styles: {...this.app.player.attackStyles},
-                    prayerSelected: this.app.player.activePrayers,
+                    prayerSelected: [...this.app.player.activePrayers],
                     // simple values
                     ancient: this.player.spellSelection.ancient,
                     aurora: this.app.player.spellSelection.aurora,
@@ -245,7 +245,7 @@
                 // Update prayers
                 for (let prayerID = 0; prayerID < PRAYER.length; prayerID++) {
                     const prayButton = document.getElementById(`MCS ${this.app.getPrayerName(prayerID)} Button`);
-                    if (prayerSelected[prayerID]) {
+                    if (prayerSelected.includes(prayerID)) {
                         this.app.selectButton(prayButton);
                         this.app.player.activePrayers.add(prayerID);
                     } else {
