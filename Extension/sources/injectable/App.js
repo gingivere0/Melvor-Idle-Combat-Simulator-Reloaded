@@ -329,13 +329,40 @@
                 this.toggleSlayerSims(!this.slayerToggleState, false);
             }
 
-            showRelevantModifiers(modifiers, text) {
-                let passives = `<h5 class="font-w600 font-size-sm mb-1 text-combat-smoke">${text}</h5>`;
+            printRelevantModifiers(modifiers, options = {}) {
+                let header = '';
+                if (options.header) {
+                    const headerTag = options.headerTag ? options.headerTag : 'h5';
+                    const headerClassNames = options.headerClassNames ? `class="${options.headerClassNames}"` : '';
+                    header += `<${headerTag} ${headerClassNames}>${options.header}</${headerTag}>`;
+                }
+                let passives = '';
                 MICSR.showModifiersInstance.printRelevantModifiers(modifiers, 'combat').forEach(toPrint => {
-                    passives += `<h5 class="font-w400 font-size-sm mb-1 ${toPrint[1]}" style="text-align: left;">${toPrint[0]}</h5>`;
+                    const tag = options.tag ? options.tag : 'h5';
+                    let classNames = 'class="';
+                    if (options.classNames) {
+                        classNames += options.classNames;
+                        classNames += ' ';
+                    }
+                    classNames += toPrint[1] + '"';
+                    const style = options.style ? `style="options.style"` : '';
+                    passives += `<${tag} ${classNames} ${style}>${toPrint[0]}</{tag}>`;
                 });
+                return {header: header, passives: passives};
+            }
+
+            showRelevantModifiers(modifiers, header) {
+                const options = {
+                    header: header,
+                    headerTag: 'h5',
+                    headerClassNames: 'font-w600 font-size-sm mb-1 text-combat-smoke',
+                    tag: 'h5',
+                    classNames: 'font-w400 font-size-sm mb-1',
+                    style: 'text-align: left;',
+                };
+                const printedModifiers = this.printRelevantModifiers(modifiers, options)
                 Swal.fire({
-                    html: passives,
+                    html: printedModifiers.headers + printedModifiers.passives,
                 });
             }
 
@@ -1473,92 +1500,87 @@
 
                 let tooltip = `<div class="text-center">${item.name}<br><small>`;
 
-                if (item.description) {
-                    tooltip += `<span class='text-info'>${item.description.replace(/<br>\(/, ' (')}</span><br>`;
-                }
-
                 if (item.hasSpecialAttack) {
                     for (let special of item.specialAttacks) {
-                        tooltip += `<span class='text-danger'>${special.name} (${special.defaultChance}%): </span><span class='text-warning'>${special.description}</span><br>`;
+                        tooltip += `<span class='text-danger'>${special.name} (${special.defaultChance}%): </span><span class='text-warning'>${describeAttack(special, youNoun, enemyNoun)}</span><br>`;
                     }
                 }
 
-                if (item.attackSpeed) {
-                    tooltip += `<span class='text-info'>Attack Speed: ${item.attackSpeed / 1000}s</span><br>`;
+                const pushBonus = (list, header = '', footer = '') => {
+                    const statBonuses = [];
+                    if (item.equipmentStats === undefined) {
+                        return;
+                    }
+                    list.forEach(bonusInfo => {
+                        const name = bonusInfo[0];
+                        const tag = bonusInfo[1];
+                        const suffix = bonusInfo[2] === undefined ? '' : bonusInfo[2];
+                        const value = item.equipmentStats.filter(y => y.key === tag).reduce((a, b) => a + b.value, 0);
+                        if (value !== 0) {
+                            statBonuses.push(this.getTooltipStatBonus(name, value, suffix));
+                        }
+                    });
+                    if (statBonuses.length > 0) {
+                        tooltip += header;
+                        tooltip += statBonuses.join(', ');
+                        tooltip += footer;
+                    }
                 }
 
-                if (item.strengthBonus || (item.attackBonus && item.attackBonus.some(b => b))) {
-                    tooltip += this.getTooltipIcon(this.media.attack);
-                    const statBonuses = [];
-                    if (item.strengthBonus) {
-                        statBonuses.push(this.getTooltipStatBonus('Strength', item.strengthBonus));
+                pushBonus(
+                    [
+                        ['Attack Speed', 'attackSpeed'],
+                        ['Strength', 'strengthBonus'],
+                        ['Strength', 'strengthBonus'],
+                    ['Stab', 'stabAttackBonus'],
+                    ['Slash', 'slashAttackBonus'],
+                    ['Block', 'blockAttackBonus'],
+                    ['Strength', 'rangedStrengthBonus'],
+                    ['Attack', 'rangedAttackBonus'],
+                    ['Damage', 'magicDamageBonus', '%'],
+                    ['Attack', 'magicAttackBonus'],
+                ],
+                    `<div>Offence:</div><span>`,
+                    '</span>',
+                );
+
+                pushBonus(
+                    [
+                    ['Damage Reduction', 'damageReduction', '%'],
+                    ['Melee Defence', 'defenceBonus'],
+                    ['Ranged Defence', 'rangedDefenceBonus'],
+                    ['Magic Defence', 'magicDefenceBonus'],
+                    ],
+                    `<div>Defence:</div><span>`,
+                    '</span>',
+                );
+
+                if (item.modifiers) {
+                    const printedModifiers = this.printRelevantModifiers(item.modifiers, {
+                        headerTag: 'div',
+                        header: 'Combat Modifiers:',
+                        tag: 'div',
+                        style: 'white-space: nowrap;',
+                    });
+                    if (printedModifiers.passives.length > 0) {
+                        tooltip += printedModifiers.header + printedModifiers.passives;
                     }
-                    if (item.attackBonus) {
-                        if (item.attackBonus[0]) {
-                            statBonuses.push(this.getTooltipStatBonus('Stab', item.attackBonus[0]));
-                        }
-                        if (item.attackBonus[1]) {
-                            statBonuses.push(this.getTooltipStatBonus('Slash', item.attackBonus[1]));
-                        }
-                        if (item.attackBonus[2]) {
-                            statBonuses.push(this.getTooltipStatBonus('Block', item.attackBonus[2]));
-                        }
-                    }
-                    tooltip += `${statBonuses.join(', ')}<br>`;
-                }
-                if (item.rangedStrengthBonus || item.rangedAttackBonus) {
-                    tooltip += this.getTooltipIcon(this.media.ranged);
-                    const statBonuses = [];
-                    if (item.rangedStrengthBonus) {
-                        statBonuses.push(this.getTooltipStatBonus('Strength', item.rangedStrengthBonus));
-                    }
-                    if (item.rangedAttackBonus) {
-                        statBonuses.push(this.getTooltipStatBonus('Attack', item.rangedAttackBonus));
-                    }
-                    tooltip += `${statBonuses.join(', ')}<br>`;
-                }
-                if (item.magicDamageBonus || item.magicAttackBonus) {
-                    tooltip += this.getTooltipIcon(this.media.magic);
-                    const statBonuses = [];
-                    if (item.magicDamageBonus) {
-                        statBonuses.push(this.getTooltipStatBonus('Damage', item.magicDamageBonus, '%'));
-                    }
-                    if (item.magicAttackBonus) {
-                        statBonuses.push(this.getTooltipStatBonus('Attack', item.magicAttackBonus));
-                    }
-                    tooltip += `${statBonuses.join(', ')}<br>`;
-                }
-                if (item.damageReduction || item.defenceBonus || item.rangedDefenceBonus || item.magicDefenceBonus) {
-                    tooltip += `<div class="d-flex justify-content-center" style="align-items: center;">${this.getTooltipIcon(this.media.defence)}`;
-                    const statBonuses = [];
-                    if (item.damageReduction) {
-                        statBonuses.push(this.getTooltipStatBonus('Damage Reduction', item.damageReduction, '%'));
-                    }
-                    if (item.defenceBonus) {
-                        statBonuses.push(this.getTooltipStatBonus('Melee Defence', item.defenceBonus));
-                    }
-                    if (item.rangedDefenceBonus) {
-                        statBonuses.push(this.getTooltipStatBonus('Ranged Defence', item.rangedDefenceBonus));
-                    }
-                    if (item.magicDefenceBonus) {
-                        statBonuses.push(this.getTooltipStatBonus('Magic Defence', item.magicDefenceBonus));
-                    }
-                    tooltip += `<span style="max-width: 240px;">${statBonuses.join(', ')}</span></div>`;
-                }
-                if (item.slayerBonusXP) {
-                    tooltip += `${this.getTooltipIcon(this.media.slayer)}${this.getTooltipStatBonus('Slayer XP', item.slayerBonusXP, '%')}<br>`;
                 }
 
-                const requirements = [
-                    {description: 'Attack Level', property: 'attackLevelRequired'},
-                    {description: 'Defence Level', property: 'defenceLevelRequired'},
-                    {description: 'Ranged Level', property: 'rangedLevelRequired'},
-                    {description: 'Magic Level', property: 'magicLevelRequired'},
-                    {description: 'Slayer Level', property: 'slayerLevelRequired'},
-                    {description: 'Summoning Level', property: 'summoningLevel'},
-                ];
-                if (requirements.some((req) => item[req.property])) {
-                    tooltip += `<span class="text-warning">Requires:</span> ${requirements.flatMap((req) => item[req.property] ? `${req.description} ${item[req.property]}` : []).join(', ')}`;
+                if (item.equipRequirements) {
+                    const requirements = [];
+                    const levelReqs = item.equipRequirements.find(x => x.type === 'Level');
+                    if (levelReqs) {
+                        this.skillKeys.forEach(skill => {
+                            const levelReq = levelReqs.levels.find(x => x.skill === CONSTANTS.skill[skill]);
+                            if (levelReq) {
+                                requirements.push(`${skill} Level ${levelReq.level}`);
+                            }
+                        });
+                    }
+                    if (requirements.length > 0) {
+                        tooltip += `<div>Requires:</div><span class="text-warning">${requirements.join(', ')}</span>`;
+                    }
                 }
 
                 tooltip += '</small></div>';
