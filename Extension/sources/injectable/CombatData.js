@@ -39,6 +39,7 @@
             constructor(manager) {
                 this.manager = manager;
                 this.player = this.manager.player;
+                this.modifiers = this.player.modifiers;
                 // Spell Selection
                 this.spells = {
                     standard: SPELLS,
@@ -82,8 +83,6 @@
                 this.numberMultiplier = numberMultiplier;
                 // lucky herb bonus
                 this.luckyHerb = 0;
-                // player modifiers
-                this.modifiers = new PlayerModifiers();
                 // equipment stats
                 this.equipmentStats = this.player.equipmentStats;
                 // combat stats
@@ -134,9 +133,9 @@
                 // attack type
                 this.setAttackType();
 
-                // update modifiers
-                this.updateModifiers();
-                const modifiers = this.modifiers;
+                //
+                this.computePotionBonus();
+                const modifiers = this.player.modifiers;
 
                 // update aurora bonuses //TODO: are some of these modifiers?
                 this.computeAuroraBonus();
@@ -146,8 +145,8 @@
                  */
 
                 // loot doubling
-                this.combatStats.lootBonusPercent = MICSR.getModifierValue(this.modifiers, 'ChanceToDoubleLootCombat')
-                    + MICSR.getModifierValue(this.modifiers, 'ChanceToDoubleItemsGlobal');
+                this.combatStats.lootBonusPercent = MICSR.getModifierValue(modifiers, 'ChanceToDoubleLootCombat')
+                    + MICSR.getModifierValue(modifiers, 'ChanceToDoubleItemsGlobal');
                 // loot doubling is always between 0% and 100% chance
                 this.combatStats.lootBonusPercent = Math.max(0, this.combatStats.lootBonusPercent);
                 this.combatStats.lootBonusPercent = Math.min(100, this.combatStats.lootBonusPercent);
@@ -155,9 +154,9 @@
                 this.combatStats.lootBonus = MICSR.averageDoubleMultiplier(this.combatStats.lootBonusPercent);
                 // gp bonus
                 this.combatStats.gpBonus = MICSR.averageDoubleMultiplier(
-                    MICSR.getModifierValue(this.modifiers, 'GPFromMonsters')
-                    + MICSR.getModifierValue(this.modifiers, 'GPGlobal')
-                    + (this.manager.isSlayerTask ? this.modifiers.summoningSynergy_0_12 : 0)
+                    MICSR.getModifierValue(modifiers, 'GPFromMonsters')
+                    + MICSR.getModifierValue(modifiers, 'GPGlobal')
+                    + (this.manager.isSlayerTask ? modifiers.summoningSynergy_0_12 : 0)
                 );
 
                 // set enemy spawn timer
@@ -167,8 +166,8 @@
                 this.combatStats.attackInterval = this.player.stats.attackInterval;
 
                 // preservation
-                this.combatStats.ammoPreservation = MICSR.getModifierValue(this.modifiers, 'AmmoPreservation');
-                this.combatStats.runePreservation = MICSR.getModifierValue(this.modifiers, 'RunePreservation');
+                this.combatStats.ammoPreservation = MICSR.getModifierValue(modifiers, 'AmmoPreservation');
+                this.combatStats.runePreservation = MICSR.getModifierValue(modifiers, 'RunePreservation');
 
                 // max attack roll
                 this.combatStats.maxAttackRoll = this.player.stats.accuracy;
@@ -220,40 +219,6 @@
                 this.combatStats.baseMaxHitpoints = this.player.levels.Hitpoints;
                 this.combatStats.baseMaxHitpoints += MICSR.getModifierValue(modifiers, 'MaxHitpoints');
                 this.combatStats.maxHitpoints = this.player.stats.maxHitpoints
-            }
-
-            /**
-             * Update this.modifiers
-             * mimics updateAllPlayerModifiers
-             */
-            updateModifiers() {
-                // reset
-                this.modifiers = new PlayerModifiers();
-
-                // mimic calculateEquippedItemModifiers // passives
-                const duplicateCheck = {};
-                this.player.equipmentIDs().filter(itemID => {
-                    if (itemID === -1) {
-                        return false;
-                    }
-                    if (items[itemID].modifiers === undefined) {
-                        return false;
-                    }
-                    if (duplicateCheck[itemID]) {
-                        return false
-                    }
-                    duplicateCheck[itemID] = true;
-                    return true;
-                }).forEach(itemID => this.modifiers.addModifiers(items[itemID].modifiers));
-
-                // mimic calculateMiscModifiers
-                // implement this if it ever is relevant
-
-                // potion modifiers
-                this.computePotionBonus();
-
-                // TODO: SPECIAL ATTACKS, MASTERY
-                //  when they get made into modifiers in the game
             }
 
             /**
@@ -410,12 +375,13 @@
                     synergy: this.player.getCurrentSynergy(),
                 };
                 // MICSR.log({...playerStats});
+                const modifiers = this.player.modifiers;
 
                 // set auto eat
                 if (this.player.autoEatTier >= 0) {
-                    playerStats.autoEat.eatAt = MICSR.getModifierValue(this.modifiers, 'AutoEatThreshold');
-                    playerStats.autoEat.efficiency = MICSR.getModifierValue(this.modifiers, 'AutoEatEfficiency');
-                    playerStats.autoEat.maxHP = MICSR.getModifierValue(this.modifiers, 'AutoEatHPLimit');
+                    playerStats.autoEat.eatAt = MICSR.getModifierValue(modifiers, 'AutoEatThreshold');
+                    playerStats.autoEat.efficiency = MICSR.getModifierValue(modifiers, 'AutoEatEfficiency');
+                    playerStats.autoEat.maxHP = MICSR.getModifierValue(modifiers, 'AutoEatHPLimit');
                 } else {
                     playerStats.autoEat.manual = true;
                 }
@@ -474,13 +440,13 @@
                     let amt = Math.floor(this.combatStats.maxHitpoints / 10);
                     amt = Math.floor(amt / this.numberMultiplier);
                     // modifiers
-                    amt += this.numberMultiplier * MICSR.getModifierValue(this.modifiers, 'HPRegenFlat');
+                    amt += this.numberMultiplier * MICSR.getModifierValue(modifiers, 'HPRegenFlat');
                     // rapid heal prayer
-                    amt *= 1 + MICSR.getModifierValue(this.modifiers, 'HitpointRegeneration');
+                    amt *= 1 + MICSR.getModifierValue(modifiers, 'HitpointRegeneration');
                     // Regeneration modifiers
                     applyModifier(
                         amt,
-                        MICSR.getModifierValue(this.modifiers, 'HitpointRegeneration')
+                        MICSR.getModifierValue(modifiers, 'HitpointRegeneration')
                     );
                     playerStats.avgHPRegen = amt;
                 }
@@ -497,12 +463,12 @@
                 }
                 // adjust prayer usage
                 const adjustPP = (pp) => {
-                    pp -= MICSR.getModifierValue(this.modifiers, 'FlatPrayerCostReduction');
+                    pp -= MICSR.getModifierValue(modifiers, 'FlatPrayerCostReduction');
                     if (playerStats.activeItems.prayerSkillcape && pp > 0) {
                         pp = Math.floor(pp / 2);
                     }
                     pp = Math.max(1, pp);
-                    let save = MICSR.getModifierValue(this.modifiers, 'ChanceToPreservePrayerPoints');
+                    let save = MICSR.getModifierValue(modifiers, 'ChanceToPreservePrayerPoints');
                     pp *= 1 - save / 100;
                     return pp;
                 }
@@ -516,43 +482,43 @@
                     playerStats.prayerXpPerDamage += PRAYER[i].pointsPerPlayer / this.numberMultiplier;
                 });
                 // Xp Bonuses
-                const globalXpBonus = MICSR.getModifierValue(this.modifiers, 'GlobalSkillXP');
+                const globalXpBonus = MICSR.getModifierValue(modifiers, 'GlobalSkillXP');
                 playerStats.combatXpBonus = globalXpBonus;
                 if (this.combatStats.attackType === CONSTANTS.attackType.Melee) {
                     switch (this.player.attackStyle.melee) {
                         case 'Stab':
-                            playerStats.combatXpBonus += MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Attack);
+                            playerStats.combatXpBonus += MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Attack);
                             break
                         case 'Slash':
-                            playerStats.combatXpBonus += MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Strength);
+                            playerStats.combatXpBonus += MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Strength);
                             break
                         case 'Block':
-                            playerStats.combatXpBonus += MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Defence);
+                            playerStats.combatXpBonus += MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Defence);
                             break
                     }
                 }
                 if (this.combatStats.attackType === CONSTANTS.attackType.Ranged) {
-                    const xpBonus = MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Ranged);
+                    const xpBonus = MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Ranged);
                     if (this.player.attackStyle.ranged === 'Longrange') {
-                        const defenceXpBonus = MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Defence);
+                        const defenceXpBonus = MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Defence);
                         playerStats.combatXpBonus += (xpBonus + defenceXpBonus) / 2;
                     } else {
                         playerStats.combatXpBonus += xpBonus;
                     }
                 }
                 if (this.combatStats.attackType === CONSTANTS.attackType.Magic) {
-                    const xpBonus = MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Magic);
+                    const xpBonus = MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Magic);
                     if (this.player.attackStyle.magic === 'Defensive') {
-                        const defenceXpBonus = MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Defence);
+                        const defenceXpBonus = MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Defence);
                         playerStats.combatXpBonus += (xpBonus + defenceXpBonus) / 2;
                     } else {
                         playerStats.combatXpBonus += xpBonus;
                     }
                 }
-                playerStats.slayerXpBonus = globalXpBonus + MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Slayer);
-                playerStats.prayerXpBonus = globalXpBonus + MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Prayer);
-                playerStats.summoningXpBonus = globalXpBonus + MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Summoning);
-                playerStats.hitpointsXpBonus = globalXpBonus + MICSR.getModifierValue(this.modifiers, 'SkillXP', CONSTANTS.skill.Hitpoints);
+                playerStats.slayerXpBonus = globalXpBonus + MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Slayer);
+                playerStats.prayerXpBonus = globalXpBonus + MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Prayer);
+                playerStats.summoningXpBonus = globalXpBonus + MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Summoning);
+                playerStats.hitpointsXpBonus = globalXpBonus + MICSR.getModifierValue(modifiers, 'SkillXP', CONSTANTS.skill.Hitpoints);
                 return playerStats;
             }
 
