@@ -248,6 +248,7 @@
                             progressBars: {},
                         }
                     },
+                    {name: 'combatPassives', data: combatPassives},
                     {name: 'combatSkills', data: combatSkills},
                     {name: 'combatTriangle', data: combatTriangle},
                     {name: 'conditionalModifiers', data: conditionalModifiers},
