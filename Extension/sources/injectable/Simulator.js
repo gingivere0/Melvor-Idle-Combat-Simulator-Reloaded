@@ -575,18 +575,19 @@
                 data.simSuccess = true;
 
                 // not time-weighted averages
-                data.killTimeS = 0;
                 data.deathRate = 0;
                 data.highestDamageTaken = 0;
                 data.lowestHitpoints = Infinity;
+                data.killTimeS = 0;
                 data.simulationTime = 0;
                 for (const monsterID of monsterIDs) {
-                    data.killTimeS += this.monsterSimData[monsterID].killTimeS;
                     data.deathRate = 1 - (1 - data.deathRate) * (1 - this.monsterSimData[monsterID].deathRate);
                     data.highestDamageTaken = Math.max(data.highestDamageTaken, this.monsterSimData[monsterID].highestDamageTaken);
                     data.lowestHitpoints = Math.min(data.lowestHitpoints, this.monsterSimData[monsterID].lowestHitpoints);
+                    data.killTimeS += this.monsterSimData[monsterID].killTimeS;
                     data.simulationTime += this.monsterSimData[monsterID].simulationTime;
                 }
+                data.killsPerSecond = 1 / data.killTimeS;
 
                 // time-weighted averages
                 const computeAvg = (tag) => {
@@ -614,7 +615,7 @@
                     // 'lowestHitpoints',
                     // kill time
                     // 'killTimeS',
-                    'killsPerSecond',
+                    // 'killsPerSecond',
                     // loot gains
                     'gpPerSecond',
                     'dropChance',
