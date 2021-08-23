@@ -109,9 +109,10 @@
                 this.player.processDeath();
             }
 
-            getSimStats() {
+            getSimStats(dungeonID) {
                 return {
                     monsterID: this.selectedMonster,
+                    dungeonID: dungeonID,
                     tickCount: this.tickCount,
                     ...this.simStats,
                     gainsPerSecond: this.player.getGainsPerSecond(this.tickCount),
@@ -288,7 +289,7 @@
                 this.stopCombat();
                 const processingTime = performance.now() - startTimeStamp;
                 MICSR.log(`Took ${processingTime / 1000}s to process ${this.simStats.killCount} kills and ${this.simStats.deathCount} deaths in ${this.tickCount} ticks. ${processingTime / this.tickCount}ms per tick.`);
-                return this.getSimStats();
+                return this.getSimStats(dungeonID);
             }
 
             get onSlayerTask() {

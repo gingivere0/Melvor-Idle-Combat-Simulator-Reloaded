@@ -57,8 +57,8 @@
                 // not simulated reason
                 this.notSimulatedReason = 'entity not simulated';
                 // Simulation data;
-                /** @type {MonsterSimResult[]} */
-                const newSimData = (monster) => {
+                /** @type {Object} */
+                const newSimData = isMonster => {
                     const data = {
                         simSuccess: false,
                         reason: this.notSimulatedReason,
@@ -87,27 +87,35 @@
                         petChance: 0,
                         dropChance: 0,
                     };
-                    if (monster) {
+                    if (isMonster) {
                         data.inQueue = false;
                         data.petRolls = {other: []};
                     }
                     return data
                 }
-                this.monsterSimData = [];
-                for (let i = 0; i < MONSTERS.length; i++) {
-                    this.monsterSimData.push(newSimData(true));
+                this.monsterSimData = {};
+                for (let monsterID = 0; monsterID < MONSTERS.length; monsterID++) {
+                    this.monsterSimData[monsterID] = newSimData(true);
                     this.monsterSimFilter.push(true);
                 }
                 /** @type {MonsterSimResult[]} */
                 this.dungeonSimData = [];
-                for (let i = 0; i < MICSR.dungeons.length; i++) {
+                for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
                     this.dungeonSimData.push(newSimData(false));
                     this.dungeonSimFilter.push(true);
+                    MICSR.dungeons.forEach(dungeon =>
+                        dungeon.monsters.forEach(monsterID => {
+                            const simID = this.simID(monsterID, dungeonID);
+                            if (!this.monsterSimData[simID]) {
+                                this.monsterSimData[simID] = newSimData(true);
+                            }
+                        })
+                    );
                 }
                 //
                 this.slayerTaskMonsters = [];
                 this.slayerSimData = [];
-                for (let i = 0; i < SlayerTask.data.length; i++) {
+                for (let taskID = 0; taskID < SlayerTask.data.length; taskID++) {
                     this.slayerTaskMonsters.push([]);
                     this.slayerSimData.push(newSimData(false));
                     this.slayerSimFilter.push(true);
@@ -417,9 +425,17 @@
                 }
             }
 
+            simID(monsterID, dungeonID) {
+                if (dungeonID === undefined) {
+                    return monsterID;
+                }
+                return `${dungeonID}-${monsterID}`
+            }
+
             pushMonsterToQueue(monsterID, dungeonID) {
-                if (!this.monsterSimData[monsterID].inQueue) {
-                    this.monsterSimData[monsterID].inQueue = true;
+                const simID = this.simID(monsterID, dungeonID);
+                if (!this.monsterSimData[simID].inQueue) {
+                    this.monsterSimData[simID].inQueue = true;
                     this.simulationQueue.push({monsterID: monsterID, dungeonID: dungeonID});
                 }
             }
@@ -453,7 +469,7 @@
                 if (dungeonID !== undefined) {
                     if (this.dungeonSimFilter[dungeonID]) {
                         MICSR.dungeons[dungeonID].monsters.forEach(monsterID => {
-                            this.pushMonsterToQueue(monsterID);
+                            this.pushMonsterToQueue(monsterID, dungeonID);
                         });
                         return {dungeonID: dungeonID};
                     }
@@ -575,13 +591,14 @@
                 this.resetSimulationData(single);
             }
 
-            combineReasons(data, monsterIDs) {
+            combineReasons(data, monsterIDs, dungeonID) {
                 let reasons = [];
                 for (const monsterID of monsterIDs) {
-                    if (!this.monsterSimData[monsterID].simSuccess || this.monsterSimData[monsterID].tooManyActions > 0) {
+                    const simID = this.simID(monsterID, dungeonID);
+                    if (!this.monsterSimData[simID].simSuccess || this.monsterSimData[simID].tooManyActions > 0) {
                         data.simSuccess = false;
                     }
-                    const reason = this.monsterSimData[monsterID].reason;
+                    const reason = this.monsterSimData[simID].reason;
                     if (reason && !reasons.includes(reason)) {
                         reasons.push(reason);
                     }
@@ -594,7 +611,7 @@
                 return false;
             }
 
-            computeAverageSimData(filter, data, monsterIDs) {
+            computeAverageSimData(filter, data, monsterIDs, dungeonID) {
                 // check filter
                 if (!filter) {
                     data.simSuccess = false;
@@ -602,7 +619,7 @@
                     return;
                 }
                 // check failure and set reasons
-                if (this.combineReasons(data, monsterIDs)) {
+                if (this.combineReasons(data, monsterIDs, dungeonID)) {
                     return;
                 }
                 data.simSuccess = true;
@@ -614,17 +631,18 @@
                 data.killTimeS = 0;
                 data.simulationTime = 0;
                 for (const monsterID of monsterIDs) {
-                    data.deathRate = 1 - (1 - data.deathRate) * (1 - this.monsterSimData[monsterID].deathRate);
-                    data.highestDamageTaken = Math.max(data.highestDamageTaken, this.monsterSimData[monsterID].highestDamageTaken);
-                    data.lowestHitpoints = Math.min(data.lowestHitpoints, this.monsterSimData[monsterID].lowestHitpoints);
-                    data.killTimeS += this.monsterSimData[monsterID].killTimeS;
-                    data.simulationTime += this.monsterSimData[monsterID].simulationTime;
+                    const simID = this.simID(monsterID, dungeonID);
+                    data.deathRate = 1 - (1 - data.deathRate) * (1 - this.monsterSimData[simID].deathRate);
+                    data.highestDamageTaken = Math.max(data.highestDamageTaken, this.monsterSimData[simID].highestDamageTaken);
+                    data.lowestHitpoints = Math.min(data.lowestHitpoints, this.monsterSimData[simID].lowestHitpoints);
+                    data.killTimeS += this.monsterSimData[simID].killTimeS;
+                    data.simulationTime += this.monsterSimData[simID].simulationTime;
                 }
                 data.killsPerSecond = 1 / data.killTimeS;
 
                 // time-weighted averages
                 const computeAvg = (tag) => {
-                    data[tag] = monsterIDs.map(monsterID => this.monsterSimData[monsterID])
+                    data[tag] = monsterIDs.map(monsterID => this.monsterSimData[this.simID(monsterID, dungeonID)])
                         .reduce((avgData, mData) => avgData + mData[tag] * mData.killTimeS, 0) / data.killTimeS;
                 }
                 [
@@ -890,8 +908,10 @@
                         this.simulationWorkers[workerID].selfTime += event.data.selfTime;
                         // Transfer data into monsterSimData
                         const monsterID = event.data.monsterID;
-                        Object.assign(this.monsterSimData[monsterID], event.data.simResult);
-                        this.monsterSimData[monsterID].simulationTime = event.data.selfTime;
+                        const dungeonID = event.data.dungeonID;
+                        const simID = this.simID(monsterID, dungeonID);
+                        Object.assign(this.monsterSimData[simID], event.data.simResult);
+                        this.monsterSimData[simID].simulationTime = event.data.selfTime;
                         document.getElementById('MCS Simulate Button').textContent = `Cancel (${this.currentJob - 1}/${this.simulationQueue.length})`;
                         // MICSR.log(event.data.simResult);
                         // Attempt to add another job to the worker
@@ -907,10 +927,10 @@
              * Resets the simulation status for each monster
              */
             resetSimDone() {
-                for (let i = 0; i < MONSTERS.length; i++) {
-                    this.monsterSimData[i].inQueue = false;
-                    this.monsterSimData[i].simSuccess = false;
-                    this.monsterSimData[i].reason = this.notSimulatedReason;
+                for (let simID in this.monsterSimData) {
+                    this.monsterSimData[simID].inQueue = false;
+                    this.monsterSimData[simID].simSuccess = false;
+                    this.monsterSimData[simID].reason = this.notSimulatedReason;
                 }
             }
 
@@ -964,16 +984,18 @@
                     const dungeonID = this.parent.viewedDungeonID;
                     const isSignet = keyValue === 'signetChance';
                     MICSR.dungeons[dungeonID].monsters.forEach((monsterID) => {
+                        const simID = this.simID(monsterID, dungeonID);
                         if (!isSignet) {
-                            if (isKillTime) dataMultiplier = this.monsterSimData[monsterID].killTimeS;
-                            dataSet.push((this.monsterSimData[monsterID].simSuccess) ? this.monsterSimData[monsterID][keyValue] * dataMultiplier : NaN);
+                            if (isKillTime) dataMultiplier = this.monsterSimData[simID].killTimeS;
+                            dataSet.push((this.monsterSimData[simID].simSuccess) ? this.monsterSimData[simID][keyValue] * dataMultiplier : NaN);
                         } else {
                             dataSet.push(0);
                         }
                     });
                     if (isSignet) {
                         const bossId = MICSR.dungeons[dungeonID].monsters[MICSR.dungeons[dungeonID].monsters.length - 1];
-                        dataSet[dataSet.length - 1] = (this.monsterSimData[bossId].simSuccess) ? this.monsterSimData[bossId][keyValue] * dataMultiplier : NaN;
+                        const simID = this.simID(bossId, dungeonID);
+                        dataSet[dataSet.length - 1] = (this.monsterSimData[simID].simSuccess) ? this.monsterSimData[simID][keyValue] * dataMultiplier : NaN;
                     }
                 } else {
                     // slayer tasks
@@ -1021,7 +1043,7 @@
                     // dungeons
                     const dungeonID = this.parent.viewedDungeonID;
                     MICSR.dungeons[dungeonID].monsters.forEach((monsterID) => {
-                        dataSet.push(this.monsterSimData[monsterID]);
+                        dataSet.push(this.monsterSimData[this.simID(monsterID, dungeonID)]);
                     });
                 } else {
                     // slayer tasks
@@ -1103,13 +1125,13 @@
                     area.monsters.forEach(monsterID => exportString.push(this.exportEntity(exportOptions, monsterID, this.monsterSimFilter, this.monsterSimData)));
                 });
                 // Dungeons
-                for (let dungeonId = 0; dungeonId < MICSR.dungeons.length; dungeonId++) {
+                for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
                     // dungeon
-                    exportString.push(this.exportEntity(exportOptions, dungeonId, this.dungeonSimFilter, this.dungeonSimData, false, this.parent.getDungeonName(dungeonId)));
+                    exportString.push(this.exportEntity(exportOptions, dungeonID, this.dungeonSimFilter, this.dungeonSimData, false, this.parent.getDungeonName(dungeonID)));
                     // dungeon monsters
                     if (exportOptions.dungeonMonsters) {
-                        const dungeonMonsterFilter = Object.fromEntries(MICSR.dungeons[dungeonId].monsters.map((id) => [id, this.dungeonSimFilter[dungeonId]]));
-                        MICSR.dungeons[dungeonId].monsters.forEach(monsterID => exportString.push(this.exportEntity(exportOptions, monsterID, dungeonMonsterFilter, this.monsterSimData, true)));
+                        const dungeonMonsterFilter = Object.fromEntries(MICSR.dungeons[dungeonID].monsters.map((id) => [id, this.dungeonSimFilter[dungeonID]]));
+                        MICSR.dungeons[dungeonID].monsters.forEach(monsterID => exportString.push(this.exportEntity(exportOptions, this.simID(monsterID, dungeonID), dungeonMonsterFilter, this.monsterSimData, true)));
                     }
                 }
                 // TODO: export for auto slayer
