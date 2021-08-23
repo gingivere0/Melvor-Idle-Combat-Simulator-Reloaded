@@ -20,9 +20,7 @@
 
 (() => {
 
-    const reqs = [
-        'SimManager'
-    ];
+    const reqs = [];
 
     const setup = () => {
 
@@ -77,6 +75,9 @@
             }
 
             addItemStat() {
+            }
+
+            trackWeaponStat() {
             }
 
             setCallbacks() {
@@ -229,8 +230,8 @@
                     return;
                 }
                 const summons = [
-                    this.getEquipedItem('Summon1').summoningID,
-                    this.getEquipedItem('Summon2').summoningID,
+                    this.equipment.slots.Summon1.item.summoningID,
+                    this.equipment.slots.Summon2.item.summoningID,
                 ];
                 const synergies = SUMMONING.Synergies[Math.min(...summons)];
                 if (!synergies) {
@@ -248,18 +249,14 @@
                 if (!this.summoningSynergy) {
                     return undefined;
                 }
-                const summLeft = this.equipmentID(MICSR.equipmentSlot.Summon1);
-                const summRight = this.equipmentID(MICSR.equipmentSlot.Summon2);
+                const summLeft = this.equipmentID(equipmentSlotData.Summon1.id);
+                const summRight = this.equipmentID(equipmentSlotData.Summon2.id);
                 if (summLeft > 0 && summRight > 0 && summLeft !== summRight) {
                     const min = Math.min(items[summLeft].summoningID, items[summRight].summoningID);
                     const max = Math.max(items[summLeft].summoningID, items[summRight].summoningID);
                     return SUMMONING.Synergies[min][max];
                 }
                 return undefined;
-            }
-
-            getEquipedItem(slotName) {
-                return MICSR.getItem(this.equipmentID(MICSR.equipmentSlot[slotName]), slotName);
             }
 
             equipmentID(slotID) {

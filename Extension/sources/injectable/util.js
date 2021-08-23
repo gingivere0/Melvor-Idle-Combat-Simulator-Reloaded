@@ -84,26 +84,6 @@
         MICSR.trials = 1e3;
         MICSR.maxTicks = 1e6;
 
-        // equipmentSlot enum
-        MICSR.equipmentSlot = {
-            Helmet: 0,
-            Platebody: 1,
-            Platelegs: 2,
-            Boots: 3,
-            Weapon: 4,
-            Shield: 5,
-            Amulet: 6,
-            Ring: 7,
-            Gloves: 8,
-            Quiver: 9,
-            Cape: 10,
-            Passive: 11,
-            Summon1: 12,
-            Summon2: 13,
-        };
-
-        MICSR.equipmentSlotKeys = Object.keys(MICSR.equipmentSlot);
-
         // empty items
         const makeEmptyItem = (img, slot) => {
             return {

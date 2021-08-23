@@ -156,35 +156,36 @@
                 // Generate equipment subsets
                 this.equipmentSubsets = [];
                 /** @type {number[]} */
-                for (let slotId = 0; slotId < MICSR.equipmentSlotKeys.length; slotId++) {
-                    const equipmentSlotKey = MICSR.equipmentSlotKeys[slotId];
-                    this.equipmentSubsets.push([MICSR.emptyItems[MICSR.equipmentSlotKeys[slotId]]]);
+                for (const slot in equipmentSlotData) {
+                    const slotId = equipmentSlotData[slot].id;
+                    this.equipmentSubsets.push([MICSR.emptyItems[slot]]);
                     for (let i = 0; i < items.length; i++) {
                         if (items[i].validSlots === undefined) {
                             continue;
                         }
-                        if (items[i].validSlots.includes(equipmentSlotKey)
+                        if (items[i].validSlots.includes(slot)
                             || (items[i].validSlots.includes('Summon')
-                                && slotId === MICSR.equipmentSlot.Summon2)) {
+                                && slotId === equipmentSlotData.Summon2.id)) {
                             this.equipmentSubsets[slotId].push(items[i]);
                         }
                     }
                 }
-                this.equipmentSubsets[MICSR.equipmentSlot.Passive].push(...items.filter(x => x.isPassiveItem));
+                this.equipmentSubsets[equipmentSlotData.Passive.id].push(...items.filter(x => x.isPassiveItem));
                 // Add ammoType 2 and 3 to weapon subsets
                 for (let i = 0; i < items.length; i++) {
                     if (items[i].validSlots && items[i].validSlots.includes('Quiver') && (items[i].ammoType === 2 || items[i].ammoType === 3)) {
-                        this.equipmentSubsets[MICSR.equipmentSlot.Weapon].push(items[i]);
+                        this.equipmentSubsets[equipmentSlotData.Weapon.id].push(items[i]);
                     }
                 }
                 // Sort equipment subsets
-                for (let equipmentSlot = 0; equipmentSlot < MICSR.equipmentSlotKeys.length; equipmentSlot++) {
-                    this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Attack) - this.getItemLevelReq(b, CONSTANTS.skill.Attack));
-                    this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Defence) - this.getItemLevelReq(b, CONSTANTS.skill.Defence));
-                    this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Ranged) - this.getItemLevelReq(b, CONSTANTS.skill.Ranged));
-                    this.equipmentSubsets[equipmentSlot].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Magic) - this.getItemLevelReq(b, CONSTANTS.skill.Magic));
-                    if (equipmentSlot === MICSR.equipmentSlot.Quiver) {
-                        this.equipmentSubsets[equipmentSlot].sort((a, b) => (a.ammoType || 0) - (b.ammoType || 0));
+                for (const slot in equipmentSlotData) {
+                    const slotId = equipmentSlotData[slot].id;
+                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Attack) - this.getItemLevelReq(b, CONSTANTS.skill.Attack));
+                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Defence) - this.getItemLevelReq(b, CONSTANTS.skill.Defence));
+                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Ranged) - this.getItemLevelReq(b, CONSTANTS.skill.Ranged));
+                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Magic) - this.getItemLevelReq(b, CONSTANTS.skill.Magic));
+                    if (slotId === equipmentSlotData.Quiver.id) {
+                        this.equipmentSubsets[slotId].sort((a, b) => (a.ammoType || 0) - (b.ammoType || 0));
                     }
                 }
                 this.skillKeys = ['Attack', 'Strength', 'Defence', 'Hitpoints', 'Ranged', 'Magic', 'Prayer', 'Slayer'];
@@ -399,12 +400,12 @@
             createEquipmentSelectCard() {
                 this.equipmentSelectCard = new MICSR.Card(this.topContent, '', '150px', true);
                 const equipmentRows = [
-                    [MICSR.equipmentSlot.Passive, MICSR.equipmentSlot.Helmet],
-                    [MICSR.equipmentSlot.Cape, MICSR.equipmentSlot.Amulet, MICSR.equipmentSlot.Quiver],
-                    [MICSR.equipmentSlot.Weapon, MICSR.equipmentSlot.Platebody, MICSR.equipmentSlot.Shield],
-                    [MICSR.equipmentSlot.Platelegs],
-                    [MICSR.equipmentSlot.Gloves, MICSR.equipmentSlot.Boots, MICSR.equipmentSlot.Ring],
-                    [MICSR.equipmentSlot.Summon1, MICSR.equipmentSlot.Summon2]
+                    [equipmentSlotData.Passive.id, equipmentSlotData.Helmet.id],
+                    [equipmentSlotData.Cape.id, equipmentSlotData.Amulet.id, equipmentSlotData.Quiver.id],
+                    [equipmentSlotData.Weapon.id, equipmentSlotData.Platebody.id, equipmentSlotData.Shield.id],
+                    [equipmentSlotData.Platelegs.id],
+                    [equipmentSlotData.Gloves.id, equipmentSlotData.Boots.id, equipmentSlotData.Ring.id],
+                    [equipmentSlotData.Summon1.id, equipmentSlotData.Summon2.id]
                 ];
                 equipmentRows.forEach((row) => {
                     const rowSources = [];
@@ -412,19 +413,10 @@
                     const rowPopups = [];
                     const tooltips = [];
                     row.forEach((equipmentSlot) => {
-                        if (!MICSR.emptyItems[MICSR.equipmentSlotKeys[equipmentSlot]]) {
-                            MICSR.log(MICSR.equipmentSlot);
-                            MICSR.log(MICSR.emptyItems);
-                            MICSR.log(MICSR.equipmentSlotKeys);
-                            MICSR.log(equipmentSlot);
-                            MICSR.log(MICSR.equipmentSlotKeys[equipmentSlot]);
-                            MICSR.log(MICSR.emptyItems[MICSR.equipmentSlotKeys[equipmentSlot]]);
-                            return;
-                        }
-                        rowSources.push(MICSR.emptyItems[MICSR.equipmentSlotKeys[equipmentSlot]].media);
-                        rowIDs.push(`MCS ${MICSR.equipmentSlotKeys[equipmentSlot]} Image`);
+                        rowSources.push(MICSR.emptyItems[EquipmentSlots[equipmentSlot]].media);
+                        rowIDs.push(`MCS ${EquipmentSlots[equipmentSlot]} Image`);
                         rowPopups.push(this.createEquipmentPopup(equipmentSlot));
-                        tooltips.push(MICSR.equipmentSlotKeys[equipmentSlot]);
+                        tooltips.push(EquipmentSlots[equipmentSlot]);
                     });
                     this.equipmentSelectCard.addMultiPopupMenu(rowSources, rowIDs, rowPopups, tooltips);
                 });
@@ -1368,7 +1360,7 @@
                         this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterIfHasNoLevelReq(item), x => x.name);
                     }
                 } else if (noSplit.includes(equipmentSlot)) {
-                    equipmentSelectCard.addSectionTitle(MICSR.equipmentSlotKeys[equipmentSlot]);
+                    equipmentSelectCard.addSectionTitle(EquipmentSlots[equipmentSlot]);
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, () => this.returnTrue());
                 } else if (equipmentSlot === 4) {
                     equipmentSelectCard.addSectionTitle('1H Melee');
@@ -1412,14 +1404,14 @@
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(2, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('Throwing Knives');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(3, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
-                } else if (equipmentSlot === MICSR.equipmentSlot.Passive) {
+                } else if (equipmentSlot === equipmentSlotData.Passive.id) {
                     equipmentSelectCard.addSectionTitle('Magic Damage');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterMagicDamage(item), x => x.name);
                     equipmentSelectCard.addSectionTitle('Slayer');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterSlayer(item), x => x.name);
                     equipmentSelectCard.addSectionTitle('Other');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterRemainingPassive(item), x => x.name);
-                } else if (equipmentSlot === MICSR.equipmentSlot.Summon1 || equipmentSlot === MICSR.equipmentSlot.Summon2) {
+                } else if (equipmentSlot === equipmentSlotData.Summon1.id || equipmentSlot === equipmentSlotData.Summon2.id) {
                     equipmentSelectCard.addSectionTitle('Combat Familiars')
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, true), x => this.getItemLevelReq(x, CONSTANTS.skill.Summoning));
                     equipmentSelectCard.addSectionTitle('Non-Combat Familiars')
@@ -1438,12 +1430,12 @@
              * @memberof McsApp
              */
             equipItem(slotID, itemId) {
-                let slot = MICSR.equipmentSlotKeys[slotID];
+                let slot = EquipmentSlots[slotID];
                 const item = MICSR.getItem(itemId, slot);
                 // determine equipment slot
                 if (item.occupiesSlots && item.occupiesSlots.includes(slot)) {
                     slot = item.validSlots[0];
-                    slotID = MICSR.equipmentSlot[slot];
+                    slotID = equipmentSlotData[slot].id;
                 }
                 // clear previous item
                 let slots = [slot];
@@ -1457,10 +1449,10 @@
                     const equipment = this.player.equipment;
                     const prevSlot = equipment.getRootSlot(slotToOccupy);
                     equipment.slots[prevSlot].occupies.forEach(occupied => {
-                        this.setEquipmentImage(MICSR.equipmentSlot[occupied], -1);
+                        this.setEquipmentImage(equipmentSlotData[occupied].id, -1);
                     });
                     this.player.unequipItem(0, prevSlot);
-                    this.setEquipmentImage(MICSR.equipmentSlot[prevSlot], -1);
+                    this.setEquipmentImage(equipmentSlotData[prevSlot].id, -1);
                 });
                 // equip new item
                 this.player.equipItem(itemId, 0, slot);
@@ -1478,13 +1470,13 @@
              * @param {boolean} occupy
              */
             setEquipmentImage(equipmentSlot, itemId, occupy = true) {
-                const slotKey = MICSR.equipmentSlotKeys[equipmentSlot];
+                const slotKey = EquipmentSlots[equipmentSlot];
                 const img = document.getElementById(`MCS ${slotKey} Image`);
                 const item = MICSR.getItem(itemId, slotKey);
                 img.src = item.media;
                 img._tippy.setContent(this.getEquipmentTooltip(equipmentSlot, item));
                 if (occupy && item.occupiesSlots) {
-                    item.occupiesSlots.forEach(slot => this.setEquipmentImage(MICSR.equipmentSlot[slot], itemId, false));
+                    item.occupiesSlots.forEach(slot => this.setEquipmentImage(equipmentSlotData[slot].id, itemId, false));
                 }
             }
 
@@ -1497,7 +1489,7 @@
              */
             getEquipmentTooltip(equipmentSlot, item) {
                 if (!item) {
-                    return MICSR.equipmentSlotKeys[equipmentSlot];
+                    return EquipmentSlots[equipmentSlot];
                 }
 
                 let tooltip = `<div class="text-center">${item.name}<br><small>`;
@@ -1614,7 +1606,7 @@
              * @memberof McsApp
              */
             updateStyleDropdowns() {
-                const itemID = this.player.equipmentID(MICSR.equipmentSlot.Weapon);
+                const itemID = this.player.equipmentID(equipmentSlotData.Weapon.id);
                 const item = MICSR.getItem(itemID, 'Weapon');
                 this.disableStyleDropdown('melee');
                 this.disableStyleDropdown('ranged');
@@ -1883,22 +1875,15 @@
              * @param {boolean} single
              */
             simulateButtonOnClick(single) {
-                const weapon = this.player.getEquipedItem('Weapon');
-                const quiver = this.player.getEquipedItem('Quiver');
-                if ((weapon.type === 'Ranged Weapon' || weapon.isRanged)
-                    && (weapon.ammoTypeRequired !== quiver.ammoType)) {
-                    notifyPlayer(CONSTANTS.skill.Ranged, 'Incorrect Ammo type equipped for weapon.', 'danger');
-                } else {
-                    if (this.simulator.simInProgress) {
-                        this.simulator.cancelSimulation();
-                        const simButton = document.getElementById('MCS Simulate Button');
-                        simButton.disabled = true;
-                        simButton.textContent = 'Cancelling...';
-                    }
-                    if (!this.simulator.simInProgress && this.simulator.simulationWorkers.length === this.simulator.maxThreads) {
-                        document.getElementById('MCS Simulate Selected Button').style.display = 'none';
-                        this.simulator.simulateCombat(single);
-                    }
+                if (this.simulator.simInProgress) {
+                    this.simulator.cancelSimulation();
+                    const simButton = document.getElementById('MCS Simulate Button');
+                    simButton.disabled = true;
+                    simButton.textContent = 'Cancelling...';
+                }
+                if (!this.simulator.simInProgress && this.simulator.simulationWorkers.length === this.simulator.maxThreads) {
+                    document.getElementById('MCS Simulate Selected Button').style.display = 'none';
+                    this.simulator.simulateCombat(single);
                 }
             }
 
@@ -1909,61 +1894,12 @@
                 const ids = this.simulator.currentSim.ids;
                 this.simulator.simulationQueue.forEach(queueItem => {
                     const simResult = this.manager.runTrials(queueItem.monsterID, ids.dungeonID, MICSR.trials, MICSR.maxTicks);
-                    this.convertSlowSimToResult(simResult, queueItem.monsterID);
+                    this.simulator.monsterSimData[queueItem.monsterID] = this.manager.convertSlowSimToResult(simResult);
                 });
                 this.simulator.performPostSimAnalysis();
                 this.updateDisplayPostSim();
                 const processingTime = performance.now() - startTimeStamp;
                 MICSR.log(`Simulation took ${processingTime / 1000}s.`);
-            }
-
-            convertSlowSimToResult(simResult, monsterID) {
-                const data = this.simulator.monsterSimData[monsterID];
-                const gps = simResult.gainsPerSecond
-                const ticksPerSecond = 1000 / TICK_INTERVAL
-                const trials = simResult.killCount + simResult.deathCount;
-                // success
-                data.simSuccess = true;
-                data.reason = undefined;
-                // xp rates
-                data.xpPerSecond = gps.skillXP[CONSTANTS.skill.Attack]
-                    + gps.skillXP[CONSTANTS.skill.Strength]
-                    + gps.skillXP[CONSTANTS.skill.Defence]
-                    + gps.skillXP[CONSTANTS.skill.Ranged]
-                    + gps.skillXP[CONSTANTS.skill.Magic]; // TODO: this depends on attack style
-                data.hpXpPerSecond = gps.skillXP[CONSTANTS.skill.Hitpoints];
-                data.slayerXpPerSecond = gps.skillXP[CONSTANTS.skill.Slayer];
-                data.prayerXpPerSecond = gps.skillXP[CONSTANTS.skill.Prayer];
-                data.summoningXpPerSecond = gps.skillXP[CONSTANTS.skill.Summoning];
-                // consumables
-                data.ppConsumedPerSecond = gps.usedPrayerPoints;
-                data.ammoUsedPerSecond = gps.usedAmmo;
-                data.runesUsedPerSecond = gps.usedRunes;
-                data.combinationRunesUsedPerSecond = gps.usedCombinationRunes;
-                let potionCharges = 1;
-                if (this.player.potionID > -1) {
-                    const potion = items[herbloreItemData[this.player.potionID].itemID[this.player.potionTier]];
-                    potionCharges = potion.potionCharges + MICSR.getModifierValue(this.player.modifiers, 'PotionChargesFlat');
-                }
-                data.potionsUsedPerSecond = gps.usedPotionCharges / potionCharges; // TODO: divide by potion capacity
-                data.tabletsUsedPerSecond = gps.usedSummoningCharges;
-                data.atePerSecond = gps.usedFood;
-                // survivability
-                data.deathRate = simResult.deathCount / trials;
-                data.highestDamageTaken = gps.highestDamageTaken;
-                data.lowestHitpoints = gps.lowestHitpoints;
-                // kill time
-                data.killTimeS = simResult.tickCount / ticksPerSecond / trials;
-                data.killsPerSecond = 1 / data.killTimeS;
-                // loot gains
-                data.gpPerSecond = gps.gp;
-                data.dropChance = NaN;
-                data.signetChance = NaN;
-                data.petChance = NaN;
-                data.slayerCoinsPerSecond = gps.slayercoins;
-                // not displayed -> TODO: remove?
-                data.simulationTime = NaN;
-                data.tooManyActions = MICSR.trials - trials;
             }
 
             exportSettingButtonOnClick() {
@@ -2512,7 +2448,6 @@
              * Updates the simulator display for when the slayer task option is changed
              */
             updatePlotForSlayerXP() {
-                this.loot.updateSlayerXP();
                 if (this.plotter.plotType === 'slayerXpPerSecond') {
                     this.updatePlotData();
                 }
@@ -2523,7 +2458,6 @@
              * Updates the simulator display for when the slayer task option is changed
              */
             updatePlotForSlayerCoins() {
-                this.loot.updateSlayerCoins();
                 if (this.plotter.plotType === 'slayerCoinsPerSecond') {
                     this.updatePlotData();
                 }

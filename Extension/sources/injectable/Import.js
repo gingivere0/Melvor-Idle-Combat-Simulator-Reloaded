@@ -178,14 +178,15 @@
 
             importEquipment(equipment) {
                 this.app.player.equipment.unequipAll();
-                MICSR.equipmentSlotKeys.forEach((_, slotID) => {
+                for (const slot in equipmentSlotData) {
+                    const slotID = equipmentSlotData[slot].id;
                     const itemID = equipment[slotID];
                     if (itemID === -1 && this.app.player.equipmentOccupiedBy(slotID) !== 'None') {
                         return;
                     }
                     this.app.equipItem(slotID, itemID);
                     this.app.setEquipmentImage(slotID, itemID);
-                });
+                }
                 this.app.updateStyleDropdowns();
             }
 

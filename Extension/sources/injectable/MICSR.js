@@ -22,7 +22,7 @@ window.MICSR = {
     /////////////
     // logging //
     /////////////
-    debug: (...args) => console.log('MICSR debugging:', ...args),
+    debug: (...args) => console.debug('MICSR:', ...args),
     log: (...args) => console.log('MICSR:', ...args),
     warn: (...args) => console.warn('MICSR:', ...args),
     error: (...args) => console.error('MICSR:', ...args),

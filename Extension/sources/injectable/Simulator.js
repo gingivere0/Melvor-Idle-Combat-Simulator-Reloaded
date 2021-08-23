@@ -112,12 +112,6 @@
                     this.slayerSimData.push(newSimData(false));
                     this.slayerSimFilter.push(true);
                 }
-                // Pre Compute Monster Base Stats
-                /** @type {EnemyStats[]} */
-                this.enemyStats = [];
-                for (let i = 0; i < MONSTERS.length; i++) {
-                    this.enemyStats.push(this.getEnemyStats(i));
-                }
                 /** Variables of currently stored simulation */
                 this.currentSim = this.initCurrentSim();
                 // Options for time multiplier
@@ -148,16 +142,6 @@
                 this.simStartTime = 0;
                 /** If the current sim has been cancelled */
                 this.simCancelled = false;
-                // modifiers to pass to webworker
-                this.constantModifiers = {
-                    // legacy: pass actual item, not the modifiers
-                    deadeyeAmulet: items[CONSTANTS.item.Deadeye_Amulet],
-                    confettiCrossbow: items[CONSTANTS.item.Confetti_Crossbow],
-                    // modifiers
-                    guardianAmulet: items[CONSTANTS.item.Guardian_Amulet].modifiers,
-                    occultist: items[CONSTANTS.item.Summoning_Familiar_Occultist].modifiers,
-                    minotaur: items[CONSTANTS.item.Summoning_Familiar_Minotaur].modifiers,
-                }
                 // Create Web workers
                 this.createWorkers();
             }
@@ -392,48 +376,12 @@
 
             initCurrentSim() {
                 return {
-                    increasedGP: 0,
-                    gpBonus: 1,
-                    lootBonus: 1,
-                    canTopazDrop: false,
-                    herbConvertChance: 0,
-                    doBonesAutoBury: false,
-                    /** @type {PlayerStats} */
-                    playerStats: {
-                        activeItems: {},
-                        equipmentSelected: [],
+                    options: {
+                        trials: MICSR.trials,
+                        maxActions: MICSR.maxActions,
+                        forceFullSim: this.forceFullSim,
                     },
-                    /** @type {EquipmentStats} */
-                    equipmentStats: {},
-                    options: {},
-                    prayerBonus: {modifiers: {}, vars: {}},
-                    combatStats: {},
-                    attackStyle: {},
-                    isSlayerTask: false,
-                    virtualLevels: {},
                 }
-            }
-
-            setupCurrentSimCombatData(currentSim, combatData) {
-                // Start by grabbing the player stats
-                currentSim.playerStats = combatData.getPlayerStats();
-                // base gp increase
-                currentSim.increasedGP = MICSR.getModifierValue(combatData.modifiers, 'GPFromMonstersFlat');
-                // multiplier gp increase
-                currentSim.gpBonus = combatData.combatStats.gpBonus;
-                // check for ARS drop
-                currentSim.canTopazDrop = combatData.player.equipmentIDs().includes(CONSTANTS.item.Gold_Topaz_Ring);
-                // loot bonus
-                currentSim.lootBonus = combatData.combatStats.lootBonus;
-                // misc
-                currentSim.herbConvertChance = combatData.luckyHerb / 100;
-                currentSim.doBonesAutoBury = (combatData.player.equipmentIDs().includes(CONSTANTS.item.Bone_Necklace));
-                currentSim.isSlayerTask = combatData.isSlayerTask;
-                currentSim.playerStats.isSlayerTask = combatData.isSlayerTask;
-                Object.assign(currentSim.equipmentStats, combatData.equipmentStats);
-                Object.assign(currentSim.prayerBonus, combatData.prayerBonus);
-                Object.assign(currentSim.attackStyle, combatData.attackStyle);
-                Object.assign(currentSim.virtualLevels, combatData.virtualLevels);
             }
 
             pushMonsterToQueue(monsterID) {
@@ -590,151 +538,8 @@
                 this.simStartTime = performance.now();
                 this.simCancelled = false;
                 this.currentSim = this.initCurrentSim();
-
-                // setup combat data for simulation
-                this.setupCurrentSimCombatData(this.currentSim, this.parent.combatData);
-                let cache = [];
-                const rawCombatData = JSON.parse(JSON.stringify(this.parent.combatData, (key, value) => {
-                    if (typeof value === 'object' && value !== null) {
-                        // Duplicate reference found, discard key
-                        if (cache.includes(value)) return;
-
-                        // Store value in our collection
-                        cache.push(value);
-                    }
-                    return value;
-                }, 1));
-                cache = null;
-                this.currentSim.combatData = new MICSR.CombatData(this.parent.manager);
-                Object.getOwnPropertyNames(rawCombatData).forEach(prop => this.currentSim.combatData[prop] = rawCombatData[prop]);
-
-                // add sim options
-                this.currentSim.options = {
-                    trials: MICSR.trials,
-                    maxActions: MICSR.maxActions,
-                    forceFullSim: this.forceFullSim,
-                };
-
                 // reset and setup sim data
                 this.resetSimulationData(single);
-            }
-
-            /**
-             * Gets the stats of a monster
-             * @param {number} monsterID
-             * @return {enemyStats}
-             */
-            getEnemyStats(monsterID) {
-                /** @type {enemyStats} */
-                const attackType = MONSTERS[monsterID].attackType;
-                const enemyStats = {
-                    isPlayer: false,
-                    // raw data
-                    monsterID: monsterID,
-                    attackType: attackType,
-                    baseMaxHitpoints: MONSTERS[monsterID].hitpoints,
-                    attackSpeed: MONSTERS[monsterID].attackSpeed,
-                    isMelee: attackType === CONSTANTS.attackType.Melee,
-                    isRanged: attackType === CONSTANTS.attackType.Ranged,
-                    isMagic: attackType === CONSTANTS.attackType.Magic,
-                    hasSpecialAttack: false,
-                    specialAttackChances: [],
-                    specialIDs: [],
-                    specialLength: 0,
-                    passiveID: [],
-                    slayerArea: undefined,
-                    slayerAreaEffectValue: undefined,
-                    // derivative data
-                    baseMaximumDefenceRoll: 0,
-                    baseMaximumRangedDefenceRoll: 0,
-                    baseMaximumMagicDefenceRoll: 0,
-                    baseMaximumAttackRoll: 0,
-                    baseMaximumStrengthRoll: 0,
-                    // results - TODO: this really should not be here
-                    damageTaken: 0,
-                    damageHealed: 0,
-                };
-
-                // Calculate special attacks
-                if (MONSTERS[monsterID].hasSpecialAttack) {
-                    enemyStats.hasSpecialAttack = true;
-                    for (let i = 0; i < MONSTERS[monsterID].specialAttackID.length; i++) {
-                        if (MONSTERS[monsterID].overrideSpecialChances !== undefined) {
-                            enemyStats.specialAttackChances.push(MONSTERS[monsterID].overrideSpecialChances[i]);
-                        } else {
-                            enemyStats.specialAttackChances.push(enemySpecialAttacks[MONSTERS[monsterID].specialAttackID[i]].chance);
-                        }
-                        enemyStats.specialIDs.push(MONSTERS[monsterID].specialAttackID[i]);
-                    }
-                    enemyStats.specialLength = enemyStats.specialAttackChances.length;
-                }
-
-                // add passive effects
-                if (MONSTERS[monsterID].passiveID) {
-                    enemyStats.passiveID = MONSTERS[monsterID].passiveID;
-                }
-
-                // TODO: refactor slayer zone assignment
-                // Determine slayer zone
-                let slayerIdx = 0;
-                zone: for (const area of slayerAreas) {
-                    for (const id of area.monsters) {
-                        if (id === monsterID) {
-                            enemyStats.slayerArea = slayerIdx;
-                            enemyStats.slayerAreaEffectValue = area.areaEffectValue;
-                            break zone;
-                        }
-                    }
-                    slayerIdx++;
-                }
-
-                // precompute base defence rolls
-                const effectiveDefenceLevel = Math.floor(MONSTERS[monsterID].defenceLevel + 8 + 1);
-                enemyStats.baseMaximumDefenceRoll = effectiveDefenceLevel * (MONSTERS[monsterID].defenceBonus + 64);
-                const effectiveRangedDefenceLevel = Math.floor(MONSTERS[monsterID].defenceLevel + 8 + 1);
-                enemyStats.baseMaximumRangedDefenceRoll = effectiveRangedDefenceLevel * (MONSTERS[monsterID].defenceBonusRanged + 64);
-                const effectiveMagicDefenceLevel = Math.floor((Math.floor(MONSTERS[monsterID].magicLevel * 0.7) + Math.floor(MONSTERS[monsterID].defenceLevel * 0.3)) + 8 + 1);
-                enemyStats.baseMaximumMagicDefenceRoll = effectiveMagicDefenceLevel * (MONSTERS[monsterID].defenceBonusMagic + 64);
-
-                // precompute base max accuracy roll
-                if (enemyStats.isMelee) {
-                    const effectiveAttackLevel = Math.floor(MONSTERS[monsterID].attackLevel + 8 + 1);
-                    enemyStats.baseMaximumAttackRoll = effectiveAttackLevel * (MONSTERS[monsterID].attackBonus + 64);
-                } else if (enemyStats.isRanged) {
-                    const effectiveAttackLevel = Math.floor(MONSTERS[monsterID].rangedLevel + 8 + 1);
-                    enemyStats.baseMaximumAttackRoll = effectiveAttackLevel * (MONSTERS[monsterID].attackBonusRanged + 64);
-                } else if (enemyStats.isMagic) {
-                    const effectiveAttackLevel = Math.floor(MONSTERS[monsterID].magicLevel + 8 + 1);
-                    enemyStats.baseMaximumAttackRoll = effectiveAttackLevel * (MONSTERS[monsterID].attackBonusMagic + 64);
-                }
-
-                // precompute base max hit roll
-                if (enemyStats.isMelee) {
-                    const effectiveStrengthLevel = Math.floor(MONSTERS[monsterID].strengthLevel + 8 + 1);
-                    enemyStats.baseMaximumStrengthRoll =
-                        1.3
-                        + effectiveStrengthLevel / 10
-                        + MONSTERS[monsterID].strengthBonus / 80
-                        + effectiveStrengthLevel * MONSTERS[monsterID].strengthBonus / 640;
-                } else if (enemyStats.isRanged) {
-                    const effectiveStrengthLevel = Math.floor(MONSTERS[monsterID].rangedLevel + 8 + 1);
-                    enemyStats.baseMaximumStrengthRoll =
-                        1.3
-                        + effectiveStrengthLevel / 10
-                        + MONSTERS[monsterID].strengthBonusRanged / 80
-                        + effectiveStrengthLevel * MONSTERS[monsterID].strengthBonusRanged / 640;
-                } else if (enemyStats.isMagic) {
-                    const spell = SPELLS[MONSTERS[monsterID].selectedSpell];
-                    let maxHit;
-                    if (spell) {
-                        maxHit = spell.maxHit;
-                    } else {
-                        maxHit = MONSTERS[monsterID].setMaxHit;
-                    }
-                    enemyStats.baseMaximumStrengthRoll = maxHit * (1 + MONSTERS[monsterID].damageBonusMagic / 100);
-                }
-
-                return enemyStats;
             }
 
             combineReasons(data, monsterIDs) {
@@ -986,16 +791,10 @@
             startJob(workerID) {
                 if (this.currentJob < this.simulationQueue.length && !this.simCancelled) {
                     const monsterID = this.simulationQueue[this.currentJob].monsterID;
-                    this.modifyCurrentSimStatsForMonster(monsterID);
                     this.simulationWorkers[workerID].worker.postMessage({
                         action: 'START_SIMULATION',
                         monsterID: monsterID,
-                        combatData: JSON.parse(JSON.stringify(this.currentSim.combatData, null, 1)),
-                        enemyStats: this.enemyStats[monsterID],
-                        playerStats: this.currentSim.playerStats,
                         simOptions: this.currentSim.options,
-                        verbose: this.parent.verbose,
-                        veryVerbose: this.parent.veryVerbose,
                     });
                     this.simulationWorkers[workerID].inUse = true;
                     this.currentJob++;
@@ -1022,76 +821,6 @@
                         // MICSR.log(this.simulationWorkers);
                     }
                 }
-            }
-
-            /**
-             * Modifies the playerStats before starting a job for a specific monster
-             * @param {number} monsterID Index of MONSTERS
-             */
-            // TODO: move this to combatData?
-            modifyCurrentSimStatsForMonster(monsterID) {
-                const combatData = this.currentSim.combatData;
-                const combatStats = combatData.combatStats;
-                const modifiers = combatData.modifiers;
-
-                // Do preprocessing of player stats for special weapons
-                if (this.currentSim.playerStats.activeItems.stormsnap
-                    || this.currentSim.playerStats.activeItems.slayerCrossbow
-                    || this.currentSim.playerStats.activeItems.bigRon
-                    || modifiers.summoningSynergy_6_7
-                    || modifiers.summoningSynergy_7_8
-                    || modifiers.summoningSynergy_6_13
-                    || modifiers.summoningSynergy_7_13
-                    || modifiers.summoningSynergy_8_13) {
-                    // recompute base stats
-                    const baseStats = combatData.updatePlayerBaseStats(monsterID);
-                    // max attack roll
-                    combatStats.maxAttackRoll = combatData.player.stats.accuracy;
-                    // max hit roll
-                    combatStats.baseMeleeMaxHit = combatData.baseMeleeMaxHit(baseStats);
-                    combatStats.maxHit = combatData.player.stats.maxHit;
-                    // update player stats
-                    this.currentSim.playerStats = combatData.getPlayerStats();
-                }
-
-                const playerStats = this.currentSim.playerStats;
-                const prayerVars = combatData.prayerBonus.vars;
-
-                // Do check for protection prayer
-                switch (MONSTERS[monsterID].attackType) {
-                    case CONSTANTS.attackType.Melee:
-                        playerStats.isProtected = prayerVars.prayerBonusProtectFromMelee > 0;
-                        break;
-                    case CONSTANTS.attackType.Ranged:
-                        playerStats.isProtected = prayerVars.prayerBonusProtectFromRanged > 0;
-                        break;
-                    case CONSTANTS.attackType.Magic:
-                        playerStats.isProtected = prayerVars.prayerBonusProtectFromMagic > 0;
-                        break;
-                }
-
-                // Do preprocessing of player damage bonus vs monster
-                let dmgModifier = 0;
-                if (MONSTERS[monsterID].isBoss) {
-                    dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToBosses', CONSTANTS.skill.Slayer);
-                }
-                if (combatData.isSlayerTask) {
-                    dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToSlayerTasks', CONSTANTS.skill.Slayer);
-                }
-                switch (getMonsterArea(monsterID).areaType) {
-                    // TODO: this does not work
-                    case 'Combat':
-                        dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToCombatAreaMonsters', CONSTANTS.skill.Slayer);
-                        break;
-                    case 'Slayer':
-                        dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToSlayerAreaMonsters', CONSTANTS.skill.Slayer);
-                        break;
-                    case 'Dungeon':
-                        dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToDungeonMonsters', CONSTANTS.skill.Slayer);
-                        break;
-                }
-                dmgModifier += MICSR.getModifierValue(modifiers, 'DamageToAllMonsters', CONSTANTS.skill.Slayer);
-                playerStats.dmgModifier = dmgModifier;
             }
 
             /**

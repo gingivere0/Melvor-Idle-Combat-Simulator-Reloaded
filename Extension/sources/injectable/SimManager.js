@@ -119,6 +119,56 @@
                 };
             }
 
+            convertSlowSimToResult(simResult) {
+                const data = {};
+                const gps = simResult.gainsPerSecond
+                const ticksPerSecond = 1000 / TICK_INTERVAL
+                const trials = simResult.killCount + simResult.deathCount;
+                // success
+                data.simSuccess = true;
+                data.reason = undefined;
+                // xp rates
+                data.xpPerSecond = gps.skillXP[CONSTANTS.skill.Attack]
+                    + gps.skillXP[CONSTANTS.skill.Strength]
+                    + gps.skillXP[CONSTANTS.skill.Defence]
+                    + gps.skillXP[CONSTANTS.skill.Ranged]
+                    + gps.skillXP[CONSTANTS.skill.Magic]; // TODO: this depends on attack style
+                data.hpXpPerSecond = gps.skillXP[CONSTANTS.skill.Hitpoints];
+                data.slayerXpPerSecond = gps.skillXP[CONSTANTS.skill.Slayer];
+                data.prayerXpPerSecond = gps.skillXP[CONSTANTS.skill.Prayer];
+                data.summoningXpPerSecond = gps.skillXP[CONSTANTS.skill.Summoning];
+                // consumables
+                data.ppConsumedPerSecond = gps.usedPrayerPoints;
+                data.ammoUsedPerSecond = gps.usedAmmo;
+                data.runesUsedPerSecond = gps.usedRunes;
+                data.combinationRunesUsedPerSecond = gps.usedCombinationRunes;
+                let potionCharges = 1;
+                if (this.player.potionID > -1) {
+                    const potion = items[herbloreItemData[this.player.potionID].itemID[this.player.potionTier]];
+                    potionCharges = potion.potionCharges + MICSR.getModifierValue(this.player.modifiers, 'PotionChargesFlat');
+                }
+                data.potionsUsedPerSecond = gps.usedPotionCharges / potionCharges; // TODO: divide by potion capacity
+                data.tabletsUsedPerSecond = gps.usedSummoningCharges;
+                data.atePerSecond = gps.usedFood;
+                // survivability
+                data.deathRate = simResult.deathCount / trials;
+                data.highestDamageTaken = gps.highestDamageTaken;
+                data.lowestHitpoints = gps.lowestHitpoints;
+                // kill time
+                data.killTimeS = simResult.tickCount / ticksPerSecond / trials;
+                data.killsPerSecond = 1 / data.killTimeS;
+                // loot gains
+                data.gpPerSecond = gps.gp;
+                data.dropChance = NaN;
+                data.signetChance = NaN;
+                data.petChance = NaN;
+                data.slayerCoinsPerSecond = gps.slayercoins;
+                // not displayed -> TODO: remove?
+                data.simulationTime = NaN;
+                data.tooManyActions = MICSR.trials - trials;
+                return data;
+            }
+
             // track kills and deaths
             onPlayerDeath() {
                 this.player.processDeath();
@@ -203,7 +253,6 @@
                     this.spawnTimer.stop();
                 if (this.enemy.state !== "Dead")
                     this.enemy.processDeath();
-                this.hideMinibar();
                 this.loot.removeAll();
                 this.areaType = 'None';
                 if (this.paused) {
