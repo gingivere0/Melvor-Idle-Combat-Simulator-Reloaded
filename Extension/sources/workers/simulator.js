@@ -34,6 +34,9 @@
         }
     };
 
+    // spoof $ so we get useful information regarding where the bugs are
+    const $ = (...args) => console.log(...args);
+
     /** @type {CombatSimulator} */
     let combatSimulator;
 
@@ -112,13 +115,10 @@
             const player = manager.player;
             const reader = new DataReader(simPlayerData);
             player.deserialize(reader);
-            MICSR.log(player);
             try {
-                const simResult = manager.convertSlowSimToResult(manager.runTrials(monsterID, dungeonID, trials, maxTicks));
-                MICSR.log(simResult);
-                return simResult;
+                return manager.convertSlowSimToResult(manager.runTrials(monsterID, dungeonID, trials, maxTicks));
             } catch (error) {
-                MICSR.log(`Error while simulating monster ${monsterID} in dungeon ${dungeonID}: ${error}`);
+                MICSR.error(`Error while simulating monster ${monsterID} in dungeon ${dungeonID}: ${error}`);
                 return {
                     simSuccess: false,
                     reason: 'simulation error',
