@@ -645,7 +645,7 @@
                 this.plotter.addToggles(this.combatStatCard);
                 this.combatStatCard.addSectionTitle('');
                 this.combatStatCard.addButton('Simulate BLOCKING', () => this.blockingSimulateButtonOnClick());
-                this.combatStatCard.addButton('Simulate All', () => {this.simulateButtonOnClick(false)});
+                this.combatStatCard.addButton('Simulate All', () => this.simulateButtonOnClick(false));
                 this.combatStatCard.addButton('Simulate Selected', () => this.simulateButtonOnClick(true));
             }
 
@@ -1892,7 +1892,8 @@
                 const ids = this.simulator.currentSim.ids;
                 this.simulator.simulationQueue.forEach(queueItem => {
                     const simResult = this.manager.runTrials(queueItem.monsterID, ids.dungeonID, MICSR.trials, MICSR.maxTicks);
-                    this.simulator.monsterSimData[queueItem.monsterID] = this.manager.convertSlowSimToResult(simResult);
+                    const simID = this.simulator.simID(queueItem.monsterID, ids.dungeonID);
+                    this.simulator.monsterSimData[simID] = this.manager.convertSlowSimToResult(simResult);
                 });
                 this.simulator.performPostSimAnalysis();
                 this.updateDisplayPostSim();
