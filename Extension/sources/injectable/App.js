@@ -2609,7 +2609,7 @@
                     this.setPlotToDungeon(this.barMonsterIDs[this.selectedBar]);
                 }
                 document.getElementById('MCS Simulate All Button').disabled = false;
-                document.getElementById('MCS Simulate All Button').textContent = 'Simulate';
+                document.getElementById('MCS Simulate All Button').textContent = 'Simulate All';
                 document.getElementById('MCS Simulate Selected Button').style.display = 'block';
             }
 
