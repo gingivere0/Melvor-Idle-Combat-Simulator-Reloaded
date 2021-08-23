@@ -1934,7 +1934,7 @@
              */
             slayerTaskRadioOnChange(event, newState) {
                 this.player.isSlayerTask = newState;
-                SlayerTask.dataimsToggle();
+                this.slayerTaskSimsToggle();
                 this.updatePlotForSlayerXP();
                 this.updatePlotForSlayerCoins();
             }
