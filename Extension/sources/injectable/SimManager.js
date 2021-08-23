@@ -272,7 +272,7 @@
             resumeDungeon() {
             }
 
-            runTrials(monsterID, dungeonID, trials, tickLimit) {
+            runTrials(monsterID, dungeonID, trials, tickLimit, verbose = false) {
                 this.resetSimStats();
                 const startTimeStamp = performance.now();
                 let areaData = getMonsterArea(monsterID);
@@ -294,7 +294,9 @@
                 }
                 this.stopCombat();
                 const processingTime = performance.now() - startTimeStamp;
-                MICSR.log(`Took ${processingTime / 1000}s to process ${this.simStats.killCount} kills and ${this.simStats.deathCount} deaths in ${this.tickCount} ticks. ${processingTime / this.tickCount}ms per tick.`);
+                if (verbose) {
+                    MICSR.log(`Took ${processingTime / 1000}s to process ${this.simStats.killCount} kills and ${this.simStats.deathCount} deaths in ${this.tickCount} ticks. ${processingTime / this.tickCount}ms per tick.`);
+                }
                 return this.getSimStats(dungeonID);
             }
 
