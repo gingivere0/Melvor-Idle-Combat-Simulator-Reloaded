@@ -590,7 +590,7 @@
 
                 // time-weighted averages
                 const computeAvg = (tag) => {
-                    data[tag] = this.monsterSimData.filter((_, i) => monsterIDs.includes(i))
+                    data[tag] = monsterIDs.map(monsterID => this.monsterSimData[monsterID])
                         .reduce((avgData, mData) => avgData + mData[tag] * mData.killTimeS, 0) / data.killTimeS;
                 }
                 [
