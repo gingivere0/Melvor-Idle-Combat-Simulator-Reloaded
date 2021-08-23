@@ -644,9 +644,8 @@
                 this.combatStatCard.addSectionTitle('Plot Options');
                 this.plotter.addToggles(this.combatStatCard);
                 this.combatStatCard.addSectionTitle('');
-                this.combatStatCard.addButton('Simulate Selected (slow)', () => this.slowSimulateButtonOnClick());
-                this.combatStatCard.addButton('Simulate', () => {/*this.simulateButtonOnClick(false)*/
-                });
+                this.combatStatCard.addButton('Simulate BLOCKING', () => this.blockingSimulateButtonOnClick());
+                this.combatStatCard.addButton('Simulate All', () => {this.simulateButtonOnClick(false)});
                 this.combatStatCard.addButton('Simulate Selected', () => this.simulateButtonOnClick(true));
             }
 
@@ -1876,7 +1875,7 @@
             simulateButtonOnClick(single) {
                 if (this.simulator.simInProgress) {
                     this.simulator.cancelSimulation();
-                    const simButton = document.getElementById('MCS Simulate Button');
+                    const simButton = document.getElementById('MCS Simulate All Button');
                     simButton.disabled = true;
                     simButton.textContent = 'Cancelling...';
                 }
@@ -1886,7 +1885,7 @@
                 }
             }
 
-            slowSimulateButtonOnClick() {
+            blockingSimulateButtonOnClick() {
                 const startTimeStamp = performance.now();
                 // queue the desired monsters
                 this.simulator.setupCurrentSim(true);
@@ -2608,8 +2607,8 @@
                     this.setPlotToGeneral();
                     this.setPlotToDungeon(this.barMonsterIDs[this.selectedBar]);
                 }
-                document.getElementById('MCS Simulate Button').disabled = false;
-                document.getElementById('MCS Simulate Button').textContent = 'Simulate';
+                document.getElementById('MCS Simulate All Button').disabled = false;
+                document.getElementById('MCS Simulate All Button').textContent = 'Simulate';
                 document.getElementById('MCS Simulate Selected Button').style.display = 'block';
             }
 

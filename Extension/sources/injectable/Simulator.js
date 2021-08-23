@@ -409,7 +409,7 @@
             simulateCombat(single) {
                 this.setupCurrentSim(single);
                 // Start simulation workers
-                document.getElementById('MCS Simulate Button').textContent = `Cancel (0/${this.simulationQueue.length})`;
+                document.getElementById('MCS Simulate All Button').textContent = `Cancel (0/${this.simulationQueue.length})`;
                 this.initializeSimulationJobs();
             }
 
@@ -834,7 +834,7 @@
                         const simID = this.simID(monsterID, dungeonID);
                         Object.assign(this.monsterSimData[simID], event.data.simResult);
                         this.monsterSimData[simID].simulationTime = event.data.selfTime;
-                        document.getElementById('MCS Simulate Button').textContent = `Cancel (${this.currentJob - 1}/${this.simulationQueue.length})`;
+                        document.getElementById('MCS Simulate All Button').textContent = `Cancel (${this.currentJob - 1}/${this.simulationQueue.length})`;
                         // MICSR.log(event.data.simResult);
                         // Attempt to add another job to the worker
                         this.startJob(workerID);
