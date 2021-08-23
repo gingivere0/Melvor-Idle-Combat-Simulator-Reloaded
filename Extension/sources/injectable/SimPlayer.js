@@ -38,6 +38,32 @@
                 this.food.consume = (quantity = 1) => {
                     this.usedFood += quantity;
                 }
+                // data names for serialization
+                this.dataNames = {
+                    booleanArrays: [
+                        'petUnlocked',
+                        'courseMastery',
+                    ],
+                    numberArrays: [
+                        'skillLevel',
+                        'course',
+                    ],
+                    booleans: [
+                        'potionSelected',
+                        'summoningSynergy',
+                        'cookingPool',
+                        'cookingMastery',
+                        'useCombinationRunes',
+                        'healAfterDeath',
+                        'isSlayerTask',
+                    ],
+                    numbers: [
+                        'pillar',
+                        'potionTier',
+                        'potionID',
+                        'autoEatTier',
+                    ],
+                }
             }
 
             // detach globals attached by parent constructor
@@ -542,6 +568,34 @@
                         break;
                 }
                 return met;
+            }
+
+
+            /** Serializes the SimPlayer object */
+            serialize() {
+                const writer = new DataWriter();
+                writer.addVariableLengthChunk(super.serialize());
+                this.dataNames.booleanArrays.forEach(x => this[x].forEach(y => writer.addBool(y)));
+                this.dataNames.numberArrays.forEach(x => this[x].forEach(y => writer.addNumber(y)));
+                this.dataNames.booleans.forEach(x => writer.addBool(this[x]));
+                this.dataNames.numbers.forEach(x => writer.addNumber(this[x]));
+                return writer.data;
+            }
+
+            /** Deserializes the SimPlayer object */
+            deserialize(reader, version) {
+                super.deserialize(reader.getVariableLengthChunk(), version);
+                this.dataNames.booleanArrays.forEach(x => {
+                    this[x] = this[x].map(_ => reader.getBool());
+                });
+                this.dataNames.numberArrays.forEach(x => {
+                    this[x] = this[x].map(_ => reader.getNumber());
+                });
+                this.dataNames.booleans.forEach(x => this[x] = reader.getBool());
+                this.dataNames.numbers.forEach(x => this[x] = reader.getNumber());
+                // after reading the data, recompute stats and reset gains
+                this.computeAllStats();
+                this.resetGains();
             }
         }
     }
