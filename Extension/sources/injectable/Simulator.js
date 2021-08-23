@@ -417,10 +417,10 @@
                 }
             }
 
-            pushMonsterToQueue(monsterID) {
+            pushMonsterToQueue(monsterID, dungeonID) {
                 if (!this.monsterSimData[monsterID].inQueue) {
                     this.monsterSimData[monsterID].inQueue = true;
-                    this.simulationQueue.push({monsterID: monsterID});
+                    this.simulationQueue.push({monsterID: monsterID, dungeonID: dungeonID});
                 }
             }
 
@@ -825,10 +825,14 @@
             startJob(workerID) {
                 if (this.currentJob < this.simulationQueue.length && !this.simCancelled) {
                     const monsterID = this.simulationQueue[this.currentJob].monsterID;
+                    const dungeonID = this.simulationQueue[this.currentJob].dungeonID;
                     this.simulationWorkers[workerID].worker.postMessage({
                         action: 'START_SIMULATION',
                         monsterID: monsterID,
-                        simOptions: this.currentSim.options,
+                        dungeonID: dungeonID,
+                        simPlayer: this.parent.player.serialize(),
+                        trials: MICSR.trials,
+                        maxTicks: MICSR.maxTicks,
                     });
                     this.simulationWorkers[workerID].inUse = true;
                     this.currentJob++;

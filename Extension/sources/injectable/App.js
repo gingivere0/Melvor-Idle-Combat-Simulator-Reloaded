@@ -645,8 +645,9 @@
                 this.plotter.addToggles(this.combatStatCard);
                 this.combatStatCard.addSectionTitle('');
                 this.combatStatCard.addButton('Simulate Selected (slow)', () => this.slowSimulateButtonOnClick());
-                // this.combatStatCard.addButton('Simulate', () => this.simulateButtonOnClick(false));
-                // this.combatStatCard.addButton('Simulate Selected', () => this.simulateButtonOnClick(true));
+                this.combatStatCard.addButton('Simulate', () => {/*this.simulateButtonOnClick(false)*/
+                });
+                this.combatStatCard.addButton('Simulate Selected', () => this.simulateButtonOnClick(true));
             }
 
             createIndividualInfoCard() {
@@ -2607,9 +2608,9 @@
                     this.setPlotToGeneral();
                     this.setPlotToDungeon(this.barMonsterIDs[this.selectedBar]);
                 }
-                // document.getElementById('MCS Simulate Button').disabled = false;
-                // document.getElementById('MCS Simulate Button').textContent = 'Simulate';
-                // document.getElementById('MCS Simulate Selected Button').style.display = 'block';
+                document.getElementById('MCS Simulate Button').disabled = false;
+                document.getElementById('MCS Simulate Button').textContent = 'Simulate';
+                document.getElementById('MCS Simulate Selected Button').style.display = 'block';
             }
 
             destroy() {

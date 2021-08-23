@@ -52,14 +52,22 @@
                 event.data.classNames.forEach(name => {
                     eval(event.data.classes[name]);
                 });
-                // create instance
+                // create instances
+                MICSR.showModifiersInstance = new MICSR.ShowModifiers('', 'MICSR', false);
+                SlayerTask.data = self.slayerTaskData;
                 combatSimulator = new CombatSimulator();
                 break;
             case 'START_SIMULATION':
                 const startTime = performance.now();
                 //settings
                 // run the simulation
-                combatSimulator.simulateMonster(event.data.player, event.data.settings).then((simResult) => {
+                combatSimulator.simulateMonster(
+                    event.data.simPlayer,
+                    event.data.monsterID,
+                    event.data.dungeonID,
+                    event.data.trials,
+                    event.data.maxTicks,
+                ).then((simResult) => {
                     const timeTaken = performance.now() - startTime;
                     postMessage({
                         action: 'FINISHED_SIM',
@@ -93,7 +101,15 @@
          * @param {Object} settings
          * @return {Promise<Object>}
          */
-        async simulateMonster(player, settings) {
+        async simulateMonster(simPlayerData, monsterID, dungeonID, trials, maxTicks) {
+            const manager = new MICSR.SimManager();
+            const player = manager.player;
+            const reader = new DataReader(simPlayerData);
+            player.deserialize(reader);
+            MICSR.log(player);
+            const simResult = manager.convertSlowSimToResult(manager.runTrials(monsterID, dungeonID, trials, maxTicks));
+            MICSR.log(simResult);
+            return simResult;
         }
 
         /**
