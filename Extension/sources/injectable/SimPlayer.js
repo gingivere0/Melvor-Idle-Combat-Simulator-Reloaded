@@ -138,7 +138,7 @@
                     Summon2: 0,
                 };
                 this.highestDamageTaken = 0;
-                this.lowestHitpoints = Infinity;
+                this.lowestHitpoints = this.stats.maxHitpoints;
                 // hack to avoid auto eating infinite birthday cakes
                 const autoHealAmt = Math.floor(this.getFoodHealing(this.food.currentSlot.item) * this.autoEatEfficiency / 100);
                 this.emptyAutoHeal = this.autoEatThreshold > 0 && autoHealAmt === 0;
