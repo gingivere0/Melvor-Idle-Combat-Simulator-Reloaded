@@ -188,8 +188,8 @@
 
             progressDungeon() {
                 // this.dungeonProgress++;
-                if (this.areaData.dropBones)
-                    this.dropEnemyBones();
+                // if (this.areaData.dropBones)
+                //     this.dropEnemyBones();
                 /*
                 if (this.dungeonProgress === this.areaData.monsters.length) {
                     this.dungeonProgress = 0;
@@ -206,6 +206,12 @@
                 }
                 */
                 // TODO: handle ITM gear change
+            }
+
+            dropEnemyBones() {
+            }
+
+            dropEnemyLoot() {
             }
 
             rewardForEnemyDeath() {
