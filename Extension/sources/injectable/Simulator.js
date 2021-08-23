@@ -228,9 +228,13 @@
                 // constants
                 const constantNames = [
                     // actual constants
+                    {name: 'agilityObstacles', data: agilityObstacles},
+                    {name: 'agilityPassivePillars', data: agilityPassivePillars},
                     {name: 'ANCIENT', data: ANCIENT},
                     {name: 'attacks', data: attacks},
+                    {name: 'attacksIDMap', data: attacksIDMap},
                     {name: 'attackStyles', data: attackStyles},
+                    {name: 'AttackStyles', data: AttackStyles},
                     {name: 'AURORAS', data: AURORAS},
                     {name: 'combatAreas', data: combatAreas},
                     {
@@ -240,6 +244,7 @@
                     },
                     {name: 'combatSkills', data: combatSkills},
                     {name: 'combatTriangle', data: combatTriangle},
+                    {name: 'conditionalModifiers', data: conditionalModifiers},
                     {name: 'CONSTANTS', data: CONSTANTS},
                     {name: 'CURSES', data: CURSES},
                     {name: 'DUNGEONS', data: DUNGEONS},
@@ -247,9 +252,11 @@
                     {name: 'enemyHTMLElements', data: {}},
                     {name: 'emptyItem', data: emptyItem},
                     {name: 'enemyNoun', data: enemyNoun},
+                    {name: 'EquipmentSlots', data: EquipmentSlots},
                     {name: 'equipmentSlotData', data: equipmentSlotDataClone},
                     {name: 'formatNumberSetting', data: formatNumberSetting},
                     {name: 'GAMEMODES', data: GAMEMODES},
+                    {name: 'herbloreItemData', data: herbloreItemData},
                     {name: 'items', data: items},
                     {name: 'modifierData', data: modifierDataClone},
                     {name: 'MONSTERS', data: MONSTERS},
@@ -260,11 +267,20 @@
                             performance: {},
                         }
                     },
+                    {name: 'PRAYER', data: PRAYER},
+                    {name: 'SHOP', data: SHOP},
+                    {name: 'skillName', data: skillName},
+                    {name: 'SKILLS', data: SKILLS},
+                    {name: 'slayerAreas', data: slayerAreas},
+                    {name: 'slayerTaskData', data: SlayerTask.data},
                     {name: 'SPELLS', data: SPELLS},
                     {name: 'Stats', data: {}},
                     {name: 'SUMMONING', data: SUMMONING},
+                    {name: 'summoningData', data: summoningData},
+                    {name: 'summoningItems', data: summoningItems},
                     {name: 'synergyElements', data: {}},
                     {name: 'TICK_INTERVAL', data: TICK_INTERVAL},
+                    {name: 'unknownArea', data: unknownArea},
                     {name: 'youNoun', data: youNoun},
                     // character settings  // TODO: sim setting
                     {name: 'currentGamemode', data: currentGamemode},
@@ -288,16 +304,27 @@
                 const functionNames = [
                     // global functions
                     {name: 'applyModifier', data: applyModifier},
+                    {
+                        name: 'checkRequirements', data: (...args) => {/*console.log('checkRequirements', ...args); */
+                            return true;
+                        }
+                    }, // TODO: what calls this? It should call SimPlayer.checkRequirements
                     {name: 'damageReducer', data: damageReducer},
                     {name: 'formatNumber', data: formatNumber},
+                    {name: 'getAttackFromID', data: getAttackFromID},
                     {name: 'getBankId', data: getBankId},
+                    {name: 'getBaseSummoningXP', data: getBaseSummoningXP},
                     {name: 'getDamageRoll', data: getDamageRoll},
                     {name: 'getMonsterArea', data: getMonsterArea},
                     {name: 'getMonsterCombatLevel', data: getMonsterCombatLevel},
                     {name: 'getNumberMultiplierValue', data: getNumberMultiplierValue},
+                    {name: 'getSummonSynergyEnemyModifiers', data: getSummonSynergyEnemyModifiers},
+                    {name: 'isEquipment', data: isEquipment},
+                    {name: 'isFood', data: isFood},
                     {name: 'isSeedItem', data: isSeedItem},
                     {name: 'isSkillEntry', data: isSkillEntry},
-                    {name: 'isSynergyUnlocked', data: isSynergyUnlocked},
+                    {name: 'isSkillLocked', data: isSkillLocked},
+                    {name: 'isWeapon', data: isWeapon},
                     {name: 'numberWithCommas', data: numberWithCommas},
                     {name: 'rollInteger', data: rollInteger},
                     {name: 'rollPercentage', data: rollPercentage},
@@ -305,6 +332,10 @@
                     {
                         name: 'MICSR.addAgilityModifiers',
                         data: `MICSR.addAgilityModifiers = ${MICSR.addAgilityModifiers}`
+                    },
+                    {
+                        name: 'MICSR.getModifierValue',
+                        data: `MICSR.getModifierValue = ${MICSR.getModifierValue}`
                     },
                 ];
                 const functions = {};
@@ -316,10 +347,12 @@
                     {name: 'BankHelper', data: BankHelper},
                     {name: 'CharacterStats', data: CharacterStats},
                     {name: 'CombatLoot', data: CombatLoot},
+                    {name: 'DataReader', data: DataReader},
                     {name: 'Equipment', data: Equipment},
                     {name: 'EquipmentStats', data: EquipmentStats},
                     {name: 'EquippedFood', data: EquippedFood},
                     {name: 'EquipSlot', data: EquipSlot},
+                    {name: 'MICSR.ShowModifiers', data: MICSR.ShowModifiers},
                     {name: 'NotificationQueue', data: NotificationQueue},
                     {name: 'TargetModifiers', data: TargetModifiers},
                     {name: 'Timer', data: Timer},
