@@ -107,9 +107,17 @@
             const reader = new DataReader(simPlayerData);
             player.deserialize(reader);
             MICSR.log(player);
-            const simResult = manager.convertSlowSimToResult(manager.runTrials(monsterID, dungeonID, trials, maxTicks));
-            MICSR.log(simResult);
-            return simResult;
+            try {
+                const simResult = manager.convertSlowSimToResult(manager.runTrials(monsterID, dungeonID, trials, maxTicks));
+                MICSR.log(simResult);
+                return simResult;
+            } catch (error) {
+                MICSR.log(`Error while simulating monster ${monsterID} in dungeon ${dungeonID}: ${error}`);
+                return {
+                    simSuccess: false,
+                    reason: 'simulation error',
+                }
+            }
         }
 
         /**
