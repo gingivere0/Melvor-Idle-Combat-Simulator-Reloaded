@@ -508,7 +508,7 @@
                         continue;
                     }
                     // check if combat level fits the current task type
-                    const cbLevel = MICSR.getMonsterCombatLevel(monsterID, true);
+                    const cbLevel = getMonsterCombatLevel(monsterID);
                     if (cbLevel < minLevel || cbLevel > maxLevel) {
                         continue;
                     }
