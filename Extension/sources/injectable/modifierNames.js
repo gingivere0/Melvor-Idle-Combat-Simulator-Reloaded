@@ -27,14 +27,14 @@
         const MICSR = window.MICSR;
 
         /**
-         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.2, latest version can be found at:
+         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.3, latest version can be found at:
          * https://raw.githubusercontent.com/gmiclotte/melvor-scripts/master/Show-Modifiers/Show-Modifiers.js
          * TODO: instead of copying it, pull it as a required file or something? No idea how to go about that.
          */
         // start of ShowModifiers copy
         MICSR.ShowModifiers = class {
 
-            constructor(name, logName) {
+            constructor(name, logName, check = true) {
                 this.name = name;
                 this.logName = logName;
                 // increased - decreased
@@ -444,7 +444,9 @@
                     unimplemented: [],
                 }
 
-                this.checkUnknownModifiers();
+                if (check) {
+                    this.checkUnknownModifiers();
+                }
 
                 // map of relevant modifiers per tag
                 this.relevantModifiers = {};
