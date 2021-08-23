@@ -142,6 +142,7 @@
                 // hack to avoid auto eating infinite birthday cakes
                 const autoHealAmt = Math.floor(this.getFoodHealing(this.food.currentSlot.item) * this.autoEatEfficiency / 100);
                 this.emptyAutoHeal = this.autoEatThreshold > 0 && autoHealAmt === 0;
+                this.hitpoints = this.stats.maxHitpoints;
             }
 
             getGainsPerSecond(ticks) {
