@@ -453,7 +453,7 @@
                 }
                 const minID = Math.min(summon1, summon2);
                 const maxID = Math.max(summon1, summon2);
-                return SUMMONING.Synergies[minID][maxID] !== undefined;
+                return SUMMONING.Synergies[minID] !== undefined && SUMMONING.Synergies[minID][maxID] !== undefined;
             }
 
             removeSummonCharge(slot, charges = 1) {
