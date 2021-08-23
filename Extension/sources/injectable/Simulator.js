@@ -251,6 +251,7 @@
                     {name: 'combatPassives', data: combatPassives},
                     {name: 'combatSkills', data: combatSkills},
                     {name: 'combatTriangle', data: combatTriangle},
+                    {name: 'combinations', data: combinations},
                     {name: 'conditionalModifiers', data: conditionalModifiers},
                     {name: 'CONSTANTS', data: CONSTANTS},
                     {name: 'CURSES', data: CURSES},
