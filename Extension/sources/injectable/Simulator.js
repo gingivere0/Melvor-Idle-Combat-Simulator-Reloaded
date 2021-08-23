@@ -254,6 +254,7 @@
                     {name: 'conditionalModifiers', data: conditionalModifiers},
                     {name: 'CONSTANTS', data: CONSTANTS},
                     {name: 'CURSES', data: CURSES},
+                    {name: 'DotTypeIDs', data: DotTypeIDs},
                     {name: 'DUNGEONS', data: DUNGEONS},
                     {name: 'emptyFood', data: emptyFood},
                     {name: 'enemyHTMLElements', data: {}},
