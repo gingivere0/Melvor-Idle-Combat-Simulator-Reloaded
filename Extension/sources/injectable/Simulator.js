@@ -711,13 +711,7 @@
                     }
                 }
                 // Update other data
-                this.parent.loot.update(
-                    this.currentSim,
-                    this.monsterSimData,
-                    this.dungeonSimData,
-                    this.slayerSimData,
-                    this.slayerTaskMonsters,
-                );
+                this.parent.loot.update();
                 MICSR.log(`Elapsed Simulation Time: ${performance.now() - this.simStartTime}ms`);
                 // store simulation
                 if (this.parent.trackHistory) {

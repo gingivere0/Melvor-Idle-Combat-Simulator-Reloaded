@@ -963,7 +963,7 @@
                         } else {
                             addToLootMap(MONSTERS[this.barMonsterIDs[this.selectedBar]]);
                         }
-                    } else if (godDungeonID.includes(this.viewedDungeonID)) {
+                    } else if (this.loot.godDungeonIDs.includes(this.viewedDungeonID)) {
                         const selection = this.getMonsterList(this.viewedDungeonID);
                         const monsterID = selection[this.selectedBar + selection.length - this.plotter.bars.length];
                         addToLootMap(MONSTERS[monsterID]);
@@ -2288,8 +2288,10 @@
                         );
                     } else {
                         let monsterID;
+                        let dungeonID;
                         if (this.isViewingDungeon) {
-                            const selection = this.getMonsterList(this.viewedDungeonID);
+                            dungeonID = this.viewedDungeonID;
+                            const selection = this.getMonsterList(dungeonID);
                             monsterID = selection[this.selectedBar + selection.length - this.plotter.bars.length];
                         } else {
                             monsterID = this.barMonsterIDs[this.selectedBar];
@@ -2298,7 +2300,7 @@
                             this.getMonsterName(monsterID),
                             monsterID,
                             MONSTERS[monsterID].media,
-                            this.simulator.monsterSimData[monsterID],
+                            this.simulator.monsterSimData[this.simulator.simID(monsterID, dungeonID)],
                         );
                     }
                 } else {
