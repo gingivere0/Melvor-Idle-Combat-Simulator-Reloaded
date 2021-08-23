@@ -462,6 +462,28 @@
                 }
             }
 
+            computeTargetModifiers() {
+                this.targetModifiers.reset();
+                this.equipment.slotArray.forEach((slot) => {
+                    const item = slot.item;
+                    if (slot.providesStats) {
+                        if (item.enemyModifiers !== undefined) {
+                            this.targetModifiers.addModifiers(item.enemyModifiers);
+                        }
+                    }
+                });
+                const args = this.getSummoningIDs();
+                if (this.isSynergyUnlocked(...args)) {
+                    const modifiers = getSummonSynergyEnemyModifiers(...args);
+                    this.targetModifiers.addModifiers(modifiers);
+                }
+                if (this.modifiers.summoningSynergy_1_12 > 0 && this.manager.onSlayerTask) {
+                    this.targetModifiers.addModifiers({
+                        decreasedGlobalAccuracy: this.modifiers.summoningSynergy_1_12,
+                    });
+                }
+            }
+
             // get grandparent rollToHit
             get characterRollToHit() {
                 return Character.prototype.rollToHit;
