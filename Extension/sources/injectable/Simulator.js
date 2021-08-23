@@ -22,6 +22,9 @@
 
     const reqs = [
         'statNames',
+        'SimEnemy',
+        'SimManager',
+        'SimPlayer',
     ];
 
     const setup = () => {
@@ -221,6 +224,143 @@
              * @param {number} i
              */
             intializeWorker(worker, i) {
+                // clone data without DOM references or functions
+                const equipmentSlotDataClone = {};
+                for (const slot in equipmentSlotData) {
+                    equipmentSlotDataClone[slot] = {
+                        ...equipmentSlotData[slot],
+                        imageElements: [],
+                        qtyElements: [],
+                        tooltips: [],
+                    }
+                }
+                const modifierDataClone = {};
+                for (const slot in modifierData) {
+                    modifierDataClone[slot] = {
+                        ...modifierData[slot],
+                        format: '',
+                    }
+                }
+                // constants
+                const constantNames = [
+                    // actual constants
+                    {name: 'ANCIENT', data: ANCIENT},
+                    {name: 'attacks', data: attacks},
+                    {name: 'attackStyles', data: attackStyles},
+                    {name: 'AURORAS', data: AURORAS},
+                    {name: 'combatAreas', data: combatAreas},
+                    {
+                        name: 'combatMenus', data: {
+                            progressBars: {},
+                        }
+                    },
+                    {name: 'combatSkills', data: combatSkills},
+                    {name: 'combatTriangle', data: combatTriangle},
+                    {name: 'CONSTANTS', data: CONSTANTS},
+                    {name: 'CURSES', data: CURSES},
+                    {name: 'DUNGEONS', data: DUNGEONS},
+                    {name: 'emptyFood', data: emptyFood},
+                    {name: 'enemyHTMLElements', data: {}},
+                    {name: 'emptyItem', data: emptyItem},
+                    {name: 'enemyNoun', data: enemyNoun},
+                    {name: 'equipmentSlotData', data: equipmentSlotDataClone},
+                    {name: 'formatNumberSetting', data: formatNumberSetting},
+                    {name: 'GAMEMODES', data: GAMEMODES},
+                    {name: 'items', data: items},
+                    {name: 'modifierData', data: modifierDataClone},
+                    {name: 'MONSTERS', data: MONSTERS},
+                    {name: 'PETS', data: PETS},
+                    {name: 'playerHTMLElements', data: {}},
+                    {
+                        name: 'SETTINGS', data: {
+                            performance: {},
+                        }
+                    },
+                    {name: 'SPELLS', data: SPELLS},
+                    {name: 'Stats', data: {}},
+                    {name: 'SUMMONING', data: SUMMONING},
+                    {name: 'synergyElements', data: {}},
+                    {name: 'TICK_INTERVAL', data: TICK_INTERVAL},
+                    {name: 'youNoun', data: youNoun},
+                    // character settings  // TODO: sim setting
+                    {name: 'currentGamemode', data: currentGamemode},
+                    {name: 'numberMultiplier', data: numberMultiplier},
+                    // character data // TODO: wipe these from SimPlayer
+                    {name: 'bank', data: []},
+                    {name: 'bankCache', data: {}},
+                    {
+                        name: 'itemStats', data: itemStats.map(_ => {
+                            return {stats: []};
+                        })
+                    },
+                    {name: 'skillLevel', data: skillLevel},
+                    {name: 'petUnlocked', data: petUnlocked},
+                ];
+                const constants = {};
+                constantNames.forEach(constant =>
+                    constants[constant.name] = constant.data
+                );
+                // functions
+                const functionNames = [
+                    // global functions
+                    {name: 'applyModifier', data: applyModifier},
+                    {name: 'damageReducer', data: damageReducer},
+                    {name: 'formatNumber', data: formatNumber},
+                    {name: 'getBankId', data: getBankId},
+                    {name: 'getDamageRoll', data: getDamageRoll},
+                    {name: 'getMonsterArea', data: getMonsterArea},
+                    {name: 'getMonsterCombatLevel', data: getMonsterCombatLevel},
+                    {name: 'getNumberMultiplierValue', data: getNumberMultiplierValue},
+                    {name: 'isSeedItem', data: isSeedItem},
+                    {name: 'isSkillEntry', data: isSkillEntry},
+                    {name: 'isSynergyUnlocked', data: isSynergyUnlocked},
+                    {name: 'numberWithCommas', data: numberWithCommas},
+                    {name: 'rollInteger', data: rollInteger},
+                    {name: 'rollPercentage', data: rollPercentage},
+                    // MICSR functions
+                    {
+                        name: 'MICSR.addAgilityModifiers',
+                        data: `MICSR.addAgilityModifiers = ${MICSR.addAgilityModifiers}`
+                    },
+                ];
+                const functions = {};
+                functionNames.forEach(func => {
+                    functions[func.name] = `${func.name} = ${func.data.toString().replace(`function ${func.name}`, 'function')}`;
+                });
+                // classes
+                const classNames = [
+                    {name: 'BankHelper', data: BankHelper},
+                    {name: 'CharacterStats', data: CharacterStats},
+                    {name: 'CombatLoot', data: CombatLoot},
+                    {name: 'Equipment', data: Equipment},
+                    {name: 'EquipmentStats', data: EquipmentStats},
+                    {name: 'EquippedFood', data: EquippedFood},
+                    {name: 'EquipSlot', data: EquipSlot},
+                    {name: 'NotificationQueue', data: NotificationQueue},
+                    {name: 'TargetModifiers', data: TargetModifiers},
+                    {name: 'Timer', data: Timer},
+                    {name: 'SlayerTask', data: SlayerTask},
+                    {name: 'SplashManager', data: SplashManager},
+                    // PlayerModifiers extends CombatModifiers
+                    {name: 'CombatModifiers', data: CombatModifiers},
+                    {name: 'PlayerModifiers', data: PlayerModifiers},
+                    // SimManager extends CombatManager extends BaseManager
+                    {name: 'BaseManager', data: BaseManager},
+                    {name: 'CombatManager', data: CombatManager},
+                    {name: 'MICSR.SimManager', data: MICSR.SimManager},
+                    // SimPlayer extends Player extends Character
+                    // SimEnemy extends Enemy extends Character
+                    {name: 'Character', data: Character},
+                    {name: 'Player', data: Player},
+                    {name: 'MICSR.SimPlayer', data: MICSR.SimPlayer},
+                    {name: 'Enemy', data: Enemy},
+                    {name: 'MICSR.SimEnemy', data: MICSR.SimEnemy},
+                ];
+                const classes = {};
+                classNames.forEach(clas => {
+                    classes[clas.name] = `${clas.name} = ${clas.data.toString().replace(`class ${clas.name}`, 'class')}`;
+                });
+                // worker
                 worker.onmessage = (event) => this.processWorkerMessage(event, i);
                 worker.onerror = (event) => {
                     MICSR.log('An error occured in a simulation worker');
@@ -228,9 +368,15 @@
                 };
                 worker.postMessage({
                     action: 'RECEIVE_GAMEDATA',
-                    enemySpecialAttacks: attacks,
-                    CURSEIDS: CONSTANTS.curse,
-                    constantModifiers: this.constantModifiers,
+                    // constants
+                    constantNames: constantNames.map(x => x.name),
+                    constants: constants,
+                    // functions
+                    functionNames: functionNames.map(x => x.name),
+                    functions: functions,
+                    // classes
+                    classNames: classNames.map(x => x.name),
+                    classes: classes,
                 });
             }
 
