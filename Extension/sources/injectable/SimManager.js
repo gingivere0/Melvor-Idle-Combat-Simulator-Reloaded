@@ -50,6 +50,7 @@
             constructor() {
                 super();
                 this.player = new MICSR.SimPlayer(this);
+                this.enemy = new MICSR.SimEnemy(MONSTERS[0], this);
                 this.detachGlobals();
                 this.replaceGlobals();
             }
@@ -90,6 +91,12 @@
 
             // don't render anything
             render() {
+            }
+
+            // create new Sim Enemy
+            createNewEnemy() {
+                this.enemy = new MICSR.SimEnemy(MONSTERS[this.selectedMonster], this);
+                this.enemy.isAfflicted = (this.areaData === DUNGEONS[CONSTANTS.dungeon.Into_the_Mist]);
             }
 
             // reset sim stats

@@ -79,6 +79,7 @@ function injectScripts() {
         'Plotter',
         'Menu',
         'Simulator',
+        'SimEnemy',
         'SimManager',
         'SimPlayer',
         'TabCard',

@@ -30,7 +30,9 @@
         'Loot',
         'Menu',
         'modifierNames',
+        'SimEnemy',
         'SimManager',
+        'SimPlayer',
         'Simulator',
         'TabCard',
     ];
