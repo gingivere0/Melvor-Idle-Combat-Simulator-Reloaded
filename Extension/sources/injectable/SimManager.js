@@ -58,7 +58,6 @@
             initialize() {
                 super.initialize();
                 this.renderCombat = false;
-                this.isSlayerTask = false;
             }
 
             // detach globals attached by parent constructor
@@ -287,7 +286,7 @@
             }
 
             get onSlayerTask() {
-                return this.isSlayerTask && this.areaType !== 'Dungeon' && this.areaType !== 'None';
+                return this.player.isSlayerTask && this.areaType !== 'Dungeon' && this.areaType !== 'None';
             }
         }
     }

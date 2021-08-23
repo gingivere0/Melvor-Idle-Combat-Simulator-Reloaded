@@ -1934,7 +1934,7 @@
              * @param {boolean} newState The new value for the option
              */
             slayerTaskRadioOnChange(event, newState) {
-                this.manager.isSlayerTask = newState;
+                this.player.isSlayerTask = newState;
                 this.slayerTaskSimsToggle();
                 this.updatePlotForSlayerXP();
                 this.updatePlotForSlayerCoins();
@@ -1942,11 +1942,11 @@
 
             slayerTaskSimsToggle() {
                 // toggle dungeon sims off if slayer task is on
-                if (this.manager.isSlayerTask) {
+                if (this.player.isSlayerTask) {
                     this.toggleDungeonSims(false, true);
                 }
                 // toggle auto slayer sims off if slayer task is off
-                if (!this.manager.isSlayerTask) {
+                if (!this.player.isSlayerTask) {
                     this.toggleSlayerSims(false, true);
                 }
             }
@@ -2133,7 +2133,7 @@
                 let newState;
                 if (this.barIsDungeon(imageID)) {
                     newState = !this.simulator.dungeonSimFilter[this.barMonsterIDs[imageID]];
-                    if (newState && this.manager.isSlayerTask) {
+                    if (newState && this.player.isSlayerTask) {
                         this.notify('no dungeon simulation on slayer task', 'danger');
                         newState = false;
                     }
@@ -2141,7 +2141,7 @@
                 } else if (this.barIsTask(imageID)) {
                     const taskID = this.barMonsterIDs[imageID] - MICSR.dungeons.length;
                     newState = !this.simulator.slayerSimFilter[taskID];
-                    if (newState && !this.manager.isSlayerTask) {
+                    if (newState && !this.player.isSlayerTask) {
                         this.notify('no auto slayer simulation off slayer task', 'danger');
                         newState = false;
                     }
@@ -2169,7 +2169,7 @@
              * Callback to toggle the simulation of dungeons
              */
             toggleDungeonSims(newState, silent) {
-                if (newState && this.manager.isSlayerTask) {
+                if (newState && this.player.isSlayerTask) {
                     if (!silent) {
                         this.notify('no dungeon simulation on slayer task', 'danger')
                     }
@@ -2187,7 +2187,7 @@
              * Callback to toggle the simulation of dungeons
              */
             toggleSlayerSims(newState, silent) {
-                if (newState && !this.manager.isSlayerTask) {
+                if (newState && !this.player.isSlayerTask) {
                     if (!silent) {
                         this.notify('no auto slayer simulation off slayer task', 'danger');
                     }

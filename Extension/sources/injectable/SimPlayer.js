@@ -119,6 +119,8 @@
                 this.cookingMastery = false;
                 // useCombinationRunes
                 this.useCombinationRunes = false;
+                // other
+                this.isSlayerTask = false;
             }
 
             resetGains() {

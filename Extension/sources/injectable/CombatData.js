@@ -118,7 +118,7 @@
                 this.combatStats.gpBonus = MICSR.averageDoubleMultiplier(
                     MICSR.getModifierValue(modifiers, 'GPFromMonsters')
                     + MICSR.getModifierValue(modifiers, 'GPGlobal')
-                    + (this.manager.isSlayerTask ? modifiers.summoningSynergy_0_12 : 0)
+                    + (this.player.isSlayerTask ? modifiers.summoningSynergy_0_12 : 0)
                 );
 
                 // attack speed without aurora
