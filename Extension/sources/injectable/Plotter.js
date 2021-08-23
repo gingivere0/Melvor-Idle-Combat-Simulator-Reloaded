@@ -86,9 +86,9 @@
                 }
 
                 this.barBottomNames.push('Auto Slayer');
-                this.barBottomLength.push(this.parent.slayerTasks.length);
-                totBars += this.parent.slayerTasks.length;
-                for (const slayerTask of this.parent.slayerTasks) {
+                this.barBottomLength.push(SlayerTask.data.length);
+                totBars += SlayerTask.data.length;
+                for (const slayerTask of SlayerTask.data) {
                     this.barNames.push(slayerTask.display);
                     this.barImageSrc.push(SKILLS[CONSTANTS.skill.Slayer].media);
                 }
@@ -356,7 +356,7 @@
                         if (this.parent.barIsDungeon(barIndex)) {
                             barName = MICSR.dungeons[this.parent.barMonsterIDs[barIndex]].name;
                         } else if (this.parent.barIsTask(barIndex)) {
-                            barName = this.parent.slayerTasks[this.parent.barMonsterIDs[barIndex] - MICSR.dungeons.length].display;
+                            barName = SlayerTask.data[this.parent.barMonsterIDs[barIndex] - MICSR.dungeons.length].display;
                         } else {
                             barName = MONSTERS[this.parent.barMonsterIDs[barIndex]].name;
                         }

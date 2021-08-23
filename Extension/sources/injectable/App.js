@@ -58,8 +58,6 @@
                 this.manager.initialize();
                 this.player = this.manager.player;
                 this.combatData = new MICSR.CombatData(this.manager);
-                // slayer tasks
-                this.slayerTasks = SlayerTask.data;
                 // Plot Type Options
                 this.plotTypes = [];
                 const addPlotOption = (option, isTime, value, info) => {
@@ -290,7 +288,7 @@
                     this.barMonsterIDs.push(i);
                     this.barType.push(this.barTypes.dungeon);
                 }
-                for (let i = 0; i < this.slayerTasks.length; i++) {
+                for (let i = 0; i < SlayerTask.data.length; i++) {
                     this.dungeonBarIDs.push(this.barMonsterIDs.length);
                     this.barMonsterIDs.push(MICSR.dungeons.length + i);
                     this.barType.push(this.barTypes.task);
@@ -1935,7 +1933,7 @@
              */
             slayerTaskRadioOnChange(event, newState) {
                 this.player.isSlayerTask = newState;
-                this.slayerTaskSimsToggle();
+                SlayerTask.dataimsToggle();
                 this.updatePlotForSlayerXP();
                 this.updatePlotForSlayerCoins();
             }
@@ -2194,7 +2192,7 @@
                     newState = false;
                 }
                 this.slayerToggleState = newState;
-                for (let i = 0; i < this.slayerTasks.length; i++) {
+                for (let i = 0; i < SlayerTask.data.length; i++) {
                     this.simulator.slayerSimFilter[i] = newState;
                 }
                 this.updatePlotData();
@@ -2282,7 +2280,7 @@
                     } else if (!this.isViewingDungeon && this.barIsTask(this.selectedBar)) {
                         const taskID = this.barMonsterIDs[this.selectedBar] - MICSR.dungeons.length;
                         this.setZoneInfoCard(
-                            this.slayerTasks[taskID].display,
+                            SlayerTask.data[taskID].display,
                             taskID,
                             SKILLS[CONSTANTS.skill.Slayer].media,
                             this.simulator.slayerSimData[taskID],

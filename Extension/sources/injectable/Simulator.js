@@ -107,7 +107,7 @@
                 //
                 this.slayerTaskMonsters = [];
                 this.slayerSimData = [];
-                for (let i = 0; i < this.parent.slayerTasks.length; i++) {
+                for (let i = 0; i < SlayerTask.data.length; i++) {
                     this.slayerTaskMonsters.push([]);
                     this.slayerSimData.push(newSimData(false));
                     this.slayerSimFilter.push(true);
@@ -447,7 +447,7 @@
             }
 
             queueSlayerTask(i) {
-                const task = this.parent.slayerTasks[i];
+                const task = SlayerTask.data[i];
                 this.slayerTaskMonsters[i] = [];
                 if (!this.slayerSimFilter[i]) {
                     return;
