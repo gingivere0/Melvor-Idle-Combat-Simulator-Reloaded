@@ -693,84 +693,8 @@
                 });
             }
 
-            computeAllRuneUsage() {
-                // compute rune usage
-                const runeCosts = this.currentSim.playerStats.runeCosts;
-                const preservation = this.currentSim.playerStats.runePreservation;
-                for (let data of this.monsterSimData) {
-                    let runes = {};
-                    let combinationRunes = {};
-                    this.computeRuneUsage(runes, combinationRunes, runeCosts.spell, data.spellCastsPerSecond, preservation);
-                    this.computeRuneUsage(runes, combinationRunes, runeCosts.aurora, data.spellCastsPerSecond, preservation);
-                    this.computeRuneUsage(runes, combinationRunes, runeCosts.curse, data.curseCastsPerSecond, preservation);
-                    data.runesUsedPerSecond = Object.values(runes).reduce((a, b) => a + b, 0);
-                    data.combinationRunesUsedPerSecond = Object.values(combinationRunes).reduce((a, b) => a + b, 0);
-                }
-            }
-
-            computePotionUsage(combatData, monsterSimData) {
-                for (let data of monsterSimData) {
-                    data.potionsUsedPerSecond = 0;
-                }
-                if (!combatData.potionSelected) {
-                    return;
-                }
-                const modifiers = combatData.modifiers;
-                // check prayers for divine potion
-                let perPlayer = false;
-                let perEnemy = false;
-                let perRegen = false;
-                if (combatData.potionID === 22) {
-                    for (let i = 0; i < PRAYER.length; i++) {
-                        if (combatData.prayerSelected[i]) {
-                            perPlayer = perPlayer || PRAYER[i].pointsPerPlayer > 0;
-                            perEnemy = perEnemy || PRAYER[i].pointsPerEnemy > 0;
-                            perRegen = perRegen || PRAYER[i].pointsPerRegen > 0;
-                        }
-                    }
-                }
-                const potionPreservation = MICSR.getModifierValue(modifiers, 'ChanceToPreservePotionCharge');
-                const potion = items[herbloreItemData[combatData.potionID].itemID[combatData.potionTier]];
-                const potionCharges = potion.potionCharges + MICSR.getModifierValue(modifiers, 'PotionChargesFlat');
-                // set potion usage for each monster
-                for (let data of monsterSimData) {
-                    let chargesUsedPerSecond = 0;
-                    if (combatData.potionID === 5) {
-                        // regen potion
-                        chargesUsedPerSecond = 0.1;
-                    } else if (combatData.potionID === 6) {
-                        // damage reduction potion
-                        chargesUsedPerSecond = data.attacksTakenPerSecond;
-                    } else if (combatData.potionID === 23) {
-                        // lucky herb potion
-                        chargesUsedPerSecond = data.killsPerSecond;
-                    } else if (combatData.potionID === 22) {
-                        // divine potion
-                        if (perPlayer) {
-                            chargesUsedPerSecond += data.attacksMadePerSecond;
-                        }
-                        if (perEnemy) {
-                            chargesUsedPerSecond += data.attacksTakenPerSecond;
-                        }
-                        if (perRegen) {
-                            chargesUsedPerSecond += 0.1;
-                        }
-                    } else {
-                        chargesUsedPerSecond = data.attacksMadePerSecond;
-                    }
-                    // take potion preservation into account
-                    if (potionPreservation > 0) {
-                        chargesUsedPerSecond *= 1 - potionPreservation / 100;
-                    }
-                    // convert charges to potions
-                    data.potionsUsedPerSecond = chargesUsedPerSecond / potionCharges;
-                }
-            }
-
             /** Performs all data analysis post queue completion */
             performPostSimAnalysis() {
-                // this.computeAllRuneUsage();
-                // this.computePotionUsage(this.currentSim.combatData, this.monsterSimData);
                 // Perform calculation of dungeon stats
                 for (let dungeonId = 0; dungeonId < MICSR.dungeons.length; dungeonId++) {
                     this.computeAverageSimData(this.dungeonSimFilter[dungeonId], this.dungeonSimData[dungeonId], MICSR.dungeons[dungeonId].monsters);
