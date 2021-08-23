@@ -34,7 +34,6 @@
                 super(simManager);
                 this.detachGlobals();
                 this.replaceGlobals();
-                this.healAfterDeath = true;
                 // overwrite food consumption
                 this.food.consume = (quantity = 1) => {
                     this.usedFood += quantity;
@@ -98,8 +97,6 @@
                 this.skillLevel = skillLevel.map(_ => 1);
                 this.skillLevel[CONSTANTS.skill.Hitpoints] = 10;
                 // TODO: currentGamemode, numberMultiplier
-                // gp, skillXP, PETS, slayercoins
-                this.resetGains();
                 // petUnlocked
                 this.petUnlocked = petUnlocked.map(x => false);
                 // chosenAgilityObstacles, agility MASTERY, agilityPassivePillarActive
@@ -120,7 +117,10 @@
                 // useCombinationRunes
                 this.useCombinationRunes = false;
                 // other
+                this.healAfterDeath = true;
                 this.isSlayerTask = false;
+                // gp, skillXP, PETS, slayercoins
+                this.resetGains();
             }
 
             resetGains() {
