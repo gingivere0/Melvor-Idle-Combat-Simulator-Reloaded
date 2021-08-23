@@ -103,14 +103,12 @@
                 for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
                     this.dungeonSimData.push(newSimData(false));
                     this.dungeonSimFilter.push(true);
-                    MICSR.dungeons.forEach(dungeon =>
-                        dungeon.monsters.forEach(monsterID => {
-                            const simID = this.simID(monsterID, dungeonID);
-                            if (!this.monsterSimData[simID]) {
-                                this.monsterSimData[simID] = newSimData(true);
-                            }
-                        })
-                    );
+                    MICSR.dungeons[dungeonID].monsters.forEach(monsterID => {
+                        const simID = this.simID(monsterID, dungeonID);
+                        if (!this.monsterSimData[simID]) {
+                            this.monsterSimData[simID] = newSimData(true);
+                        }
+                    });
                 }
                 //
                 this.slayerTaskMonsters = [];
@@ -566,11 +564,11 @@
                     });
                 });
                 // Queue simulation of monsters in dungeons
-                for (let i = 0; i < MICSR.dungeons.length; i++) {
-                    if (this.dungeonSimFilter[i]) {
-                        for (let j = 0; j < MICSR.dungeons[i].monsters.length; j++) {
-                            const monsterID = MICSR.dungeons[i].monsters[j];
-                            this.pushMonsterToQueue(monsterID);
+                for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
+                    if (this.dungeonSimFilter[dungeonID]) {
+                        for (let j = 0; j < MICSR.dungeons[dungeonID].monsters.length; j++) {
+                            const monsterID = MICSR.dungeons[dungeonID].monsters[j];
+                            this.pushMonsterToQueue(monsterID, dungeonID);
                         }
                     }
                 }
@@ -696,8 +694,8 @@
             /** Performs all data analysis post queue completion */
             performPostSimAnalysis() {
                 // Perform calculation of dungeon stats
-                for (let dungeonId = 0; dungeonId < MICSR.dungeons.length; dungeonId++) {
-                    this.computeAverageSimData(this.dungeonSimFilter[dungeonId], this.dungeonSimData[dungeonId], MICSR.dungeons[dungeonId].monsters);
+                for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
+                    this.computeAverageSimData(this.dungeonSimFilter[dungeonID], this.dungeonSimData[dungeonID], MICSR.dungeons[dungeonID].monsters, dungeonID);
                 }
                 for (let slayerTaskID = 0; slayerTaskID < this.slayerTaskMonsters.length; slayerTaskID++) {
                     this.computeAverageSimData(this.slayerSimFilter[slayerTaskID], this.slayerSimData[slayerTaskID], this.slayerTaskMonsters[slayerTaskID]);

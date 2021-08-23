@@ -72,6 +72,7 @@
                     postMessage({
                         action: 'FINISHED_SIM',
                         monsterID: event.data.monsterID,
+                        dungeonID: event.data.dungeonID,
                         simResult: simResult,
                         selfTime: timeTaken
                     });
