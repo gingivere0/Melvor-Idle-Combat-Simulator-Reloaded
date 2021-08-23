@@ -266,6 +266,12 @@
                 }
             }
 
+            pauseDungeon() {
+            }
+
+            resumeDungeon() {
+            }
+
             runTrials(monsterID, dungeonID, trials, tickLimit) {
                 this.resetSimStats();
                 const startTimeStamp = performance.now();
