@@ -270,9 +270,12 @@
             }
 
             pauseDungeon() {
+                this.paused = true;
             }
 
             resumeDungeon() {
+                this.startFight();
+                this.paused = false;
             }
 
             runTrials(monsterID, dungeonID, trials, tickLimit, verbose = false) {
@@ -291,6 +294,9 @@
                     while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < tickLimit) {
                         if (!this.isInCombat && !this.spawnTimer.active) {
                             this.selectMonster(monsterID, areaData);
+                        }
+                        if (this.paused) {
+                            this.resumeDungeon();
                         }
                         this.tick();
                     }
