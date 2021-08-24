@@ -66,7 +66,6 @@
             }
             if (patch !== MICSR.patchVersion) {
                 return patch < MICSR.patchVersion;
-
             }
             if (MICSR.preReleaseVersion !== undefined) {
                 if (prerelease === undefined) {
@@ -75,8 +74,8 @@
                 }
                 return prerelease < MICSR.preReleaseVersion;
             }
-            // all cases should be covered before
-            return false;
+            // this is release version, and either pre-release or release is required, so we're good
+            return true;
         }
 
         // simulation settings
