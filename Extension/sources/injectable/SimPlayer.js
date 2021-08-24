@@ -55,6 +55,7 @@
                         'cookingMastery',
                         'useCombinationRunes',
                         'healAfterDeath',
+                        'isManualEating',
                         'isSlayerTask',
                     ],
                     numbers: [
@@ -145,6 +146,7 @@
                 // other
                 this.healAfterDeath = true;
                 this.isSlayerTask = false;
+                this.isManualEating = false;
                 // gp, skillXP, PETS, slayercoins
                 this.resetGains();
             }
@@ -205,7 +207,7 @@
 
             tick() {
                 super.tick();
-                if (this.autoEatTier === -1) {
+                if (this.isManualEating) {
                     this.manualEat();
                 }
             }
@@ -231,7 +233,14 @@
                 if (!this.manager.isInCombat) {
                     return;
                 }
-                // enemy
+                // check dotDamage
+                // TODO: this could be handled more efficiently, consider when the DOTs will hit
+                const dotDamage = this.getMaxDotDamage();
+                if (dotDamage >= this.hitpoints) {
+                    this.eatFood();
+                    return;
+                }
+                // check enemy damage
                 const enemy = this.manager.enemy;
                 // if enemy doesn't attack next turn, don't eat
                 if (enemy.nextAction !== 'Attack') {
@@ -242,8 +251,9 @@
                 if (tLeft < 0) {
                     return;
                 }
-                // max hit of the enemy attack
-                const maxDamage = enemy.getAttackMaxDamage(enemy.nextAttack);
+                // max hit of the enemy attack + max dotDamage
+                // TODO: this could be handled more efficiently, consider when the different attacks will hit
+                const maxDamage = enemy.getAttackMaxDamage(enemy.nextAttack) + dotDamage;
                 // number of ticks required to heal to safety
                 const healsReq = Math.ceil((maxDamage + 1 - this.hitpoints) / healAmt);
                 // don't eat until we have to
@@ -251,6 +261,17 @@
                     return;
                 }
                 this.eatFood();
+            }
+
+            getMaxDotDamage() {
+                let dotDamage = 0;
+                this.activeDOTs.forEach(dot => {
+                    if (dot.type === 'Regen') {
+                        return;
+                    }
+                    dotDamage += dot.damage;
+                });
+                return dotDamage;
             }
 
             addSlayerCoins(amount) {

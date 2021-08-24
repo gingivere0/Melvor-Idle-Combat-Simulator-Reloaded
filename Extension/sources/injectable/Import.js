@@ -98,6 +98,7 @@
                     isAdventure: currentGamemode === 2,
                     isAncient: player.spellSelection.ancient !== -1,
                     isHardcore: currentGamemode === 1,
+                    isManualEating: this.app.player.isManualEating,
                     isSlayerTask: this.app.player.isSlayerTask,
                     pillar: agilityPassivePillarActive,
                     potionID: potionID,
@@ -140,6 +141,7 @@
                     isAdventure: this.app.combatData.isAdventure,
                     isAncient: this.app.player.spellSelection.ancient > -1,
                     isHardcore: this.app.combatData.isHardcore,
+                    isManualEating: this.app.player.isManualEating,
                     isSlayerTask: this.app.player.isSlayerTask,
                     pillar: this.app.player.pillar,
                     potionID: this.app.player.potionID,
@@ -160,6 +162,7 @@
                 this.importPotion(settings.potionID, settings.potionTier);
                 this.importPets(settings.petUnlocked);
                 this.importAutoEat(settings.autoEatTier, settings.foodSelected, settings.cookingPool, settings.cookingMastery);
+                this.importManualEating(settings.isManualEating);
                 this.importSlayerTask(settings.isSlayerTask);
                 this.importHardCore(settings.isHardcore);
                 this.importAdventure(settings.isAdventure);
@@ -301,6 +304,12 @@
                 this.app.player.cookingPool = cookingPool;
                 this.checkRadio('MCS 99 Cooking Mastery', cookingMastery);
                 this.app.player.cookingMastery = cookingMastery;
+            }
+
+            importManualEating(isManualEating) {
+                // Update slayer task mode
+                this.checkRadio('MCS Manual Eating', isManualEating);
+                this.app.player.isManualEating = isManualEating;
             }
 
             importSlayerTask(isSlayerTask) {

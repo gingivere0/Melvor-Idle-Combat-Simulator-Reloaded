@@ -476,7 +476,7 @@
                 foodPopup.style.display = 'none';
                 this.equipmentSelectCard.registerPopupMenu(containerDiv, foodPopup);
                 // auto eat dropdown
-                let autoEatTierNames = ['Manual Eating'];
+                let autoEatTierNames = ['No Auto Eat'];
                 let autoEatTierValues = [-1];
                 for (let i = 1; i < 4; i++) {
                     autoEatTierNames.push(SHOP.General[i].name);
@@ -501,21 +501,17 @@
                     this.player,
                     'cookingMastery',
                 );
-                // heal after death
-                this.equipmentSelectCard.addRadio(
+                this.equipmentSelectCard.addToggleRadio(
+                    'Manual Eating',
+                    'isManualEating',
+                    this.player,
+                    'isManualEating',
+                );
+                this.equipmentSelectCard.addToggleRadio(
                     'Heal After Death',
-                    25,
                     'healAfterDeath',
-                    ['Yes', 'No'],
-                    [
-                        () => {
-                            this.player.healAfterDeath = true;
-                        },
-                        () => {
-                            this.player.healAfterDeath = false;
-                        },
-                    ],
-                    0,
+                    this.player,
+                    'healAfterDeath',
                 );
                 // Slayer task and hardcore mode
                 this.equipmentSelectCard.addRadio(
@@ -1937,6 +1933,15 @@
                 this.slayerTaskSimsToggle();
                 this.updatePlotForSlayerXP();
                 this.updatePlotForSlayerCoins();
+            }
+
+            /**
+             * Callback for when the slayer task option is changed
+             * @param {Event} event The change event for a radio
+             * @param {boolean} newState The new value for the option
+             */
+            manualEatRadioOnChange(event, newState) {
+                this.player.isManualEating = newState;
             }
 
             slayerTaskSimsToggle() {
