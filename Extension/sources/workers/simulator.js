@@ -53,11 +53,6 @@
                 });
                 // classes
                 event.data.classNames.forEach(name => {
-                    if (event.data.classes[name].match('combatManager')) {
-                        //TODO: remove this when Character.applyDOT no longer refers to the global combatManager object
-                        event.data.classes[name] = event.data.classes[name].replace('combatManager', 'this.manager');
-                        MICSR.warn(`Patched combatManager in ${name}.`);
-                    }
                     eval(event.data.classes[name]);
                 });
                 // create instances

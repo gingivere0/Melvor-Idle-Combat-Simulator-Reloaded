@@ -386,7 +386,15 @@
                 ];
                 const classes = {};
                 classNames.forEach(clas => {
-                    classes[clas.name] = `${clas.name} = ${clas.data.toString().replace(`class ${clas.name}`, 'class')}`;
+                    const s = clas.data.toString()
+                        // remove class name
+                        .replace(`class ${clas.name}`, 'class')
+                        // remove logging from CombatManager constructor
+                        .replace(`console.log('Combat Manager Built...');`, '')
+                        // fix Character bug
+                        //TODO: remove this when Character.applyDOT no longer refers to the global combatManager object
+                        .replace('combatManager', 'this.manager');
+                    classes[clas.name] = `${clas.name} = ${s}`;
                 });
                 // worker
                 worker.onmessage = (event) => this.processWorkerMessage(event, i);
