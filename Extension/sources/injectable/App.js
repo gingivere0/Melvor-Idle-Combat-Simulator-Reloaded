@@ -1120,7 +1120,7 @@
                 return this.getItemLevelReq(item, skillID) > 0;
             }
 
-            getItemLevelReq = (item, skillID) => {
+            getItemLevelReq(item, skillID) {
                 if (skillID === CONSTANTS.skill.Summoning) {
                     return item.summoningLevel | 0;
                 }
