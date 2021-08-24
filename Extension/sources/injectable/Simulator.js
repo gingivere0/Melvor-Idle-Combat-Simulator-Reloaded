@@ -267,6 +267,7 @@
                     {name: 'equipmentSlotData', data: equipmentSlotDataClone},
                     {name: 'formatNumberSetting', data: formatNumberSetting},
                     {name: 'GAMEMODES', data: GAMEMODES},
+                    {name: 'gp', data: 1e9}, // required for confetti crossbow
                     {name: 'herbloreItemData', data: herbloreItemData},
                     {name: 'markOfDeathEffect', data: markOfDeathEffect},
                     {name: 'items', data: items},
@@ -323,6 +324,7 @@
                             return true;
                         }
                     }, // TODO: what calls this? It should call SimPlayer.checkRequirements
+                    {name: 'clampValue', data: clampValue},
                     {name: 'damageReducer', data: damageReducer},
                     {name: 'formatNumber', data: formatNumber},
                     {name: 'getAttackFromID', data: getAttackFromID},
