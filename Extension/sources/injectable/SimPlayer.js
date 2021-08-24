@@ -203,6 +203,56 @@
                 }
             }
 
+            tick() {
+                super.tick();
+                if (this.autoEatTier === -1) {
+                    this.manualEat();
+                }
+            }
+
+            // this method does not care about overeating
+            // eats at most once per tick
+            manualEat() {
+                // don't eat at full health
+                if (this.hitpoints >= this.stats.maxHitpoints) {
+                    return;
+                }
+                // don't eat if eating heals 0 hp
+                const healAmt = this.getFoodHealing(this.food.currentSlot.item);
+                if (healAmt <= 0) {
+                    return;
+                }
+                // eat without repercussions when enemy is spawning
+                if (this.manager.spawnTimer.active) {
+                    this.eatFood();
+                    return;
+                }
+                // don't eat outside combat
+                if (!this.manager.isInCombat) {
+                    return;
+                }
+                // enemy
+                const enemy = this.manager.enemy;
+                // if enemy doesn't attack next turn, don't eat
+                if (enemy.nextAction !== 'Attack') {
+                    return;
+                }
+                // number of ticks until the enemy attacks
+                const tLeft = enemy.timers.act.ticksLeft;
+                if (tLeft < 0) {
+                    return;
+                }
+                // max hit of the enemy attack
+                const maxDamage = enemy.getAttackMaxDamage(enemy.nextAttack);
+                // number of ticks required to heal to safety
+                const healsReq = Math.ceil((maxDamage + 1 - this.hitpoints) / healAmt);
+                // don't eat until we have to
+                if (healsReq < tLeft) {
+                    return;
+                }
+                this.eatFood();
+            }
+
             addSlayerCoins(amount) {
                 amount = applyModifier(amount, this.modifiers.increasedSlayerCoins - this.modifiers.decreasedSlayerCoins, 0);
                 this._slayercoins += amount;
