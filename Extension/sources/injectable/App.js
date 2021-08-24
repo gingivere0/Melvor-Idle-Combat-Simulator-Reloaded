@@ -60,12 +60,13 @@
                 this.combatData = new MICSR.CombatData(this.manager);
                 // Plot Type Options
                 this.plotTypes = [];
-                const addPlotOption = (option, isTime, value, info) => {
+                const addPlotOption = (option, isTime, value, info, scale = true) => {
                     this.plotTypes.push({
                         option: option,
                         isTime: isTime,
                         value: value,
                         info: info,
+                        scale: scale && isTime,
                     });
                 }
                 // xp gains
@@ -92,7 +93,7 @@
                 // loot gains
                 addPlotOption('GP per ', true, 'gpPerSecond', 'GP/');
                 addPlotOption('Drops per', true, 'dropChance', 'Drops/');
-                addPlotOption('Chance for Signet Part B(%)', false, 'signetChance', 'Signet Chance (%)');
+                addPlotOption('Percent Chance for Signet Part B per', true, 'signetChance', 'Signet Chance (%)/', false);
                 addPlotOption('Pet Chance per ', true, 'petChance', ' Pet Chance/');
                 addPlotOption('Slayer Coins per ', true, 'slayerCoinsPerSecond', 'Slayer Coins/');
                 // addPlotOption('Simulation Time', false, 'simulationTime', 'Sim Time');
@@ -1962,6 +1963,10 @@
                 this.timeMultiplier = this.timeMultipliers[event.currentTarget.selectedIndex];
                 this.simulator.selectedPlotIsTime = this.plotTypes[this.plotter.plotID].isTime;
                 this.selectedTimeShorthand = this.timeShorthand[event.currentTarget.selectedIndex];
+                // Updated Signet chance
+                this.loot.updateSignetChance();
+                // Update pet chance
+                this.loot.updatePetChance();
                 // Update zone info card time units
                 for (let i = 0; i < this.plotTypes.length; i++) {
                     const name = this.plotTypes[i].info;
@@ -1978,10 +1983,6 @@
                         document.getElementById(`MCS ${name}h Label`).textContent = newName;
                     }
                 }
-                // Updated Signet chance
-                this.updatePlotForSignetChance();
-                // Update pet chance
-                this.loot.updatePetChance();
                 // Update Plot
                 this.updatePlotData();
                 // Update Info Card
@@ -2243,7 +2244,7 @@
                 for (let i = 0; i < this.plotTypes.length; i++) {
                     const dataKey = this.plotTypes[i].value;
                     const outElem = document.getElementById(`MCS ${dataKey} Output`);
-                    let dataMultiplier = (this.plotTypes[i].isTime) ? this.timeMultiplier : 1;
+                    let dataMultiplier = (this.plotTypes[i].scale) ? this.timeMultiplier : 1;
                     if (dataMultiplier === -1) dataMultiplier = data.killTimeS;
                     if (dataKey === 'petChance') dataMultiplier = 1;
                     outElem.textContent = updateInfo && !isNaN(data[dataKey])
@@ -2454,17 +2455,6 @@
              */
             updatePlotForSlayerCoins() {
                 if (this.plotter.plotType === 'slayerCoinsPerSecond') {
-                    this.updatePlotData();
-                }
-                this.updateZoneInfoCard();
-            }
-
-            /**
-             * Updates the simulator display for when the signet time option is changed
-             */
-            updatePlotForSignetChance() {
-                this.loot.updateSignetChance();
-                if (this.plotter.plotType === 'signetChance') {
                     this.updatePlotData();
                 }
                 this.updateZoneInfoCard();
