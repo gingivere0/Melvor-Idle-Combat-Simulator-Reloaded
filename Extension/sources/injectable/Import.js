@@ -72,9 +72,14 @@
                     CONSTANTS.shop.general.Auto_Eat_Tier_II,
                     CONSTANTS.shop.general.Auto_Eat_Tier_III,
                 ].forEach(id => {
-                    if (shopItemsPurchased.size > 0 && shopItemsPurchased.get(`General:${id}`).quantity > 0) {
-                        autoEatTier++;
+                    if (shopItemsPurchased.size === 0) {
+                        return;
                     }
+                    const ae = shopItemsPurchased.get(`General:${id}`);
+                    if (ae === undefined || ae.quantity === 0) {
+                        return;
+                    }
+                    autoEatTier++;
                 });
 
                 // create settings object
