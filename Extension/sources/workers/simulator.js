@@ -115,6 +115,7 @@
             const player = manager.player;
             const reader = new DataReader(simPlayerData);
             player.deserialize(reader);
+            player.initForWebWorker();
             try {
                 return manager.convertSlowSimToResult(manager.runTrials(monsterID, dungeonID, trials, maxTicks));
             } catch (error) {

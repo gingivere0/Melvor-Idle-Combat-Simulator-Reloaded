@@ -59,12 +59,22 @@
                         'isSlayerTask',
                     ],
                     numbers: [
+                        'currentGamemode',
                         'pillar',
                         'potionTier',
                         'potionID',
                         'autoEatTier',
                     ],
                 }
+            }
+
+            initForWebWorker() {
+                currentGamemode = this.currentGamemode;
+                numberMultiplier = combatTriangle[GAMEMODES[currentGamemode].numberMultiplier];
+                this.activeTriangle = combatTriangle[GAMEMODES[currentGamemode].combatTriangle];
+                // recompute stats
+                this.updateForEquipmentChange();
+                this.resetGains();
             }
 
             // detach globals attached by parent constructor
@@ -123,7 +133,8 @@
                 // skillLevel
                 this.skillLevel = skillLevel.map(_ => 1);
                 this.skillLevel[CONSTANTS.skill.Hitpoints] = 10;
-                // TODO: currentGamemode, numberMultiplier
+                // currentGamemode, numberMultiplier
+                this.currentGamemode = currentGamemode;
                 // petUnlocked
                 this.petUnlocked = petUnlocked.map(x => false);
                 // chosenAgilityObstacles, agility MASTERY, agilityPassivePillarActive
@@ -486,8 +497,12 @@
                 }
             }
 
-            // TODO: override
             updateForEquipmentChange() {
+                this.computeAllStats();
+                this.interruptAttack();
+                if (this.manager.fightInProgress) {
+                    this.target.combatModifierUpdate();
+                }
             }
 
             equipItem(itemID, set, slot = "Default", quantity = 1) {

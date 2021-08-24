@@ -517,7 +517,7 @@
                     'healAfterDeath',
                     this.player.healAfterDeath,
                 );
-                // Slayer task and hardcore mode
+                // Slayer task
                 this.equipmentSelectCard.addRadio(
                     'Slayer Task',
                     25,
@@ -529,23 +529,19 @@
                     ],
                     1,
                 );
-                /*
-                this.equipmentSelectCard.addToggleRadio(
-                    'Hardcore Mode',
-                    'hardcore',
-                    this.combatData,
-                    'isHardcore',
-                );
-                this.equipmentSelectCard.addToggleRadio(
-                    'Adventure Mode',
-                    'adventure',
-                    this.combatData,
-                    'isAdventure',
-                    false, // default
-                    25, // default
-                    () => this.updateCombatStats(),
-                );
-                */
+                // game mode
+                const gameModeNames = [];
+                const gameModeValues = [];
+                for (const i in GAMEMODES) {
+                    gameModeNames.push(GAMEMODES[i].name);
+                    gameModeValues.push(i);
+                }
+                const gameModeDropdown = this.equipmentSelectCard.createDropdown(gameModeNames, gameModeValues, 'MCS Game Mode Dropdown', (event) => {
+                    this.player.currentGamemode = parseInt(event.currentTarget.selectedOptions[0].value);
+                });
+                const gameModeContainer = this.equipmentSelectCard.createCCContainer();
+                gameModeContainer.appendChild(gameModeDropdown);
+                this.equipmentSelectCard.container.appendChild(gameModeContainer);
                 // import equipment and settings
                 const importSetCCContainer = this.equipmentSelectCard.createCCContainer();
                 importSetCCContainer.appendChild(this.equipmentSelectCard.createLabel('Import Set', ''));
@@ -644,7 +640,7 @@
                 this.combatStatCard.addSectionTitle('Plot Options');
                 this.plotter.addToggles(this.combatStatCard);
                 this.combatStatCard.addSectionTitle('');
-                this.combatStatCard.addButton('Simulate BLOCKING', () => this.blockingSimulateButtonOnClick());
+                // this.combatStatCard.addButton('Simulate BLOCKING', () => this.blockingSimulateButtonOnClick());
                 this.combatStatCard.addButton('Simulate All', () => this.simulateButtonOnClick(false));
                 this.combatStatCard.addButton('Simulate Selected', () => this.simulateButtonOnClick(true));
             }

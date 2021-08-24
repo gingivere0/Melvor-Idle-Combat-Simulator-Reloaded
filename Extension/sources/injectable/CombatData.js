@@ -62,10 +62,6 @@
                     lootBonusPercent: 0,
                     gpBonus: 0,
                 };
-                // Game Mode Settings
-                this.isHardcore = currentGamemode === 1;
-                this.isAdventure = currentGamemode === 2;
-                this.numberMultiplier = numberMultiplier;
                 // lucky herb bonus
                 this.luckyHerb = 0;
                 // equipment stats
@@ -77,13 +73,6 @@
             }
 
             /**
-             * mimic getNumberMultiplierValue
-             */
-            getNumberMultiplierValue(value) {
-                return value * this.numberMultiplier;
-            }
-
-            /**
              * Calculates the combat stats from equipment, combat style, spell selection and player levels and stores them in `this.combatStats`
              */
             updateCombatStats() {
@@ -92,14 +81,6 @@
                 /*
                 First, gather all bonuses TODO: extract this
                  */
-
-                // update numberMultiplier
-                if (this.isAdventure) {
-                    this.numberMultiplier = 100;
-                } else {
-                    this.numberMultiplier = 10;
-                }
-
                 //
                 this.computePotionBonus();
                 const modifiers = this.player.modifiers;
@@ -132,7 +113,7 @@
                 this.combatStats.minHit = this.player.stats.minHit;
 
                 // max summ roll
-                this.combatStats.summoningMaxHit = this.player.equipmentStats.summoningMaxhit * this.numberMultiplier;
+                this.combatStats.summoningMaxHit = this.player.equipmentStats.summoningMaxhit * numberMultiplier;
 
                 // max defence roll
                 this.combatStats.maxDefRoll = this.player.stats.evasion.melee;

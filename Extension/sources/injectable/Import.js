@@ -93,11 +93,10 @@
                     autoEatTier: autoEatTier,
                     cookingMastery: cookingMastery,
                     cookingPool: getMasteryPoolProgress(CONSTANTS.skill.Cooking) >= 95,
+                    currentGamemode: currentGamemode,
                     curse: player.spellSelection.curse,
                     foodSelected: foodSelected.id,
-                    isAdventure: currentGamemode === 2,
                     isAncient: player.spellSelection.ancient !== -1,
-                    isHardcore: currentGamemode === 1,
                     isManualEating: this.app.player.isManualEating,
                     isSlayerTask: this.app.player.isSlayerTask,
                     pillar: agilityPassivePillarActive,
@@ -136,11 +135,10 @@
                     autoEatTier: this.app.player.autoEatTier,
                     cookingMastery: this.app.player.cookingMastery,
                     cookingPool: this.app.player.cookingPool,
+                    currentGamemode: this.app.player.currentGamemode,
                     curse: this.app.player.spellSelection.curse,
                     foodSelected: this.app.player.food.currentSlot.item.id,
-                    isAdventure: this.app.combatData.isAdventure,
                     isAncient: this.app.player.spellSelection.ancient > -1,
-                    isHardcore: this.app.combatData.isHardcore,
                     isManualEating: this.app.player.isManualEating,
                     isSlayerTask: this.app.player.isSlayerTask,
                     pillar: this.app.player.pillar,
@@ -164,8 +162,7 @@
                 this.importAutoEat(settings.autoEatTier, settings.foodSelected, settings.cookingPool, settings.cookingMastery);
                 this.importManualEating(settings.isManualEating);
                 this.importSlayerTask(settings.isSlayerTask);
-                this.importHardCore(settings.isHardcore);
-                this.importAdventure(settings.isAdventure);
+                this.importGameMode(settings.currentGamemode);
                 this.importUseCombinationRunes(settings.useCombinationRunes);
                 this.importAgilityCourse(settings.course, settings.courseMastery, settings.pillar);
                 this.importSummoningSynergy(settings.summoningSynergy);
@@ -307,7 +304,6 @@
             }
 
             importManualEating(isManualEating) {
-                // Update slayer task mode
                 this.checkRadio('MCS Manual Eating', isManualEating);
                 this.app.player.isManualEating = isManualEating;
             }
@@ -319,32 +315,14 @@
                 this.app.slayerTaskSimsToggle();
             }
 
-            importHardCore(isHardcore) {
-                if (isHardcore !== this.app.combatData.isHardcore) {
-                    this.app.notify('Imported game mode does not match selected game mode!', 'danger');
-                }
-                /* TODO
-                // Update hardcore mode
-                this.checkRadio('MCS Hardcore Mode', isHardcore);
-                this.app.combatData.isHardcore = isHardcore;
-                */
+            importGameMode(currentGamemode) {
+                this.app.player.currentGamemode = currentGamemode;
+                document.getElementById('MCS Game Mode Dropdown').selectedIndex = currentGamemode;
             }
 
             importSummoningSynergy(summoningSynergy) {
                 // Update summoningSynergy
                 this.app.player.summoningSynergy = summoningSynergy;
-            }
-
-            importAdventure(isAdventure) {
-                if (isAdventure !== this.app.combatData.isAdventure) {
-                    this.app.notify('Imported game mode does not match selected game mode!', 'danger');
-                }
-                /* TODO
-                // Update adventure mode
-                this.checkRadio('MCS Adventure Mode', isAdventure);
-                this.app.combatData.isAdventure = isAdventure;
-                this.app.updateCombatStats();
-                */
             }
 
             importUseCombinationRunes(useCombinationRunes) {
