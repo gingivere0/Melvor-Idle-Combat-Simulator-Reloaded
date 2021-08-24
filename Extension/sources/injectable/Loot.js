@@ -119,21 +119,20 @@
              * @return {number}
              */
             computeMonsterValue(monsterID) {
+                // compute value from selling drops
                 let monsterValue = 0;
-
                 // loot and signet are affected by loot chance
                 monsterValue += this.computeDropTableValue(monsterID);
                 if (this.modifiers.allowSignetDrops) {
                     monsterValue += items[CONSTANTS.item.Signet_Ring_Half_B].sellsFor * getMonsterCombatLevel(monsterID) / 500000;
+                } else {
+                    monsterValue += items[CONSTANTS.item.Gold_Topaz_Ring].sellsFor * getMonsterCombatLevel(monsterID) / 500000;
                 }
                 monsterValue *= this.computeLootChance(monsterID);
-
-                // coin drops are already tracked as part of gp gain in the simulation
-                // coin and bones drops are not affected by loot chance
+                // bones drops are not affected by loot chance
                 if (this.sellBones && !this.modifiers.autoBurying && MONSTERS[monsterID].bones) {
                     monsterValue += items[MONSTERS[monsterID].bones].sellsFor * this.lootBonus * ((MONSTERS[monsterID].boneQty) ? MONSTERS[monsterID].boneQty : 1);
                 }
-
                 return monsterValue;
             }
 
