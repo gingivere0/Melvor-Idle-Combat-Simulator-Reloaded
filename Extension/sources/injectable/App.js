@@ -1011,7 +1011,6 @@
                     () => this.veryVerbose = true,
                     () => this.veryVerbose = false,
                 ], this.veryVerbose ? 0 : 1);
-                this.simOptionsCard.addNumberInput('Signet Time (h)', 1, 1, 1000, (event) => this.signetTimeInputOnChange(event));
                 this.simOptionsCard.addSectionTitle('Export');
                 this.simOptionsCard.addButton('Export Data', () => this.exportDataOnClick());
                 this.simOptionsCard.addButton('Export Settings', () => this.exportSettingButtonOnClick());
@@ -1956,18 +1955,6 @@
             }
 
             /**
-             * The callback for when the signet farm time is changed
-             * @param {Event} event The change event for an input
-             */
-            signetTimeInputOnChange(event) {
-                const newFarmTime = parseInt(event.currentTarget.value);
-                if (newFarmTime > 0 && newFarmTime <= 1000) {
-                    this.loot.signetFarmTime = newFarmTime;
-                }
-                this.updatePlotForSignetChance();
-            }
-
-            /**
              * The callback for when the time unit dropdown is changed
              * @param {Event} event The change event for a dropdown
              */
@@ -1991,6 +1978,8 @@
                         document.getElementById(`MCS ${name}h Label`).textContent = newName;
                     }
                 }
+                // Updated Signet chance
+                this.updatePlotForSignetChance();
                 // Update pet chance
                 this.loot.updatePetChance();
                 // Update Plot

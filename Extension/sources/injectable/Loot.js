@@ -49,9 +49,6 @@
                 this.sellBones = false; // True or false
                 this.convertShards = false;
 
-                /** Number of hours to farm for signet ring */
-                this.signetFarmTime = 1;
-
                 // ids of god dungeons
                 this.godDungeonIDs = [8, 9, 10, 11];
             }
@@ -127,7 +124,7 @@
                 // loot and signet are affected by loot chance
                 monsterValue += this.computeDropTableValue(monsterID);
                 if (this.modifiers.allowSignetDrops) {
-                    monsterValue += items[CONSTANTS.item.Signet_Ring_Half_B].sellsFor * MICSR.getMonsterCombatLevel(monsterID) / 500000;
+                    monsterValue += items[CONSTANTS.item.Signet_Ring_Half_B].sellsFor * getMonsterCombatLevel(monsterID) / 500000;
                 }
                 monsterValue *= this.computeLootChance(monsterID);
 
@@ -171,7 +168,7 @@
                     }
                 }
                 if (this.modifiers.allowSignetDrops) {
-                    dungeonValue += items[CONSTANTS.item.Signet_Ring_Half_B].sellsFor * MICSR.getMonsterCombatLevel(MICSR.dungeons[dungeonID].monsters[MICSR.dungeons[dungeonID].monsters.length - 1]) / 500000;
+                    dungeonValue += items[CONSTANTS.item.Signet_Ring_Half_B].sellsFor * getMonsterCombatLevel(MICSR.dungeons[dungeonID].monsters[MICSR.dungeons[dungeonID].monsters.length - 1]) / 500000;
                 }
                 return dungeonValue;
             }
@@ -423,7 +420,11 @@
                             return;
                         }
                         if (this.modifiers.allowSignetDrops && data.simSuccess) {
-                            data.signetChance = (1 - Math.pow(1 - this.getSignetDropRate(monsterID), Math.floor(this.signetFarmTime * 3600 / data.killTimeS))) * 100;
+                            if (this.app.timeMultiplier === -1) {
+                                data.signetChance = 100 * this.getSignetDropRate(monsterID);
+                            } else {
+                                data.signetChance = 100 * (1 - Math.pow(1 - this.getSignetDropRate(monsterID), this.app.timeMultiplier / data.killTimeS));
+                            }
                         } else {
                             data.signetChance = 0;
                         }
@@ -454,7 +455,7 @@
              * @return {number}
              */
             getSignetDropRate(monsterID) {
-                return MICSR.getMonsterCombatLevel(monsterID) * this.computeLootChance(monsterID) / 500000;
+                return getMonsterCombatLevel(monsterID) * this.computeLootChance(monsterID) / 500000;
             }
 
             /** Updates the chance to get a pet for the given skill*/
