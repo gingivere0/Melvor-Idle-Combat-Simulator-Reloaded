@@ -201,10 +201,6 @@
                     onlyUndiscovered: false,
                 }
 
-                // verbose settings
-                this.verbose = false;
-                this.veryVerbose = false;
-
                 // Create the top container for the sim
                 this.topContent = document.createElement('div');
                 this.topContent.className = 'mcsTabContent';
@@ -985,23 +981,8 @@
             createSimulationAndExportCard() {
                 this.simOptionsCard = this.mainTabCard.addTab('Sim. Options', this.media.settings, '', '150px');
                 this.simOptionsCard.addSectionTitle('Simulation Options');
-                this.simOptionsCard.addNumberInput('Max Actions', MICSR.maxActions, 1, 1e4, (event) => this.maxActionsInputOnChange(event));
                 this.simOptionsCard.addNumberInput('# Trials', MICSR.trials, 1, 1e5, (event) => this.numTrialsInputOnChange(event));
                 this.simOptionsCard.addNumberInput('Max Kiloticks', MICSR.maxTicks / 1000, 1, 1e5, (event) => this.maxKiloTicksInputOnChange(event));
-                this.simOptionsCard.addToggleRadio(
-                    'Force full simulation',
-                    'forceFullSim',
-                    this.simulator,
-                    'forceFullSim',
-                );
-                this.simOptionsCard.addRadio('Verbose Logging', 25, 'verbose', ['Yes', 'No'], [
-                    () => this.verbose = true,
-                    () => this.verbose = false,
-                ], this.verbose ? 0 : 1);
-                this.simOptionsCard.addRadio('Verybose Logging', 25, 'veryVerbose', ['Yes', 'No'], [
-                    () => this.veryVerbose = true,
-                    () => this.veryVerbose = false,
-                ], this.veryVerbose ? 0 : 1);
                 this.simOptionsCard.addSectionTitle('Export');
                 this.simOptionsCard.addButton('Export Data', () => this.exportDataOnClick());
                 this.simOptionsCard.addButton('Export Settings', () => this.exportSettingButtonOnClick());

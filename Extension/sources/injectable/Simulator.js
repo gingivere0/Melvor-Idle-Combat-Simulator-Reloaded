@@ -43,12 +43,6 @@
             constructor(parent, workerURL) {
                 this.parent = parent;
                 // Simulation settings
-                /** Max number of player actions to attempt before timeout */
-                this.maxActions = MICSR.maxActions;
-                /** Number of enemy kills to simulate */
-                this.trials = MICSR.trials;
-                /** force full sim when too many actions are taken */
-                this.forceFullSim = false;
                 /** @type {boolean[]} */
                 this.monsterSimFilter = [];
                 /** @type {boolean[]} */
@@ -428,8 +422,6 @@
                 return {
                     options: {
                         trials: MICSR.trials,
-                        maxActions: MICSR.maxActions,
-                        forceFullSim: this.forceFullSim,
                     },
                 }
             }
