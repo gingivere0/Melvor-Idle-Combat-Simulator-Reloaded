@@ -1,5 +1,17 @@
-v1.5.0-WIP
-    Update for 0.21 combat rewrite
+v1.5.0
+    Update for 0.21
+    Changes:
+    - The simulator now uses the offline combat code to simulate combat, as a result it is:
+      - a lot slower (sad)
+      - a lot more accurate (probably)
+      - a lot easier to maintain (yay)
+    - New option "Manual Eating": performs "smart" manual eating, limited to at most 1 foodstuff per tick, off by default
+    - New option "Heal After Death": eat food to heal to full HP after player dies, on by default
+    - Signet chance now uses the same time period as other statistics
+    - Dungeon simulations now simulate each monster in a dungeon context
+    - Default simulations per monster has been reduced to 1k (from 10k)
+    - Max Actions has been replaced by Max kiloticks (i.e. limit to the number of ticks to simulate, in multiples of 1000)
+    - Verbose logging has been removed
 
 v1.4.3
     Changes:

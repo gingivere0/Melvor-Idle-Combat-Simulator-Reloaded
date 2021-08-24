@@ -38,7 +38,7 @@
         MICSR.majorVersion = 1;
         MICSR.minorVersion = 5;
         MICSR.patchVersion = 0;
-        MICSR.preReleaseVersion = 7;
+        MICSR.preReleaseVersion = undefined;
         MICSR.version = `v${MICSR.majorVersion}.${MICSR.minorVersion}.${MICSR.patchVersion}`;
         if (MICSR.preReleaseVersion !== undefined) {
             MICSR.version = `${MICSR.version}-${MICSR.preReleaseVersion}`;
