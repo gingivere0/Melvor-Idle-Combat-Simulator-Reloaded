@@ -494,7 +494,8 @@
                 }
                 if (petSkills.includes(this.petSkill)) {
                     const petSkillLevel = this.player.skillLevel[CONSTANTS.skill[this.petSkill]] + 1;
-                    this.monsterSimData.forEach((simResult) => {
+                    for (const simID in this.monsterSimData) {
+                        const simResult = this.monsterSimData[simID];
                         if (!simResult.simSuccess) {
                             simResult.petChance = 0;
                             return;
@@ -505,7 +506,7 @@
                             return chanceToNotGet * Math.pow((1 - petRoll.speed * petSkillLevel / 25000000000), timePeriod * petRoll.rollsPerSecond);
                         }, 1);
                         simResult.petChance *= 100;
-                    });
+                    }
                     MICSR.dungeons.forEach((_, dungeonId) => {
                         const dungeonResult = this.dungeonSimData[dungeonId];
                         if (!dungeonResult.simSuccess || this.petSkill === 'Slayer') {
@@ -526,9 +527,10 @@
                     });
                     // TODO: pet rolls for auto slayer
                 } else {
-                    this.monsterSimData.forEach((simResult) => {
+                    for (const simID in this.monsterSimData) {
+                        const simResult = this.monsterSimData[simID];
                         simResult.petChance = 0;
-                    });
+                    }
                     this.dungeonSimData.forEach((simResult) => {
                         simResult.petChance = 0;
                     });
