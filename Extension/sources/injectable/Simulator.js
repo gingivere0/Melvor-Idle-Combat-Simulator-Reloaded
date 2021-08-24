@@ -234,6 +234,7 @@
                 // constants
                 const constantNames = [
                     // actual constants
+                    {name: 'afflictionEffect', data: afflictionEffect},
                     {name: 'agilityObstacles', data: agilityObstacles},
                     {name: 'agilityPassivePillars', data: agilityPassivePillars},
                     {name: 'ANCIENT', data: ANCIENT},
@@ -242,6 +243,7 @@
                     {name: 'attackStyles', data: attackStyles},
                     {name: 'AttackStyles', data: AttackStyles},
                     {name: 'AURORAS', data: AURORAS},
+                    {name: 'burnEffect', data: burnEffect},
                     {name: 'combatAreas', data: combatAreas},
                     {
                         name: 'combatMenus', data: {
@@ -266,23 +268,26 @@
                     {name: 'formatNumberSetting', data: formatNumberSetting},
                     {name: 'GAMEMODES', data: GAMEMODES},
                     {name: 'herbloreItemData', data: herbloreItemData},
+                    {name: 'markOfDeathEffect', data: markOfDeathEffect},
                     {name: 'items', data: items},
                     {name: 'modifierData', data: modifierDataClone},
                     {name: 'MONSTERS', data: MONSTERS},
                     {name: 'PETS', data: PETS},
                     {name: 'playerHTMLElements', data: {}},
+                    {name: 'poisonEffect', data: poisonEffect},
+                    {name: 'PRAYER', data: PRAYER},
                     {
                         name: 'SETTINGS', data: {
                             performance: {},
                         }
                     },
-                    {name: 'PRAYER', data: PRAYER},
                     {name: 'SHOP', data: SHOP},
                     {name: 'skillName', data: skillName},
                     {name: 'SKILLS', data: SKILLS},
                     {name: 'slayerAreas', data: slayerAreas},
                     {name: 'slayerTaskData', data: SlayerTask.data},
                     {name: 'SPELLS', data: SPELLS},
+                    {name: 'stackingEffects', data: stackingEffects},
                     {name: 'Stats', data: {}},
                     {name: 'SUMMONING', data: SUMMONING},
                     {name: 'summoningData', data: summoningData},
@@ -334,6 +339,7 @@
                     {name: 'isSkillEntry', data: isSkillEntry},
                     {name: 'isSkillLocked', data: isSkillLocked},
                     {name: 'isWeapon', data: isWeapon},
+                    {name: 'maxDamageReducer', data: maxDamageReducer},
                     {name: 'numberWithCommas', data: numberWithCommas},
                     {name: 'rollInteger', data: rollInteger},
                     {name: 'rollPercentage', data: rollPercentage},
