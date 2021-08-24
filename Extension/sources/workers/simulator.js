@@ -117,7 +117,7 @@
             player.deserialize(reader);
             player.initForWebWorker();
             try {
-                return manager.convertSlowSimToResult(manager.runTrials(monsterID, dungeonID, trials, maxTicks));
+                return manager.convertSlowSimToResult(manager.runTrials(monsterID, dungeonID, trials, maxTicks), trials);
             } catch (error) {
                 MICSR.error(`Error while simulating monster ${monsterID} in dungeon ${dungeonID}: ${error}`);
                 return {

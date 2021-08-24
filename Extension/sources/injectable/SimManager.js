@@ -119,7 +119,7 @@
                 };
             }
 
-            convertSlowSimToResult(simResult) {
+            convertSlowSimToResult(simResult, targetTrials) {
                 const data = {};
                 const gps = simResult.gainsPerSecond
                 const ticksPerSecond = 1000 / TICK_INTERVAL
@@ -165,7 +165,9 @@
                 data.slayerCoinsPerSecond = gps.slayercoins;
                 // not displayed -> TODO: remove?
                 data.simulationTime = NaN;
-                data.tooManyActions = MICSR.trials - trials;
+                if (targetTrials - trials > 0) {
+                    data.reason = `simulated ${trials}/${targetTrials} trials`;
+                }
                 return data;
             }
 

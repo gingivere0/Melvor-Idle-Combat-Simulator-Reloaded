@@ -1888,7 +1888,7 @@
                 this.simulator.simulationQueue.forEach(queueItem => {
                     const simResult = this.manager.runTrials(queueItem.monsterID, ids.dungeonID, MICSR.trials, MICSR.maxTicks);
                     const simID = this.simulator.simID(queueItem.monsterID, ids.dungeonID);
-                    this.simulator.monsterSimData[simID] = this.manager.convertSlowSimToResult(simResult);
+                    this.simulator.monsterSimData[simID] = this.manager.convertSlowSimToResult(simResult, MICSR.trials);
                 });
                 this.simulator.performPostSimAnalysis();
                 this.updateDisplayPostSim();

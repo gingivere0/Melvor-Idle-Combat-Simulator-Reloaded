@@ -602,7 +602,7 @@
                 let reasons = [];
                 for (const monsterID of monsterIDs) {
                     const simID = this.simID(monsterID, dungeonID);
-                    if (!this.monsterSimData[simID].simSuccess || this.monsterSimData[simID].tooManyActions > 0) {
+                    if (!this.monsterSimData[simID].simSuccess) {
                         data.simSuccess = false;
                     }
                     const reason = this.monsterSimData[simID].reason;
@@ -625,10 +625,8 @@
                     data.reason = 'entity filtered';
                     return;
                 }
-                // check failure and set reasons
-                if (this.combineReasons(data, monsterIDs, dungeonID)) {
-                    return;
-                }
+                // combine failure reasons, if any
+                this.combineReasons(data, monsterIDs, dungeonID);
                 data.simSuccess = true;
 
                 // not time-weighted averages
@@ -823,7 +821,7 @@
              */
             processWorkerMessage(event, workerID) {
                 // MICSR.log(`Received Message ${event.data.action} from worker: ${workerID}`);
-                if (!event.data.simResult.simSuccess || event.data.simResult.tooManyActions > 0) {
+                if (!event.data.simResult.simSuccess) {
                     MICSR.log({...event.data.simResult});
                 }
                 switch (event.data.action) {

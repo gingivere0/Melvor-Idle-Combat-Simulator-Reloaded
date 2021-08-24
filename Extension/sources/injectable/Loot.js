@@ -194,7 +194,7 @@
                         if (!this.monsterSimData[monsterID]) {
                             return;
                         }
-                        if (this.monsterSimData[monsterID].simSuccess && this.monsterSimData[monsterID].tooManyActions === 0) {
+                        if (this.monsterSimData[monsterID].simSuccess) {
                             let gpPerKill = 0;
                             if (this.godDungeonIDs.includes(this.app.viewedDungeonID)) {
                                 const boneQty = MONSTERS[monsterID].boneQty || 1;
@@ -216,7 +216,7 @@
                         if (!this.monsterSimData[monsterID]) {
                             return;
                         }
-                        if (this.monsterSimData[monsterID].simSuccess && this.monsterSimData[monsterID].tooManyActions === 0) {
+                        if (this.monsterSimData[monsterID].simSuccess) {
                             this.monsterSimData[monsterID].gpPerSecond += this.computeMonsterValue(monsterID) / this.monsterSimData[monsterID].killTimeS;
                         }
                     };
