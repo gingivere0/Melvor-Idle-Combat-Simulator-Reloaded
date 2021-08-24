@@ -294,10 +294,11 @@
                 }
                 this.stopCombat();
                 const processingTime = performance.now() - startTimeStamp;
+                const simResult = this.getSimStats(dungeonID);
                 if (verbose) {
-                    MICSR.log(`Took ${processingTime / 1000}s to process ${this.simStats.killCount} kills and ${this.simStats.deathCount} deaths in ${this.tickCount} ticks. ${processingTime / this.tickCount}ms per tick.`);
+                    MICSR.log(`Processed ${this.simStats.killCount} / ${this.simStats.deathCount} k/d and ${this.tickCount} ticks in ${processingTime / 1000}s (${processingTime / this.tickCount}ms/tick).`, simResult);
                 }
-                return this.getSimStats(dungeonID);
+                return simResult;
             }
 
             get onSlayerTask() {
