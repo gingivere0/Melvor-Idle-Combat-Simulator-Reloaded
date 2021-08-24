@@ -1877,7 +1877,7 @@
                 this.simulator.setupCurrentSim(true);
                 const ids = this.simulator.currentSim.ids;
                 this.simulator.simulationQueue.forEach(queueItem => {
-                    const simResult = this.manager.runTrials(queueItem.monsterID, ids.dungeonID, MICSR.trials, MICSR.maxTicks);
+                    const simResult = this.manager.runTrials(queueItem.monsterID, ids.dungeonID, MICSR.trials, MICSR.maxTicks, true);
                     const simID = this.simulator.simID(queueItem.monsterID, ids.dungeonID);
                     this.simulator.monsterSimData[simID] = this.manager.convertSlowSimToResult(simResult, MICSR.trials);
                 });
