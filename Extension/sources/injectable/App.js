@@ -494,24 +494,28 @@
                     'cookingPool',
                     this.player,
                     'cookingPool',
+                    this.player.cookingPool
                 );
                 this.equipmentSelectCard.addToggleRadio(
                     '99 Cooking Mastery',
                     'cookingMastery',
                     this.player,
                     'cookingMastery',
+                    this.player.cookingMastery
                 );
                 this.equipmentSelectCard.addToggleRadio(
                     'Manual Eating',
                     'isManualEating',
                     this.player,
                     'isManualEating',
+                    this.player.isManualEating
                 );
                 this.equipmentSelectCard.addToggleRadio(
                     'Heal After Death',
                     'healAfterDeath',
                     this.player,
                     'healAfterDeath',
+                    this.player.healAfterDeath,
                 );
                 // Slayer task and hardcore mode
                 this.equipmentSelectCard.addRadio(
