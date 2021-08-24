@@ -198,10 +198,14 @@
                         usedRunes += amt;
                     }
                 }
+                const petRolls = {};
+                for (const interval in this.petRolls) {
+                    petRolls[interval] = this.petRolls[interval] / seconds;
+                }
                 return {
                     gp: this.gp / seconds,
                     skillXP: this.skillXP.map(x => x / seconds),
-                    petRolls: this.petRolls,
+                    petRolls: petRolls,
                     slayercoins: this.slayercoins / seconds,
                     usedAmmo: this.usedAmmo / seconds,
                     usedRunesBreakdown: usedRunesBreakdown,

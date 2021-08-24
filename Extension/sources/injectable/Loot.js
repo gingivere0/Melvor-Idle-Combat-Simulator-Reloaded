@@ -180,7 +180,7 @@
                 this.updateGPData();
                 this.updateSignetChance();
                 this.updateDropChance();
-                // this.updatePetChance();
+                this.updatePetChance();
             }
 
             /**
@@ -492,39 +492,36 @@
                         break;
                 }
                 if (petSkills.includes(this.petSkill)) {
+                    const timeMultiplier = (this.app.timeMultiplier === -1) ? simResult.killTimeS : this.app.timeMultiplier;
                     const petSkillLevel = this.player.skillLevel[CONSTANTS.skill[this.petSkill]] + 1;
                     for (const simID in this.monsterSimData) {
                         const simResult = this.monsterSimData[simID];
-                        if (!simResult.simSuccess) {
-                            simResult.petChance = 0;
-                            return;
-                        }
-                        const timePeriod = (this.app.timeMultiplier === -1) ? simResult.killTimeS : this.app.timeMultiplier;
-                        const petRolls = simResult.petRolls[this.petSkill] || simResult.petRolls.other;
-                        simResult.petChance = 1 - petRolls.reduce((chanceToNotGet, petRoll) => {
-                            return chanceToNotGet * Math.pow((1 - petRoll.speed * petSkillLevel / 25000000000), timePeriod * petRoll.rollsPerSecond);
-                        }, 1);
-                        simResult.petChance *= 100;
+                        simResult.petChance = 100 * (1 - this.chanceForNoPet(simResult, timeMultiplier, petSkillLevel));
                     }
-                    MICSR.dungeons.forEach((_, dungeonId) => {
-                        const dungeonResult = this.dungeonSimData[dungeonId];
-                        if (!dungeonResult.simSuccess || this.petSkill === 'Slayer') {
-                            dungeonResult.petChance = 0;
-                            return;
-                        }
-                        const timePeriod = (this.app.timeMultiplier === -1) ? dungeonResult.killTimeS : this.app.timeMultiplier;
-                        dungeonResult.petChance = 1 - MICSR.dungeons[dungeonId].monsters.reduce((cumChanceToNotGet, monsterID) => {
-                            const monsterResult = this.monsterSimData[monsterID];
-                            const timeRatio = monsterResult.killTimeS / dungeonResult.killTimeS;
-                            const petRolls = monsterResult.petRolls[this.petSkill] || monsterResult.petRolls.other;
-                            const monsterChanceToNotGet = petRolls.reduce((chanceToNotGet, petRoll) => {
-                                return chanceToNotGet * Math.pow((1 - petRoll.speed * petSkillLevel / 25000000000), timePeriod * timeRatio * petRoll.rollsPerSecond);
-                            }, 1);
-                            return cumChanceToNotGet * monsterChanceToNotGet;
-                        }, 1);
-                        dungeonResult.petChance *= 100;
+                    MICSR.dungeons.forEach((_, dungeonID) => {
+                        const dungeonResult = this.dungeonSimData[dungeonID];
+                        let chanceToNotGet = 1;
+                        MICSR.dungeons[dungeonID].monsters.forEach(monsterID => {
+                            const simID = this.simulator.simID(monsterID, dungeonID);
+                            const simResult = this.monsterSimData[simID];
+                            const timeRatio = simResult.killTimeS / dungeonResult.killTimeS;
+                            const chanceToNotGetFromMonster = this.chanceForNoPet(simResult, timeMultiplier * timeRatio, petSkillLevel);
+                            simResult.petChance = 100 * (1 - chanceToNotGetFromMonster);
+                            chanceToNotGet *= chanceToNotGetFromMonster;
+                        });
+                        dungeonResult.petChance = 100 * (1 - chanceToNotGet);
                     });
-                    // TODO: pet rolls for auto slayer
+                    SlayerTask.data.forEach((_, taskID) => {
+                        const taskResult = this.slayerSimData[taskID];
+                        const sumTime = taskResult.killTimeS * this.simulator.slayerTaskMonsters[taskID].length;
+                        let chanceToNotGet = 1;
+                        this.simulator.slayerTaskMonsters[taskID].forEach(monsterID => {
+                            const simResult = this.monsterSimData[monsterID];
+                            const timeRatio = simResult.killTimeS / sumTime;
+                            chanceToNotGet *= this.chanceForNoPet(simResult, timeMultiplier * timeRatio, petSkillLevel);
+                        });
+                        taskResult.petChance = 100 * (1 - chanceToNotGet);
+                    });
                 } else {
                     for (const simID in this.monsterSimData) {
                         const simResult = this.monsterSimData[simID];
@@ -537,6 +534,17 @@
                         simResult.petChance = 0;
                     });
                 }
+            }
+
+            chanceForNoPet(simResult, timeMultiplier, petSkillLevel) {
+                let chanceToNotGet = 1;
+                for (const interval in simResult.petRolls) {
+                    const rollsPerSecond = simResult.petRolls[interval];
+                    const rolls = timeMultiplier * rollsPerSecond;
+                    const chancePerRoll = interval * petSkillLevel / 25e9;
+                    chanceToNotGet *= Math.pow(1 - chancePerRoll, rolls);
+                }
+                return chanceToNotGet;
             }
         }
     }

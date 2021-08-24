@@ -162,6 +162,7 @@
                 data.dropChance = NaN;
                 data.signetChance = NaN;
                 data.petChance = NaN;
+                data.petRolls = gps.petRolls;
                 data.slayerCoinsPerSecond = gps.slayercoins;
                 // not displayed -> TODO: remove?
                 data.simulationTime = NaN;

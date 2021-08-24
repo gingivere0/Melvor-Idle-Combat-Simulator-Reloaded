@@ -93,8 +93,8 @@
                 // loot gains
                 addPlotOption('GP per ', true, 'gpPerSecond', 'GP/');
                 addPlotOption('Drops per', true, 'dropChance', 'Drops/');
-                addPlotOption('Percent Chance for Signet Part B per', true, 'signetChance', 'Signet Chance (%)/', false);
-                addPlotOption('Pet Chance per ', true, 'petChance', ' Pet Chance/');
+                addPlotOption('Percent Chance for Signet Part B per', true, 'signetChance', 'Signet (%)/', false);
+                addPlotOption('Pet (%) per ', true, 'petChance', ' Pet (%)/');
                 addPlotOption('Slayer Coins per ', true, 'slayerCoinsPerSecond', 'Slayer Coins/');
                 // addPlotOption('Simulation Time', false, 'simulationTime', 'Sim Time');
                 // Time unit options
@@ -188,16 +188,6 @@
                     }
                 }
                 this.skillKeys = ['Attack', 'Strength', 'Defence', 'Hitpoints', 'Ranged', 'Magic', 'Prayer', 'Slayer'];
-                this.skillShorthand = {
-                    Attack: 'Att.',
-                    Strength: 'Str.',
-                    Defence: 'Def.',
-                    Hitpoints: 'HP',
-                    Ranged: 'Ran.',
-                    Magic: 'Mag.',
-                    Prayer: 'Pra.',
-                    Slayer: 'Sla.',
-                };
                 // Simulation Object
                 this.simulator = new MICSR.Simulator(this, urls.simulationWorker);
                 // Import Object
@@ -318,7 +308,7 @@
                 this.plotter.timeDropdown.selectedIndex = this.initialTimeUnitIndex;
                 this.subInfoCard.container.style.display = 'none';
                 this.plotter.petSkillDropdown.style.display = 'none';
-                document.getElementById(`MCS  Pet Chance/${this.timeShorthand[this.initialTimeUnitIndex]} Label`).textContent = this.skillShorthand[this.loot.petSkill] + ' Pet Chance/' + this.selectedTimeShorthand;
+                document.getElementById(`MCS  Pet (%)/${this.timeShorthand[this.initialTimeUnitIndex]} Label`).textContent = this.loot.petSkill + ' Pet (%)/' + this.selectedTimeShorthand;
                 this.updateSpellOptions();
                 this.updatePrayerOptions();
                 // Set up spells
@@ -1860,7 +1850,7 @@
                 if (this.plotter.plotType === 'petChance') {
                     this.updatePlotData();
                 }
-                document.getElementById(`MCS  Pet Chance/${this.timeShorthand[this.initialTimeUnitIndex]} Label`).textContent = this.skillShorthand[this.loot.petSkill] + ' Pet Chance/' + this.selectedTimeShorthand;
+                document.getElementById(`MCS  Pet (%)/${this.timeShorthand[this.initialTimeUnitIndex]} Label`).textContent = this.loot.petSkill + ' Pet (%)/' + this.selectedTimeShorthand;
                 this.updateZoneInfoCard();
             }
 
@@ -1973,7 +1963,7 @@
                     const value = this.plotTypes[i].value;
                     let newName = '';
                     if (value === 'petChance') {
-                        newName = this.skillShorthand[this.loot.petSkill] + name + this.selectedTimeShorthand;
+                        newName = this.loot.petSkill + name + this.selectedTimeShorthand;
                     } else if (value === 'dropChance') {
                         newName = this.getSelectedDropLabel();
                     } else if (this.plotTypes[i].isTime) {
