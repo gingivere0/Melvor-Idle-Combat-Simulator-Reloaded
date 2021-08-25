@@ -722,12 +722,14 @@
                 MICSR.log(`Elapsed Simulation Time: ${performance.now() - this.simStartTime}ms`);
                 // store simulation
                 if (this.parent.trackHistory) {
+                    const monsterSimData = {};
+                    for (const id in this.monsterSimData) {
+                        monsterSimData[id] = {...this.monsterSimData[id]};
+                    }
                     const save = {
                         settings: this.parent.import.exportSettings(),
                         export: '',
-                        monsterSimData: this.monsterSimData.map(x => {
-                            return {...x};
-                        }),
+                        monsterSimData: monsterSimData,
                         dungeonSimData: this.dungeonSimData.map(x => {
                             return {...x};
                         }),
