@@ -123,8 +123,7 @@
                 const courseMastery = {};
                 this.app.player.course.forEach((o, i) => courseMastery[o] = this.app.player.courseMastery[i]);
                 return {
-                    // player: this.app.player,
-                    // TODO: all these should be in SimPlayer class?
+                    version: MICSR.version,
                     // lists
                     course: [...this.app.player.course],
                     courseMastery: courseMastery,
