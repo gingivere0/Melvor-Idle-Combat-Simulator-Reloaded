@@ -36,6 +36,7 @@
                 this.filters = filters;
                 this.filter = this.filters[0];
                 this.id = Date.now();
+                this.tmpModifiers = new PlayerModifiers();
 
                 // icons
                 this.media = {
@@ -136,17 +137,17 @@
 
             getObstacleTooltip(category, obstacle) {
                 let passives = `<div class="text-center">${obstacle.name}</div>`;
-                const modifiers = new PlayerModifiers();
                 if (this.data.courseMastery[category]) {
-                    modifiers.addModifiers(obstacle.modifiers, 0.5);
+                    this.tmpModifiers.addModifiers(obstacle.modifiers, 0.5);
                 } else {
-                    modifiers.addModifiers(obstacle.modifiers);
+                    this.tmpModifiers.addModifiers(obstacle.modifiers);
                 }
-                for (let prop in modifiers) {
-                    MICSR.showModifiersInstance.printRelevantModifiers({[prop]: modifiers[prop]}, this.filter.tag).forEach(toPrint => {
+                for (let prop in obstacle.modifiers) {
+                    MICSR.showModifiersInstance.printRelevantModifiers({[prop]: this.tmpModifiers[prop]}, this.filter.tag).forEach(toPrint => {
                         passives += `<div class="${toPrint[1]}">${toPrint[0]}</div>`;
                     });
                 }
+                this.tmpModifiers.reset();
                 return passives;
             }
 
