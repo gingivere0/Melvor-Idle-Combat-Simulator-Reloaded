@@ -1,3 +1,8 @@
+v1.5.3
+    Add MICSR version to settings export
+    Fix history tracking bug
+    Fix combat stats in item tooltips
+
 v1.5.2
     Fix equipment importing bug
     Fix AgilityCourse.getObstacleTooltip performance issues
