@@ -1026,7 +1026,7 @@
             loadSavedSimulation(idx) {
                 const simulation = this.savedSimulations[idx];
                 if (!simulation) {
-                    MICSR.log(`Unable to load simualtion with index ${idx}`);
+                    MICSR.log(`Unable to load simulation with index ${idx}`);
                     return;
                 }
                 // load settings
@@ -1489,15 +1489,14 @@
                 pushBonus(
                     [
                         ['Attack Speed', 'attackSpeed'],
-                        ['Strength', 'strengthBonus'],
-                        ['Strength', 'strengthBonus'],
+                        ['Melee Strength', 'meleeStrengthBonus'],
                         ['Stab', 'stabAttackBonus'],
                         ['Slash', 'slashAttackBonus'],
                         ['Block', 'blockAttackBonus'],
-                        ['Strength', 'rangedStrengthBonus'],
-                        ['Attack', 'rangedAttackBonus'],
-                        ['Damage', 'magicDamageBonus', '%'],
-                        ['Attack', 'magicAttackBonus'],
+                        ['Ranged Strength', 'rangedStrengthBonus'],
+                        ['Ranged Attack', 'rangedAttackBonus'],
+                        ['Magic Damage', 'magicDamageBonus', '%'],
+                        ['Magic Attack', 'magicAttackBonus'],
                     ],
                     `<div>Offence:</div><span>`,
                     '</span>',
