@@ -182,16 +182,22 @@
             }
 
             importEquipment(equipment) {
+                // clear previous items
                 this.app.player.equipment.unequipAll();
                 for (const slot in equipmentSlotData) {
                     const slotID = equipmentSlotData[slot].id;
+                    this.app.setEquipmentImage(slotID, -1);
+                }
+                // load new items
+                for (const slot in equipmentSlotData) {
+                    const slotID = equipmentSlotData[slot].id;
                     const itemID = equipment[slotID];
-                    if (itemID === -1 && this.app.player.equipmentOccupiedBy(slotID) !== 'None') {
-                        return;
+                    if (itemID === -1) {
+                        continue;
                     }
                     this.app.equipItem(slotID, itemID);
-                    this.app.setEquipmentImage(slotID, itemID);
                 }
+                // update style drop down
                 this.app.updateStyleDropdowns();
             }
 
