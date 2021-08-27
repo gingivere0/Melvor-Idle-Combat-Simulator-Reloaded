@@ -139,19 +139,16 @@
              * @return {HTMLDivElement[]} The image buttons
              */
             addImageButtons(sources, idtexts, size, onclickCallbacks, tooltips = [], containerWidth) {
-                const deleteMe = [];
                 const newCCContainer = document.createElement('div');
                 newCCContainer.className = 'mcsMultiImageButtonContainer';
                 for (let i = 0; i < sources.length; i++) {
                     const newButton = this.createImageButton(sources[i], idtexts[i], onclickCallbacks[i], size, tooltips[i]);
-                    deleteMe.push(this.addTooltip(newButton));
                     newCCContainer.appendChild(newButton);
                 }
                 if (containerWidth) {
                     newCCContainer.style.width = containerWidth;
                 }
                 this.container.appendChild(newCCContainer);
-                return deleteMe;
             }
 
             /**
@@ -574,21 +571,6 @@
                 newImage.style.height = `${height}px`;
                 newImage.src = imageSrc;
                 return newImage;
-            }
-
-            /**
-             * Adds a tooltip to an element
-             * @param {HTMLElement} parent The parent element to attach the tooltip to
-             * @return {HTMLDivElement} The newly created tooltip
-             */
-            addTooltip(parent) {
-                const newTooltip = document.createElement('div');
-                newTooltip.className = 'mcsTooltip';
-                newTooltip.style.display = 'none';
-                parent.addEventListener('mouseenter', (e) => this.showTooltip(e, newTooltip));
-                parent.addEventListener('mouseleave', (e) => this.hideTooltip(e, newTooltip));
-                parent.appendChild(newTooltip);
-                return newTooltip;
             }
 
             // Prebaked functions for tooltips
