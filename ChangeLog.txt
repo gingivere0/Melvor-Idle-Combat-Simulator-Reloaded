@@ -1,3 +1,6 @@
+v1.5.5
+    Replace tsv data export with JSON data export
+
 v1.5.4
     Add rune use breakdown
     Fix bar footer destruction
