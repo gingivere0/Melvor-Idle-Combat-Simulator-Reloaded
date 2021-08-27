@@ -1,3 +1,9 @@
+v1.5.4
+    Add rune use breakdown
+    Fix bar footer destruction
+    Remove unused tooltip code
+    Fix undefined slayer area name in warning, #59
+
 v1.5.3
     Add MICSR version to settings export
     Fix history tracking bug
