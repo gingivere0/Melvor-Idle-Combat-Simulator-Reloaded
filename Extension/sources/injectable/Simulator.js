@@ -56,30 +56,6 @@
                     const data = {
                         simSuccess: false,
                         reason: this.notSimulatedReason,
-                        xpPerSecond: 0,
-                        xpPerHit: 0,
-                        hpXpPerSecond: 0,
-                        hpPerSecond: 0,
-                        deathRate: 0,
-                        highestDamageTaken: 0,
-                        lowestHitpoints: Infinity,
-                        atePerSecond: 0,
-                        dmgPerSecond: 0,
-                        avgHitDmg: 0,
-                        killTimeS: 0,
-                        killsPerSecond: 0,
-                        gpPerSecond: 0,
-                        prayerXpPerSecond: 0,
-                        slayerXpPerSecond: 0,
-                        summoningXpPerSecond: 0,
-                        ppConsumedPerSecond: 0,
-                        signetChance: 0,
-                        gpFromDamagePerSecond: 0,
-                        attacksTakenPerSecond: 0,
-                        attacksMadePerSecond: 0,
-                        simulationTime: 0,
-                        petChance: 0,
-                        dropChance: 0,
                     };
                     if (isMonster) {
                         data.inQueue = false;
@@ -116,16 +92,6 @@
                 this.currentSim = this.initCurrentSim();
                 // Options for time multiplier
                 this.selectedPlotIsTime = true;
-                // Data Export Settings
-                this.exportOptions = {
-                    dataTypes: [],
-                    name: true,
-                    dungeonMonsters: true,
-                    nonSimmed: true,
-                }
-                for (let i = 0; i < this.parent.plotTypes.length; i++) {
-                    this.exportOptions.dataTypes.push(true);
-                }
                 // Test Settings
                 this.isTestMode = false;
                 this.testMax = 10;
@@ -639,6 +605,7 @@
                 data.simulationTime = 0;
                 for (const monsterID of monsterIDs) {
                     const simID = this.simID(monsterID, dungeonID);
+                    data.simSuccess &&= this.monsterSimData[simID].simSuccess;
                     data.deathRate = 1 - (1 - data.deathRate) * (1 - this.monsterSimData[simID].deathRate);
                     data.highestDamageTaken = Math.max(data.highestDamageTaken, this.monsterSimData[simID].highestDamageTaken);
                     data.lowestHitpoints = Math.min(data.lowestHitpoints, this.monsterSimData[simID].lowestHitpoints);
@@ -859,6 +826,16 @@
                     this.monsterSimData[simID].simSuccess = false;
                     this.monsterSimData[simID].reason = this.notSimulatedReason;
                 }
+                for (let simID in this.dungeonSimData) {
+                    this.dungeonSimData[simID].inQueue = false;
+                    this.dungeonSimData[simID].simSuccess = false;
+                    this.dungeonSimData[simID].reason = this.notSimulatedReason;
+                }
+                for (let simID in this.slayerSimData) {
+                    this.slayerSimData[simID].inQueue = false;
+                    this.slayerSimData[simID].simSuccess = false;
+                    this.slayerSimData[simID].reason = this.notSimulatedReason;
+                }
             }
 
             /**
@@ -980,95 +957,6 @@
                     });
                 }
                 return dataSet;
-            }
-
-            exportEntity(exportOptions, entityID, filter, data, isDungeonMonster = false, nameOverride = undefined) {
-                const name = nameOverride !== undefined ? nameOverride : this.parent.getMonsterName(entityID);
-                const exportLine = [];
-                if (!exportOptions.nonSimmed && !filter[entityID]) {
-                    return exportLine;
-                }
-                if (exportOptions.name) {
-                    exportLine.push(name);
-                }
-                for (let i = 0; i < this.parent.plotTypes.length; i++) {
-                    if (!exportOptions.dataTypes[i]) {
-                        continue;
-                    }
-                    if (isDungeonMonster) {
-                        if (this.parent.plotTypes[i].value === 'signetChance') {
-                            exportLine.push(0);
-                        } else {
-                            let dataMultiplier = this.parent.plotTypes[i].isTime ? this.parent.timeMultipliers[1] : 1;
-                            if (dataMultiplier === -1) dataMultiplier = data[entityID].killTimeS;
-                            exportLine.push((data[entityID].simSuccess) ? data[entityID][this.parent.plotTypes[i].value] * dataMultiplier : 0);
-                        }
-                    } else {
-                        let dataMultiplier = this.parent.plotTypes[i].isTime ? this.parent.timeMultipliers[1] : 1;
-                        if (dataMultiplier === -1) dataMultiplier = data[entityID].killTimeS;
-                        exportLine.push((filter[entityID] && data[entityID].simSuccess) ? data[entityID][this.parent.plotTypes[i].value] * dataMultiplier : 0);
-                    }
-                }
-                return exportLine;
-            }
-
-            /**
-             * Creates a string to paste into your favourite spreadsheet software
-             * @return {string}
-             */
-            exportData() {
-                // settings
-                const exportOptions = this.exportOptions;
-
-                // header
-                const headerLine = [];
-                if (exportOptions.name) {
-                    headerLine.push('Monster/Dungeon Name');
-                }
-                for (let i = 0; i < this.parent.plotTypes.length; i++) {
-                    if (exportOptions.dataTypes[i]) {
-                        if (this.parent.plotTypes[i].isTime) {
-                            headerLine.push(this.parent.plotTypes[i].option + this.parent.timeOptions[1]);
-                        } else {
-                            headerLine.push(this.parent.plotTypes[i].option);
-                        }
-                    }
-                }
-
-                // result
-                let exportString = [
-                    headerLine,
-                ];
-
-                // Combat Areas
-                combatAreas.forEach((area) => {
-                    area.monsters.forEach(monsterID => exportString.push(this.exportEntity(exportOptions, monsterID, this.monsterSimFilter, this.monsterSimData)));
-                });
-                // Wandering Bard
-                const bardID = 139;
-                exportString.push(this.exportEntity(exportOptions, bardID, this.monsterSimFilter, this.monsterSimData));
-                // Slayer Areas
-                slayerAreas.forEach((area) => {
-                    area.monsters.forEach(monsterID => exportString.push(this.exportEntity(exportOptions, monsterID, this.monsterSimFilter, this.monsterSimData)));
-                });
-                // Dungeons
-                for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
-                    // dungeon
-                    exportString.push(this.exportEntity(exportOptions, dungeonID, this.dungeonSimFilter, this.dungeonSimData, false, this.parent.getDungeonName(dungeonID)));
-                    // dungeon monsters
-                    if (exportOptions.dungeonMonsters) {
-                        const dungeonMonsterFilter = Object.fromEntries(MICSR.dungeons[dungeonID].monsters.map((id) => [id, this.dungeonSimFilter[dungeonID]]));
-                        MICSR.dungeons[dungeonID].monsters.forEach(monsterID => exportString.push(this.exportEntity(exportOptions, this.simID(monsterID, dungeonID), dungeonMonsterFilter, this.monsterSimData, true)));
-                    }
-                }
-                // TODO: export for auto slayer
-
-                // add column separators
-                exportString = exportString.map(row => row.join('\t'));
-                // add row separators
-                exportString = exportString.join('\n');
-                // return the export string
-                return exportString;
             }
 
             /**

@@ -109,8 +109,9 @@
                 this.player.processDeath();
             }
 
-            getSimStats(dungeonID) {
+            getSimStats(dungeonID, success) {
                 return {
+                    success: success,
                     monsterID: this.selectedMonster,
                     dungeonID: dungeonID,
                     tickCount: this.tickCount,
@@ -125,7 +126,7 @@
                 const ticksPerSecond = 1000 / TICK_INTERVAL
                 const trials = simResult.killCount + simResult.deathCount;
                 // success
-                data.simSuccess = true;
+                data.simSuccess = simResult.success;
                 data.reason = undefined;
                 // xp rates
                 data.xpPerSecond = gps.skillXP[CONSTANTS.skill.Attack]
@@ -192,25 +193,6 @@
             }
 
             progressDungeon() {
-                // this.dungeonProgress++;
-                // if (this.areaData.dropBones)
-                //     this.dropEnemyBones();
-                /*
-                if (this.dungeonProgress === this.areaData.monsters.length) {
-                    this.dungeonProgress = 0;
-                    const lootQty = rollPercentage(this.player.modifiers.combatLootDoubleChance) ? 2 : 1;
-                    this.areaData.rewards.forEach((itemID) => {
-                        this.bank.addItem(itemID, lootQty);
-                    });
-                    this.dropEnemyGP();
-                    this.dropSignetHalfB();
-                    if (this.player.modifiers.bonusCoalOnDungeonCompletion) {
-                        if (rollPercentage(1))
-                            this.bank.addItem(CONSTANTS.item.Coal_Ore, this.player.modifiers.bonusCoalOnDungeonCompletion);
-                    }
-                }
-                */
-                // TODO: handle ITM gear change
             }
 
             dropEnemyBones() {
@@ -290,7 +272,8 @@
                         this.dungeonProgress++;
                     }
                 }
-                if (this.player.checkRequirements(areaData.entryRequirements, true, 'fight this monster.')) {
+                const success = this.player.checkRequirements(areaData.entryRequirements, true, 'fight this monster.');
+                if (success) {
                     this.selectMonster(monsterID, areaData);
                     while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < tickLimit) {
                         if (!this.isInCombat && !this.spawnTimer.active) {
@@ -304,7 +287,7 @@
                 }
                 this.stopCombat();
                 const processingTime = performance.now() - startTimeStamp;
-                const simResult = this.getSimStats(dungeonID);
+                const simResult = this.getSimStats(dungeonID, success);
                 if (verbose) {
                     MICSR.log(`Processed ${this.simStats.killCount} / ${this.simStats.deathCount} k/d and ${this.tickCount} ticks in ${processingTime / 1000}s (${processingTime / this.tickCount}ms/tick).`, simResult);
                 }

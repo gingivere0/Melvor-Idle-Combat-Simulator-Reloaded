@@ -25,6 +25,7 @@
         'AgilityCourse',
         'Card',
         'CombatData',
+        'DataExport',
         'Import',
         'Plotter',
         'Loot',
@@ -196,6 +197,8 @@
                 this.simulator = new MICSR.Simulator(this, urls.simulationWorker);
                 // Import Object
                 this.import = new MICSR.Import(this);
+                // Data Export Object
+                this.dataExport = new MICSR.DataExport(this);
                 // Loot Object
                 this.loot = new MICSR.Loot(this, this.simulator);
 
@@ -1001,18 +1004,28 @@
                 this.simOptionsCard.addSectionTitle('Simulation Options');
                 this.simOptionsCard.addNumberInput('# Trials', MICSR.trials, 1, 1e5, (event) => this.numTrialsInputOnChange(event));
                 this.simOptionsCard.addNumberInput('Max Kiloticks', MICSR.maxTicks / 1000, 1, 1e5, (event) => this.maxKiloTicksInputOnChange(event));
-                this.simOptionsCard.addSectionTitle('Export');
-                this.simOptionsCard.addButton('Export Data', () => this.exportDataOnClick());
+                this.simOptionsCard.addSectionTitle('Settings Export - Import');
+                // settings export and import
                 this.simOptionsCard.addButton('Export Settings', () => this.exportSettingButtonOnClick());
-                this.simOptionsCard.addTextInput('Settings JSON:', '', (event) => this.importedSettings = JSON.parse(event.currentTarget.value));
+                this.simOptionsCard.addTextInput('Settings JSON:', '', (event) => {
+                    try {
+                        this.importedSettings = JSON.parse(event.currentTarget.value)
+                    } catch {
+                        this.notify('Ignored invalid JSON settings!', 'danger');
+                        this.importedSettings = undefined;
+                    }
+                });
                 this.simOptionsCard.addButton('Import Settings', () => {
                     if (!this.importedSettings) {
-                        MICSR.log('No settings to import.');
+                        this.notify('No settings to import.', 'danger');
                         return;
                     }
                     this.import.importSettings(this.importedSettings);
                     this.import.update();
                 });
+                // data export
+                this.simOptionsCard.addSectionTitle('Data Export');
+                this.simOptionsCard.addButton('Export Data', () => this.exportDataOnClick());
                 this.exportOptionsButton = this.simOptionsCard.addButton('Show Export Options', () => this.exportOptionsOnClick());
                 // Export Options Card
                 this.createExportOptionsCard();
@@ -1064,38 +1077,17 @@
                 this.exportOptionsCard.addToggleRadio(
                     'Dungeon Monsters',
                     `DungeonMonsterExportRadio`,
-                    this.simulator.exportOptions,
+                    this.dataExport.exportOptions,
                     'dungeonMonsters',
-                    true,
+                    this.dataExport.exportOptions.dungeonMonsters,
                 );
                 this.exportOptionsCard.addToggleRadio(
                     'Non-Simulated',
                     `NonSimmedExportRadio`,
-                    this.simulator.exportOptions,
+                    this.dataExport.exportOptions,
                     'nonSimmed',
-                    true,
+                    this.dataExport.exportOptions.nonSimmed,
                 );
-                this.exportOptionsCard.addSectionTitle('Data to Export');
-                this.exportOptionsCard.addToggleRadio(
-                    'Name',
-                    `NameExportRadio`,
-                    this.simulator.exportOptions,
-                    'name',
-                    true,
-                );
-                for (let i = 0; i < this.plotTypes.length; i++) {
-                    let timeText = '';
-                    if (this.plotTypes[i].isTime) {
-                        timeText = 'X';
-                    }
-                    this.exportOptionsCard.addToggleRadio(
-                        `${this.plotTypes[i].info}${timeText}`,
-                        `${this.plotTypes[i].value}ExportRadio`,
-                        this.simulator.exportOptions.dataTypes,
-                        i,
-                        true,
-                    );
-                }
             }
 
             /** Adds a multi-button with equipment to the equipment select popup
@@ -2008,7 +2000,7 @@
              * The callback for when the export button is clicked
              */
             exportDataOnClick() {
-                let data = this.simulator.exportData();
+                let data = this.dataExport.exportData();
                 this.popExport(data);
             }
 
