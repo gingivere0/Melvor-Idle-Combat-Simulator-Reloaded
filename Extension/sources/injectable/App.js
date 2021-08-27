@@ -58,6 +58,9 @@
                 this.manager.initialize();
                 this.player = this.manager.player;
                 this.combatData = new MICSR.CombatData(this.manager);
+                // prepare tooltips
+                this.tippyOptions = {allowHTML: true, animation: false, hideOnClick: false};
+                this.tippyNoSingletonInstances = [];
                 // Plot Type Options
                 this.plotTypes = [];
                 const addPlotOption = (option, isTime, value, info, scale = true) => {
@@ -292,12 +295,11 @@
                 MICSR.addMenuItem(MICSR.shortName, this.media.combat, this.menuItemId, this.modalID);
 
                 // Finalize tooltips
-                const tippyOptions = {allowHTML: true, animation: false, hideOnClick: false};
-                this.tippyInstances = tippy('#mcsModal [data-tippy-content]', tippyOptions);
-                this.plotter.bars.forEach((bar) => {
-                    this.tippyInstances.concat(tippy(bar, {triggerTarget: bar.parentElement, ...tippyOptions}));
-                });
-                this.tippySingleton = tippy.createSingleton(this.tippyInstances, {delay: [0, 200], ...tippyOptions});
+                this.tippyInstances = tippy('#mcsModal [data-tippy-content]', this.tippyOptions);
+                this.tippySingleton = tippy.createSingleton(this.tippyInstances, {delay: [0, 200], ...this.tippyOptions});
+                for (const bar of this.plotter.bars) {
+                    this.addNoSingletonTippy(bar, {triggerTarget: bar.parentElement});
+                }
 
                 // Setup the default state of the UI
                 this.exportOptionsCard.outerContainer.style.display = 'none';
@@ -651,6 +653,13 @@
                 for (let i = 0; i < this.plotTypes.length; i++) {
                     this.subInfoCard.addNumberOutput(zoneInfoLabelNames[i], 'N/A', 20, '', `MCS ${this.plotTypes[i].value} Output`, true);
                 }
+            }
+
+            addNoSingletonTippy(target, options) {
+                this.tippyNoSingletonInstances = this.tippyNoSingletonInstances.concat(tippy(target, {
+                    ...this.tippyOptions,
+                    ...options,
+                }));
             }
 
             createLevelSelectCard() {
@@ -2575,6 +2584,7 @@
                 // remove all tool tips
                 this.tippySingleton.destroy();
                 this.tippyInstances.forEach(instance => instance.destroy());
+                this.tippyNoSingletonInstances.forEach(instance => instance.destroy());
                 // remove the interface
                 MICSR.destroyMenu(this.menuItemId, this.modalID);
             }
