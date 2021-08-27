@@ -561,7 +561,7 @@
                     if (!this.parent.player.checkRequirements(area.entryRequirements)) {
                         const tryToSim = area.monsters.reduce((sim, monsterID) => (this.monsterSimFilter[monsterID] && !this.monsterSimData[monsterID].inQueue) || sim, false);
                         if (tryToSim) {
-                            this.parent.notify(`Can't access ${area.areaName}`, 'danger');
+                            this.parent.notify(`Can't access ${area.name}`, 'danger');
                             area.monsters.forEach(monsterID => {
                                 this.monsterSimData[monsterID].reason = 'cannot access area';
                             });
