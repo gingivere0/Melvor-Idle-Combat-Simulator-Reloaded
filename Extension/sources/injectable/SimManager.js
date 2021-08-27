@@ -141,6 +141,7 @@
                 data.ppConsumedPerSecond = gps.usedPrayerPoints;
                 data.ammoUsedPerSecond = gps.usedAmmo;
                 data.runesUsedPerSecond = gps.usedRunes;
+                data.usedRunesBreakdown = gps.usedRunesBreakdown;
                 data.combinationRunesUsedPerSecond = gps.usedCombinationRunes;
                 let potionCharges = 1;
                 if (this.player.potionID > -1) {

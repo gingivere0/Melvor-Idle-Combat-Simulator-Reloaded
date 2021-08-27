@@ -105,6 +105,7 @@
                 this.timeShorthand = ['kill', 's', 'm', 'h', 'd'];
                 this.timeMultipliers = [-1, 1, 60, 3600, 3600 * 24];
                 this.initialTimeUnitIndex = 3;
+                this.selectedTime = this.timeOptions[this.initialTimeUnitIndex];
                 this.selectedTimeShorthand = this.timeShorthand[this.initialTimeUnitIndex];
                 this.timeMultiplier = this.timeMultipliers[this.initialTimeUnitIndex];
 
@@ -652,6 +653,14 @@
                 }
                 for (let i = 0; i < this.plotTypes.length; i++) {
                     this.subInfoCard.addNumberOutput(zoneInfoLabelNames[i], 'N/A', 20, '', `MCS ${this.plotTypes[i].value} Output`, true);
+                }
+                // attach tooltip to runesUsedPerSecond element
+                let idx = 0;
+                for (; idx < this.subInfoCard.container.children.length; idx++) {
+                    const child = this.subInfoCard.container.children[idx].lastChild;
+                    if (child && child.id === 'MCS runesUsedPerSecond Output') {
+                        this.addNoSingletonTippy(child);
+                    }
                 }
             }
 
@@ -1941,6 +1950,7 @@
             timeUnitDropdownOnChange(event) {
                 this.timeMultiplier = this.timeMultipliers[event.currentTarget.selectedIndex];
                 this.simulator.selectedPlotIsTime = this.plotTypes[this.plotter.plotID].isTime;
+                this.selectedTime = this.timeOptions[event.currentTarget.selectedIndex];
                 this.selectedTimeShorthand = this.timeShorthand[event.currentTarget.selectedIndex];
                 // Updated Signet chance
                 this.loot.updateSignetChance();
@@ -2234,6 +2244,24 @@
                     document.getElementById('MCS deathRate Output').style.color = 'red';
                 } else {
                     document.getElementById('MCS deathRate Output').style.color = '';
+                }
+                this.setRuneTooltip(data.usedRunesBreakdown, data.killTimeS);
+            }
+
+            setRuneTooltip(runesUsed, killTimeS) {
+                let dataMultiplier = this.timeMultiplier;
+                if (dataMultiplier === -1) {
+                    dataMultiplier = killTimeS;
+                }
+                let tooltip = '';
+                for (const id in runesUsed) {
+                    tooltip += `<img class="skill-icon-xs" src="${getItemMedia(id)}"><span>${(runesUsed[id] * dataMultiplier).toFixed(2)}</span><br/>`
+                }
+                if (tooltip.length > 0) {
+                    tooltip = `<div className="text-center">Runes / ${this.selectedTime}<br/>${tooltip}</div>`
+                    document.getElementById(`MCS runesUsedPerSecond Output`)._tippy.setContent(tooltip);
+                } else {
+                    document.getElementById(`MCS runesUsedPerSecond Output`)._tippy.setContent(`No runes used.`);
                 }
             }
 

@@ -382,22 +382,25 @@
                 if (!outputID) {
                     outputID = `MCS ${labelText} Output`;
                 }
+                // container
                 const newCCContainer = this.createCCContainer();
                 if (imageSrc && imageSrc !== '') {
                     newCCContainer.appendChild(this.createImage(imageSrc, height));
                 }
+                // label
                 const newLabel = this.createLabel(labelText, outputID, setLabelID);
                 if (setLabelID) {
                     newLabel.id = `MCS ${labelText} Label`;
                 }
                 newCCContainer.appendChild(newLabel);
+                // output field
                 const newOutput = document.createElement('span');
                 newOutput.className = 'mcsNumberOutput';
                 newOutput.style.width = this.inputWidth;
                 newOutput.textContent = initialValue;
                 newOutput.id = outputID;
                 newCCContainer.appendChild(newOutput);
-
+                // append container
                 this.container.appendChild(newCCContainer);
                 this.numOutputs.push(newOutput);
             }
