@@ -68,8 +68,8 @@
                     return x;
                 }
                 if ((x).toString() === '[object Object]') {
-                    const result = [];
-                    Object.getOwnPropertyNames(x => result[x] = this.round(x));
+                    const result = {};
+                    Object.getOwnPropertyNames(x).forEach(prop => result[prop] = this.round(x[prop]));
                     return result;
                 } else if (!isNaN) {
                     return x;
