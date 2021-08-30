@@ -105,8 +105,10 @@
                     killCount: 0,
                     deathCount: 0,
                 }
-                this.player.resetGains();
+                // process death, this will consume food or put you at 20% HP
                 this.player.processDeath();
+                // reset gains, this includes resetting food usage and setting player to 100% HP
+                this.player.resetGains();
             }
 
             getSimStats(dungeonID, success) {
