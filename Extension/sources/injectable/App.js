@@ -1007,12 +1007,13 @@
                 this.simOptionsCard.addSectionTitle('Settings Export - Import');
                 // settings export and import
                 this.simOptionsCard.addButton('Export Settings', () => this.exportSettingButtonOnClick());
-                this.simOptionsCard.addTextInput('Settings JSON:', '', (event) => {
+                this.importedSettings = {};
+                this.simOptionsCard.addTextInput('Settings JSON:', '{}', (event) => {
                     try {
                         this.importedSettings = JSON.parse(event.currentTarget.value)
                     } catch {
                         this.notify('Ignored invalid JSON settings!', 'danger');
-                        this.importedSettings = undefined;
+                        this.importedSettings = {};
                     }
                 });
                 this.simOptionsCard.addButton('Import Settings', () => {
