@@ -101,6 +101,7 @@
                     currentGamemode: currentGamemode,
                     curse: player.spellSelection.curse,
                     foodSelected: foodSelected.id,
+                    healAfterDeath: this.app.player.healAfterDeath,
                     isAncient: player.spellSelection.ancient !== -1,
                     isManualEating: this.app.player.isManualEating,
                     isSlayerTask: this.app.player.isSlayerTask,
@@ -142,6 +143,7 @@
                     currentGamemode: this.app.player.currentGamemode,
                     curse: this.app.player.spellSelection.curse,
                     foodSelected: this.app.player.food.currentSlot.item.id,
+                    healAfterDeath: this.app.player.healAfterDeath,
                     isAncient: this.app.player.spellSelection.ancient > -1,
                     isManualEating: this.app.player.isManualEating,
                     isSlayerTask: this.app.player.isSlayerTask,
@@ -165,6 +167,7 @@
                 this.importPets(settings.petUnlocked);
                 this.importAutoEat(settings.autoEatTier, settings.foodSelected, settings.cookingPool, settings.cookingMastery);
                 this.importManualEating(settings.isManualEating);
+                this.importHealAfterDeath(settings.healAfterDeath);
                 this.importSlayerTask(settings.isSlayerTask);
                 this.importGameMode(settings.currentGamemode);
                 this.importUseCombinationRunes(settings.useCombinationRunes);
@@ -316,6 +319,11 @@
             importManualEating(isManualEating) {
                 this.checkRadio('MCS Manual Eating', isManualEating);
                 this.app.player.isManualEating = isManualEating;
+            }
+
+            importHealAfterDeath(healAfterDeath) {
+                this.checkRadio('MCS Heal After Death', healAfterDeath);
+                this.app.player.healAfterDeath = healAfterDeath;
             }
 
             importSlayerTask(isSlayerTask) {
