@@ -27,6 +27,40 @@
     const setup = () => {
         const MICSR = window.MICSR;
 
+        MICSR.defaultSettings = {
+            // version: MICSR.version,
+            course: Array(10).fill(-1),
+            courseMastery: {"-1": false},
+            equipment: Array(Object.getOwnPropertyNames(equipmentSlotData).length).fill(-1),
+            levels: Array(skillXP.length).fill(1),
+            petUnlocked: Array(PETS.length).fill(false),
+            styles: {
+                melee: 'Stab',
+                ranged: 'Accurate',
+                magic: 'Magic',
+            },
+            prayerSelected: [],
+            ancient: -1,
+            aurora: -1,
+            autoEatTier: -1,
+            cookingMastery: false,
+            cookingPool: false,
+            currentGamemode: 0,
+            curse: -1,
+            foodSelected: -1,
+            healAfterDeath: true,
+            isAncient: false,
+            isManualEating: false,
+            isSlayerTask: false,
+            pillar: -1,
+            potionID: -1,
+            potionTier: 0,
+            standard: 0,
+            summoningSynergy: true,
+            useCombinationRunes: false,
+        }
+        MICSR.defaultSettings.levels[CONSTANTS.skill.Hitpoints] = 10;
+
         /**
          * Class to handle importing
          */
@@ -157,6 +191,16 @@
             }
 
             importSettings(settings) {
+                if (settings.version !== MICSR.version) {
+                    MICSR.warn(`Importing MICSR ${settings.version} settings in MICSR ${MICSR.version}.`)
+                }
+                // validate
+                for (const prop in MICSR.defaultSettings) {
+                    if (settings[prop] === undefined) {
+                        MICSR.error(`No valid ${prop} data imported, using default ${MICSR.defaultSettings[prop]}.`)
+                        settings[prop] = MICSR.defaultSettings[prop];
+                    }
+                }
                 // import settings
                 this.importEquipment(settings.equipment);
                 this.importLevels(settings.levels);
