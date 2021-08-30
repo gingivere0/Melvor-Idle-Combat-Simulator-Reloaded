@@ -993,8 +993,8 @@
             }
 
             createSimulationAndExportCard() {
-                this.simOptionsCard = this.mainTabCard.addTab('Sim. Options', this.media.settings, '', '150px');
-                this.simOptionsCard.addSectionTitle('Simulation Options');
+                this.simOptionsCard = this.mainTabCard.addTab('Simulation Options', this.media.settings, '', '150px');
+                this.simOptionsCard.addSectionTitle('Advanced Options');
                 this.simOptionsCard.addNumberInput('# Trials', MICSR.trials, 1, 1e5, (event) => this.numTrialsInputOnChange(event));
                 this.simOptionsCard.addNumberInput('Max ticks (x1000)', MICSR.maxTicks / 1000, 1, 1e5, (event) => this.maxKiloTicksInputOnChange(event));
                 this.simOptionsCard.addToggleRadio(
