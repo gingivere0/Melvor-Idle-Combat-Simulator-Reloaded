@@ -1014,6 +1014,7 @@
 
             createSimulationAndExportCard() {
                 this.simOptionsCard = this.mainTabCard.addTab('Simulation Options', this.media.settings, '', '150px');
+                // advanced options
                 this.simOptionsCard.addSectionTitle('Advanced Options');
                 this.simOptionsCard.addNumberInput('# Trials', MICSR.trials, 1, 1e5, (event) => this.numTrialsInputOnChange(event));
                 this.simOptionsCard.addNumberInput('Max ticks (x1000)', MICSR.maxTicks / 1000, 1, 1e5, (event) => this.maxKiloTicksInputOnChange(event));
@@ -1025,6 +1026,7 @@
                     this.player.healAfterDeath,
                 );
                 // settings export and import
+                this.simOptionsCard.container.appendChild(document.createElement('br'));
                 this.simOptionsCard.addSectionTitle('Settings Export - Import');
                 this.simOptionsCard.addButton('Export Settings', () => this.exportSettingButtonOnClick());
                 this.importedSettings = {};
@@ -1045,11 +1047,23 @@
                     this.import.update();
                 });
                 // data export
+                this.simOptionsCard.container.appendChild(document.createElement('br'));
                 this.simOptionsCard.addSectionTitle('Data Export');
+                this.simOptionsCard.addToggleRadio(
+                    'Dungeon Monsters',
+                    `DungeonMonsterExportRadio`,
+                    this.dataExport.exportOptions,
+                    'dungeonMonsters',
+                    this.dataExport.exportOptions.dungeonMonsters,
+                );
+                this.simOptionsCard.addToggleRadio(
+                    'Non-Simulated',
+                    `NonSimmedExportRadio`,
+                    this.dataExport.exportOptions,
+                    'nonSimmed',
+                    this.dataExport.exportOptions.nonSimmed,
+                );
                 this.simOptionsCard.addButton('Export Data', () => this.exportDataOnClick());
-                this.exportOptionsButton = this.simOptionsCard.addButton('Show Export Options', () => this.exportOptionsOnClick());
-                // Export Options Card
-                this.createExportOptionsCard();
             }
 
             createCompareCard() {
@@ -1089,26 +1103,6 @@
                 this.simulator.dungeonSimData = simulation.dungeonSimData;
                 this.simulator.slayerSimData = simulation.slayerSimData;
                 this.updateDisplayPostSim();
-            }
-
-            createExportOptionsCard() {
-                this.isExportDisplayed = false;
-                this.exportOptionsCard = new MICSR.Card(this.topContent, '', '100px', true);
-                this.exportOptionsCard.addSectionTitle('Export Options');
-                this.exportOptionsCard.addToggleRadio(
-                    'Dungeon Monsters',
-                    `DungeonMonsterExportRadio`,
-                    this.dataExport.exportOptions,
-                    'dungeonMonsters',
-                    this.dataExport.exportOptions.dungeonMonsters,
-                );
-                this.exportOptionsCard.addToggleRadio(
-                    'Non-Simulated',
-                    `NonSimmedExportRadio`,
-                    this.dataExport.exportOptions,
-                    'nonSimmed',
-                    this.dataExport.exportOptions.nonSimmed,
-                );
             }
 
             /** Adds a multi-button with equipment to the equipment select popup
@@ -2087,20 +2081,6 @@
             exportDataOnClick() {
                 let data = this.dataExport.exportData();
                 this.popExport(data);
-            }
-
-            /**
-             * The callback for when the show/hide export options button is clicked
-             */
-            exportOptionsOnClick() {
-                if (this.isExportDisplayed) {
-                    this.exportOptionsCard.outerContainer.style.display = 'none';
-                    this.exportOptionsButton.textContent = 'Show Export Options';
-                } else {
-                    this.exportOptionsCard.outerContainer.style.display = '';
-                    this.exportOptionsButton.textContent = 'Hide Export Options';
-                }
-                this.isExportDisplayed = !this.isExportDisplayed;
             }
 
             barIsMonster(idx) {
