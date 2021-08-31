@@ -1028,7 +1028,7 @@
                 this.simOptionsCard.addSectionTitle('Settings Export - Import');
                 this.simOptionsCard.addButton('Export Settings', () => this.exportSettingButtonOnClick());
                 this.importedSettings = {};
-                this.simOptionsCard.addTextInput('Settings JSON:', '{}', (event) => {
+                this.simOptionsCard.addTextInput('Settings JSON:', '', (event) => {
                     try {
                         this.importedSettings = JSON.parse(event.currentTarget.value)
                     } catch {
