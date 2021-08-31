@@ -313,10 +313,6 @@
                 document.getElementById(`MCS  Pet (%)/${this.timeShorthand[this.initialTimeUnitIndex]} Label`).textContent = this.loot.petSkill + ' Pet (%)/' + this.selectedTimeShorthand;
                 this.updateSpellOptions();
                 this.updatePrayerOptions();
-                // Set up spells
-                const spellList = this.combatData.spells.standard;
-                const selectedID = this.player.spellSelection.standard;
-                this.selectButton(document.getElementById(`MCS ${spellList[selectedID].name} Button`));
                 this.updateCombatStats();
                 this.updatePlotData();
                 // slayer sim is off by default, so toggle auto slayer off
@@ -1004,8 +1000,8 @@
                     'healAfterDeath',
                     this.player.healAfterDeath,
                 );
-                this.simOptionsCard.addSectionTitle('Settings Export - Import');
                 // settings export and import
+                this.simOptionsCard.addSectionTitle('Settings Export - Import');
                 this.simOptionsCard.addButton('Export Settings', () => this.exportSettingButtonOnClick());
                 this.importedSettings = {};
                 this.simOptionsCard.addTextInput('Settings JSON:', '{}', (event) => {
@@ -1435,7 +1431,7 @@
                 this.setEquipmentImage(slotID, itemId);
                 // update stats
                 this.updateStyleDropdowns();
-                this.checkForElisAss();
+                this.updateSpellOptions();
                 this.updateCombatStats();
             }
 
@@ -1601,7 +1597,6 @@
                     // Update Spell and Prayer Button UIS, and deselect things if they become invalid
                     if (skillName === 'Magic') {
                         this.updateSpellOptions();
-                        this.checkForElisAss();
                     }
                     if (skillName === 'Prayer') {
                         this.updatePrayerOptions();
@@ -1702,9 +1697,41 @@
              * @param {string} spellType
              */
             spellButtonOnClick(event, spellID, spellType) {
-                const spellList = this.combatData.spells[spellType];
                 const selectedID = this.player.spellSelection[spellType];
-                const spell = spellList[spellID];
+                if (selectedID === spellID) {
+                    this.disableSpell(spellType, spellID);
+                } else {
+                    this.enableSpell(spellType, spellID);
+                }
+                // Clean up invalid configurations
+                this.spellSanityCheck();
+                // Update combat stats for new spell
+                this.updateCombatStats();
+            }
+
+            disableSpell(spellType, spellID, message) {
+                // do nothing
+                if (spellID === -1 || this.player.spellSelection[spellType] !== spellID) {
+                    return;
+                }
+                // get spell
+                const spell = this.combatData.spells[spellType][spellID];
+                // unselect spell
+                this.unselectButton(document.getElementById(`MCS ${spell.name} Button`));
+                this.player.spellSelection[spellType] = -1;
+                // send message if required
+                if (message) {
+                    notifyPlayer(CONSTANTS.skill.Magic, message, 'danger');
+                }
+            }
+
+            enableSpell(spellType, spellID, message) {
+                // do nothing
+                if (spellID === -1) {
+                    return;
+                }
+                // get spell
+                const spell = this.combatData.spells[spellType][spellID];
                 // Escape for not meeting the level/item requirement
                 if (this.player.skillLevel[CONSTANTS.skill.Magic] < spell.magicLevelRequired) {
                     notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires level ${spell.magicLevelRequired} Magic.`, 'danger');
@@ -1714,48 +1741,59 @@
                     notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires ${this.getItemName(spell.requiredItem)}.`, 'danger');
                     return;
                 }
-                // Special Cases: If Ancient or Standard deselect standard/anciennt
-                // If Ancient deselect curses
-                // If curse and ancient active, do not select
-                if (selectedID > -1) {
-                    // Spell of type already selected
-                    if (selectedID === spellID && spellType !== 'standard' && spellType !== 'ancient') {
-                        this.player.spellSelection[spellType] = -1;
-                        this.unselectButton(event.currentTarget);
-                    } else {
-                        this.unselectButton(document.getElementById(`MCS ${spellList[selectedID].name} Button`));
-                        this.player.spellSelection[spellType] = spellID;
-                        this.selectButton(event.currentTarget);
-                    }
-                } else {
-                    this.selectNewSpellType(spellType, spellID);
+                // remove previous selection
+                this.disableSpell(spellType, this.player.spellSelection[spellType]);
+                if (spellType === 'ancient') {
+                    this.disableSpell('standard', this.player.spellSelection.standard, 'Disabled standard magic spell.');
                 }
-                // Update combat stats for new spell
-                this.updateCombatStats();
+                if (spellType === 'standard') {
+                    this.disableSpell('ancient', this.player.spellSelection.ancient, 'Disabled ancient magick spell.');
+                }
+                // select spell
+                this.selectButton(document.getElementById(`MCS ${spell.name} Button`));
+                this.player.spellSelection[spellType] = spellID;
+                // send message if required
+                if (message) {
+                    notifyPlayer(CONSTANTS.skill.Magic, message, 'danger');
+                }
             }
 
-            selectNewSpellType(spellType, spellID) {
-                switch (spellType) {
-                    case 'ancient':
-                        this.unselectButton(document.getElementById(`MCS ${this.combatData.spells.standard[this.player.spellSelection.standard].name} Button`));
-                        this.player.spellSelection.standard = -1;
-                        if (this.player.spellSelection.curse > -1) {
-                            this.unselectButton(document.getElementById(`MCS ${this.combatData.spells.curse[this.player.spellSelection.curse].name} Button`));
-                            this.player.spellSelection.curse = -1;
-                            notifyPlayer(CONSTANTS.skill.Magic, 'Curse Deselected, they cannot be used with Ancient Magicks', 'danger');
-                        }
-                        break;
-                    case 'standard':
-                        this.unselectButton(document.getElementById(`MCS ${this.combatData.spells.ancient[this.player.spellSelection.ancient].name} Button`));
-                        this.player.spellSelection.ancient = -1;
-                        break;
+            spellSanityCheck() {
+                const spellSelection = this.player.spellSelection;
+                // can we even use magic?
+                this.player.checkMagicUsage();
+                if (!this.player.canAurora) {
+                    this.disableSpell('aurora', spellSelection.aurora, `Disabled aurora, can't use auroras!`);
                 }
-                // Spell of type not selected
-                if (spellType === 'curse' && this.player.spellSelection.ancient > -1) {
-                    notifyPlayer(CONSTANTS.skill.Magic, 'Curses cannot be used with Ancient Magicks', 'danger');
-                } else {
-                    this.player.spellSelection[spellType] = spellID;
-                    this.selectButton(event.currentTarget);
+                if (!this.player.canCurse) {
+                    this.disableSpell('curse', spellSelection.curse, `Disabled curse, can't use curses!`);
+                }
+                if (this.player.attackType !== "magic") {
+                    this.disableSpell('ancient', spellSelection.ancient, `Disabled ancient magicks spell, can't use magic!`);
+                    this.disableSpell('standard', spellSelection.standard, `Disabled standard magic spell, can't use magic!`);
+                    return;
+                }
+                // get rid of invalid spells selections
+                Object.keys(this.combatData.spells).forEach(spellType => {
+                    if (spellSelection[spellType] === -1) {
+                        return;
+                    }
+                    if (this.combatData.spells[spellType][spellSelection[spellType]] === undefined) {
+                        this.player.spellSelection[spellType] = -1;
+                        notifyPlayer(CONSTANTS.skill.Magic, `disabled invalid ${spellType} ${spellSelection[spellType]}`, 'danger');
+                    }
+                });
+                // check that at least one spell is selected
+                if (spellSelection.standard === -1 && spellSelection.ancient === -1) {
+                    this.enableSpell('standard', 0, `Enabled ${this.combatData.spells.standard[0].name}.`);
+                }
+                // if both standard and ancient magic are selected, disable ancient magic
+                if (spellSelection.standard > -1 && spellSelection.ancient > -1) {
+                    this.disableSpell('ancient', spellSelection.ancient, `Disabled ${this.combatData.spells.ancient[spellSelection.ancient].name}.`);
+                }
+                // if ancient magic is selected, disable curses
+                if (spellSelection.ancient > -1 && spellSelection.curse > -1) {
+                    this.disableSpell('curse', spellSelection.curse, `Disabled ${this.combatData.spells.curse[spellSelection.curse].name}.`);
                 }
             }
 
@@ -2337,19 +2375,13 @@
              * Updates the list of options in the spell menus, based on if the player can use it
              */
             updateSpellOptions() {
+                this.player.computeAttackType();
+                this.player.checkMagicUsage();
                 const magicLevel = this.player.skillLevel[CONSTANTS.skill.Magic];
-                const setSpellsPerLevel = (spell, index, type) => {
+                const setSpellsPerLevel = (spell, spellID, spellType) => {
                     if (spell.magicLevelRequired > magicLevel) {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
-                        if (this.player.spellSelection[type] === index) {
-                            this.player.spellSelection[type] = -1;
-                            this.unselectButton(document.getElementById(`MCS ${spell.name} Button`));
-                            if (type === 'standard' || type === 'ancient') {
-                                this.player.spellSelection.standard = 0;
-                                this.selectButton(document.getElementById(`MCS ${SPELLS[0].name} Button`));
-                            }
-                            notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} has been de-selected. It requires level ${spell.magicLevelRequired} Magic.`, 'danger');
-                        }
+                        this.disableSpell(spellType, spellID, `${spell.name} has been de-selected. It requires level ${spell.magicLevelRequired} Magic.`);
                     } else {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                     }
@@ -2359,24 +2391,22 @@
                 CURSES.forEach((spell, index) => setSpellsPerLevel(spell, index, 'curse'));
                 ANCIENT.forEach((spell, index) => setSpellsPerLevel(spell, index, 'ancient'));
                 this.checkForElisAss();
+                this.spellSanityCheck();
             }
 
             /**
              * Checks if Eli's Ass is equipped and set aurora menu options
              */
             checkForElisAss() {
-                AURORAS.forEach((spell, index) => {
-                    if (spell.requiredItem !== -1) {
-                        if (this.player.equipmentIDs().includes(spell.requiredItem) && this.player.skillLevel[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
-                            document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
-                        } else {
-                            document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
-                            if (this.player.spellSelection.aurora === index) {
-                                this.player.spellSelection.aurora = -1;
-                                this.unselectButton(document.getElementById(`MCS ${spell.name} Button`));
-                                notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} has been de-selected. It requires ${this.getItemName(spell.requiredItem)}.`, 'danger');
-                            }
-                        }
+                AURORAS.forEach((spell, spellID) => {
+                    if (spell.requiredItem === -1) {
+                        return;
+                    }
+                    if (this.player.equipmentIDs().includes(spell.requiredItem) && this.player.skillLevel[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
+                        document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
+                    } else {
+                        document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
+                        this.disableSpell('aurora', spellID, `${spell.name} has been de-selected. It requires ${this.getItemName(spell.requiredItem)}.`);
                     }
                 });
             }

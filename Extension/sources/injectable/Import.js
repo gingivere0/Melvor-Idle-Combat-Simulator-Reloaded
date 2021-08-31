@@ -205,7 +205,12 @@
                 this.importEquipment(settings.equipment);
                 this.importLevels(settings.levels);
                 this.importStyle(settings.styles);
-                this.importSpells(settings.ancient, settings.standard, settings.curse, settings.aurora);
+                this.importSpells({
+                    ancient: settings.ancient,
+                    aurora: settings.aurora,
+                    curse: settings.curse,
+                    standard: settings.standard,
+                });
                 this.importPrayers(settings.prayerSelected);
                 this.importPotion(settings.potionID, settings.potionTier);
                 this.importPets(settings.petUnlocked);
@@ -222,7 +227,6 @@
             update() {
                 // update and compute values
                 this.app.updateSpellOptions();
-                this.app.checkForElisAss();
                 this.app.updatePrayerOptions();
                 this.app.updateCombatStats();
             }
@@ -265,34 +269,16 @@
                 });
             }
 
-            importSpells(ancient, standard, curse, aurora) {
+            importSpells(spellSelection) {
                 // Set all active spell UI to be disabled
                 Object.keys(this.app.combatData.spells).forEach((spellType) => {
-                    const spellList = this.app.combatData.spells[spellType];
-                    const selectedID = this.app.player.spellSelection[spellType];
-                    if (selectedID > -1) {
-                        this.app.unselectButton(document.getElementById(`MCS ${spellList[selectedID].name} Button`));
+                    const spellID = this.app.player.spellSelection[spellType];
+                    if (spellID > -1) {
+                        this.app.disableSpell(spellType, spellID);
                     }
+                    this.app.enableSpell(spellType, spellSelection[spellType]);
                 });
-                this.app.player.spellSelection.ancient = ancient;
-                this.app.player.spellSelection.standard = standard;
-                this.app.player.spellSelection.curse = curse;
-                this.app.player.spellSelection.aurora = aurora;
-                // import spells
-                if (ancient !== -1) {
-                    // clear standard and curse
-                    this.app.player.spellSelection.standard = -1;
-                    this.app.player.spellSelection.curse = -1;
-                }
-                // Update spell UI
-                Object.keys(this.app.combatData.spells).forEach((spellType, i) => {
-                    const spellList = this.app.combatData.spells[spellType];
-                    const selectedID = this.app.player.spellSelection[spellType];
-                    if (selectedID > -1) {
-                        this.app.selectButton(document.getElementById(`MCS ${spellList[selectedID].name} Button`));
-                        this.app.spellSelectCard.onTabClick(i);
-                    }
-                });
+                this.app.spellSanityCheck();
             }
 
             importPrayers(prayerSelected) {

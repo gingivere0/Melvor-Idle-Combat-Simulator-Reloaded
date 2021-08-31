@@ -34,6 +34,8 @@
                 super(simManager);
                 this.detachGlobals();
                 this.replaceGlobals();
+                // remove standard spell selection
+                this.spellSelection.standard = -1
                 // overwrite food consumption
                 this.food.consume = (quantity = 1) => {
                     this.usedFood += quantity;
@@ -598,6 +600,13 @@
                         decreasedGlobalAccuracy: this.modifiers.summoningSynergy_1_12,
                     });
                 }
+            }
+
+            // don't disable selected spells
+            checkMagicUsage() {
+                const allowMagic = this.attackType === "magic" || this.modifiers.allowAttackAugmentingMagic > 0;
+                this.canAurora = allowMagic;
+                this.canCurse = allowMagic && !this.usingAncient;
             }
 
             // get grandparent rollToHit
