@@ -642,7 +642,7 @@
                     // 'killTimeS',
                     // 'killsPerSecond',
                     // loot gains
-                    'gpPerSecond',
+                    'baseGpPerSecond',
                     'dropChance',
                     'signetChance',
                     'petChance',

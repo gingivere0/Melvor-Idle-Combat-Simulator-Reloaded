@@ -921,6 +921,23 @@
                     ],
                     1,
                 );
+                this.lootSelectCard.addRadio(
+                    'High Alch Drops',
+                    25,
+                    'alchHighValueItems',
+                    ['Yes', 'No'],
+                    [
+                        (e) => this.alchHighValueItemsRadioOnChange(e, true),
+                        (e) => this.alchHighValueItemsRadioOnChange(e, false),
+                    ],
+                    1,
+                );
+                this.lootSelectCard.addNumberInput(
+                    'Alch Min Sale Value',
+                    this.loot.alchemyCutoff,
+                    0,
+                    Infinity,
+                    (event) => this.alchemyCutoffInputOnChange(event));
             }
 
             buildItemDropList() {
@@ -1856,6 +1873,18 @@
             }
 
             /**
+             * Callback for when the alchemyCutoff input is changed
+             * @param {Event} event The change event for an input
+             */
+            alchemyCutoffInputOnChange(event) {
+                const alchemyCutoff = parseInt(event.currentTarget.value);
+                if (alchemyCutoff > 0) {
+                    this.loot.alchemyCutoff = alchemyCutoff;
+                }
+                this.updatePlotForGP();
+            }
+
+            /**
              * Callback for when the plot type is changed
              * @param {Event} event The change event for a dropdown
              */
@@ -1946,6 +1975,16 @@
              */
             convertShardsRadioOnChange(event, newState) {
                 this.loot.convertShards = newState;
+                this.updatePlotForGP();
+            }
+
+            /**
+             * Callback for when the alchHighValueItems option is changed
+             * @param {Event} event The change event for a radio
+             * @param {boolean} newState The new value for the option
+             */
+            alchHighValueItemsRadioOnChange(event, newState) {
+                this.loot.alchHighValueItems = newState;
                 this.updatePlotForGP();
             }
 

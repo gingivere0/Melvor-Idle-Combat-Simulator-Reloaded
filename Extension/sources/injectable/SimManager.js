@@ -162,7 +162,7 @@
                 data.killTimeS = simResult.tickCount / ticksPerSecond / trials;
                 data.killsPerSecond = 1 / data.killTimeS;
                 // loot gains
-                data.gpPerSecond = gps.gp;
+                data.baseGpPerSecond = gps.gp; // gpPerSecond is computed from this
                 data.dropChance = NaN;
                 data.signetChance = NaN;
                 data.petChance = NaN;

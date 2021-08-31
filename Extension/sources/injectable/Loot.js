@@ -51,6 +51,11 @@
 
                 // ids of god dungeons
                 this.godDungeonIDs = [8, 9, 10, 11];
+
+                // alchemy settings
+                this.alchHighValueItems = false;
+                this.alchemyCutoff = 10000;
+                this.computingAlchCount = false;
             }
 
             /**
@@ -81,9 +86,9 @@
                             const herbConvertChance = MICSR.getModifierValue(this.modifiers, 'ChanceToConvertSeedDrops');
                             if (herbConvertChance > 0 && (items[itemID].tier === 'Herb' && items[itemID].type === 'Seeds')) {
                                 avgQty += 3;
-                                gpWeight += (items[itemID].sellsFor * (1 - herbConvertChance) + items[items[itemID].grownItemID].sellsFor * herbConvertChance) * x[1] * avgQty;
+                                gpWeight += (this.getItemValue(itemID) * (1 - herbConvertChance) + this.getItemValue(items[itemID].grownItemID) * herbConvertChance) * x[1] * avgQty;
                             } else {
-                                gpWeight += items[itemID].sellsFor * x[1] * avgQty;
+                                gpWeight += this.getItemValue(itemID) * x[1] * avgQty;
                             }
                         }
                         totWeight += x[1];
@@ -107,7 +112,7 @@
                     } else {
                         avgQty = 1;
                     }
-                    gpWeight += avgQty * items[items[chestID].dropTable[i][0]].sellsFor * items[chestID].dropTable[i][1];
+                    gpWeight += avgQty * this.getItemValue(items[chestID].dropTable[i][0]) * items[chestID].dropTable[i][1];
                     totWeight += items[chestID].dropTable[i][1];
                 }
                 return gpWeight / totWeight;
@@ -124,16 +129,36 @@
                 // loot and signet are affected by loot chance
                 monsterValue += this.computeDropTableValue(monsterID);
                 if (this.modifiers.allowSignetDrops) {
-                    monsterValue += items[CONSTANTS.item.Signet_Ring_Half_B].sellsFor * getMonsterCombatLevel(monsterID) / 500000;
+                    monsterValue += this.getItemValue(CONSTANTS.item.Signet_Ring_Half_B) * getMonsterCombatLevel(monsterID) / 500000;
                 } else {
-                    monsterValue += items[CONSTANTS.item.Gold_Topaz_Ring].sellsFor * getMonsterCombatLevel(monsterID) / 500000;
+                    monsterValue += this.getItemValue(CONSTANTS.item.Gold_Topaz_Ring) * getMonsterCombatLevel(monsterID) / 500000;
                 }
                 monsterValue *= this.computeLootChance(monsterID);
                 // bones drops are not affected by loot chance
                 if (this.sellBones && !this.modifiers.autoBurying && MONSTERS[monsterID].bones) {
-                    monsterValue += items[MONSTERS[monsterID].bones].sellsFor * this.lootBonus * ((MONSTERS[monsterID].boneQty) ? MONSTERS[monsterID].boneQty : 1);
+                    monsterValue += this.getItemValue(MONSTERS[monsterID].bones) * this.lootBonus * ((MONSTERS[monsterID].boneQty) ? MONSTERS[monsterID].boneQty : 1);
                 }
                 return monsterValue;
+            }
+
+            /**
+             * Computes the average amount of GP earned when killing a monster in a dungeon, respecting the loot sell settings
+             * @param {number} monsterID
+             * @return {number}
+             */
+            computeDungeonMonsterValue(monsterID) {
+                let gpPerKill = 0;
+                if (this.godDungeonIDs.includes(this.app.viewedDungeonID)) {
+                    const boneQty = MONSTERS[monsterID].boneQty ?? 1;
+                    const shardID = MONSTERS[monsterID].bones;
+                    if (this.convertShards) {
+                        const chestID = items[shardID].trimmedItemID;
+                        gpPerKill += boneQty * this.lootBonus / items[chestID].itemsRequired[0][1] * this.computeChestOpenValue(chestID);
+                    } else {
+                        gpPerKill += boneQty * this.lootBonus * this.getItemValue(shardID);
+                    }
+                }
+                return gpPerKill;
             }
 
             /**
@@ -143,12 +168,11 @@
              */
             computeDungeonValue(dungeonID) {
                 let dungeonValue = 0;
-                // TODO: should double everything that appears in the droptable of the boss monster, not just chests
                 MICSR.dungeons[dungeonID].rewards.forEach((reward) => {
                     if (items[reward].canOpen) {
                         dungeonValue += this.computeChestOpenValue(reward) * this.lootBonus;
                     } else {
-                        dungeonValue += items[reward].sellsFor;
+                        dungeonValue += this.getItemValue(reward) * this.lootBonus;
                     }
                 });
                 // Shards
@@ -156,20 +180,32 @@
                     let shardCount = 0;
                     const shardID = MONSTERS[MICSR.dungeons[dungeonID].monsters[0]].bones;
                     MICSR.dungeons[dungeonID].monsters.forEach((monsterID) => {
-                        shardCount += MONSTERS[monsterID].boneQty || 1;
+                        shardCount += MONSTERS[monsterID].boneQty ?? 1;
                     });
                     shardCount *= this.lootBonus;
                     if (this.convertShards) {
                         const chestID = items[shardID].trimmedItemID;
                         dungeonValue += shardCount / items[chestID].itemsRequired[0][1] * this.computeChestOpenValue(chestID);
                     } else {
-                        dungeonValue += shardCount * items[shardID].sellsFor;
+                        dungeonValue += shardCount * this.getItemValue(shardID);
                     }
                 }
                 if (this.modifiers.allowSignetDrops) {
-                    dungeonValue += items[CONSTANTS.item.Signet_Ring_Half_B].sellsFor * getMonsterCombatLevel(MICSR.dungeons[dungeonID].monsters[MICSR.dungeons[dungeonID].monsters.length - 1]) / 500000;
+                    dungeonValue += this.getItemValue(CONSTANTS.item.Signet_Ring_Half_B) * getMonsterCombatLevel(MICSR.dungeons[dungeonID].monsters[MICSR.dungeons[dungeonID].monsters.length - 1]) / 500000;
                 }
                 return dungeonValue;
+            }
+
+            getItemValue(id) {
+                const value = items[id].sellsFor;
+                const willAlch = this.alchHighValueItems && value >= this.alchemyCutoff
+                if (this.computingAlchCount) {
+                    return willAlch ? 1 : 0;
+                }
+                if (willAlch) {
+                    return value * ALTMAGIC[10].convertToQty;
+                }
+                return value;
             }
 
             /**
@@ -183,32 +219,39 @@
                 this.updatePetChance();
             }
 
+            computeValueAlchs(f, ...args) {
+                const value = this[f](...args);
+                this.computingAlchCount = true;
+                const alchTime = this[f](...args) * magicInterval / 1000;
+                this.computingAlchCount = false;
+                return {value: value, alchTime: alchTime};
+            }
+
+            computeGP(basePerSecond, killTime, f, ...args) {
+                const monsterValue = this.computeValueAlchs(f, ...args);
+                const value = monsterValue.value;
+                const alchTime = monsterValue.alchTime;
+                const excludeAlchTime = basePerSecond + value / killTime;
+                return (excludeAlchTime * killTime) / (killTime + alchTime);
+            }
+
             /**
              * Computes the gp/kill and gp/s data for monsters and dungeons and sets those values.
              */
             updateGPData() {
-                // Set data for monsters in combat zones
                 if (this.app.isViewingDungeon && this.app.viewedDungeonID < MICSR.dungeons.length) {
-                    MICSR.dungeons[this.app.viewedDungeonID].monsters.forEach((monsterID) => {
-                        if (!this.monsterSimData[monsterID]) {
+                    const dungeonID = this.app.viewedDungeonID
+                    MICSR.dungeons[dungeonID].monsters.forEach((monsterID) => {
+                        const simID = this.simulator.simID(dungeonID, monsterID);
+                        if (!this.monsterSimData[simID]) {
                             return;
                         }
-                        if (this.monsterSimData[monsterID].simSuccess) {
-                            let gpPerKill = 0;
-                            if (this.godDungeonIDs.includes(this.app.viewedDungeonID)) {
-                                const boneQty = MONSTERS[monsterID].boneQty || 1;
-                                const shardID = MONSTERS[monsterID].bones;
-                                if (this.convertShards) {
-                                    const chestID = items[shardID].trimmedItemID;
-                                    gpPerKill += boneQty * this.lootBonus / items[chestID].itemsRequired[0][1] * this.computeChestOpenValue(chestID);
-                                } else {
-                                    gpPerKill += boneQty * this.lootBonus * items[shardID].sellsFor;
-                                }
-                            }
-                            this.monsterSimData[monsterID].gpPerSecond += gpPerKill / this.monsterSimData[monsterID].killTimeS;
-                        } else {
-                            this.monsterSimData[monsterID].gpPerSecond = 0;
-                        }
+                        this.monsterSimData[simID].gpPerSecond = this.computeGP(
+                            this.monsterSimData[simID].baseGpPerSecond,
+                            this.monsterSimData[simID].killTimeS,
+                            'computeDungeonMonsterValue',
+                            monsterID,
+                        );
                     });
                 } else {
                     const updateMonsterGP = (monsterID) => {
@@ -216,27 +259,28 @@
                             return;
                         }
                         if (this.monsterSimData[monsterID].simSuccess) {
-                            this.monsterSimData[monsterID].gpPerSecond += this.computeMonsterValue(monsterID) / this.monsterSimData[monsterID].killTimeS;
+                            this.monsterSimData[monsterID].gpPerSecond = this.computeGP(
+                                this.monsterSimData[monsterID].baseGpPerSecond,
+                                this.monsterSimData[monsterID].killTimeS,
+                                'computeMonsterValue',
+                                monsterID,
+                            );
                         }
                     };
-                    // Combat areas
-                    combatAreas.forEach(area => {
-                        area.monsters.forEach(monsterID => updateMonsterGP(monsterID));
-                    });
-                    // Wandering Bard
-                    const bardID = 139;
-                    updateMonsterGP(bardID);
-                    // Slayer areas
-                    slayerAreas.forEach(area => {
-                        area.monsters.forEach(monsterID => updateMonsterGP(monsterID));
-                    });
+                    // Regular monsters
+                    this.app.monsterIDs.forEach(monsterID => updateMonsterGP(monsterID));
                     // Dungeons
                     for (let i = 0; i < MICSR.dungeons.length; i++) {
                         if (!this.dungeonSimData[i]) {
                             return;
                         }
                         if (this.dungeonSimData[i].simSuccess) {
-                            this.dungeonSimData[i].gpPerSecond += this.computeDungeonValue(i) / this.dungeonSimData[i].killTimeS;
+                            this.dungeonSimData[i].gpPerSecond = this.computeGP(
+                                this.dungeonSimData[i].baseGpPerSecond,
+                                this.dungeonSimData[i].killTimeS,
+                                'computeDungeonValue',
+                                i,
+                            );
                         }
                     }
                     // slayer tasks
