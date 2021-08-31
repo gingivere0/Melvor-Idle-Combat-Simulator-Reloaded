@@ -653,16 +653,17 @@
                     'attacksTakenPerSecond',
                     // 'simulationTime',
                 ].forEach(tag => computeAvg(tag));
-            }
 
-            computeRuneUsage(runes, combinationRunes, runeCosts, castsPerSecond, preservation) {
-                runeCosts.forEach(x => {
-                    const runeID = x.id;
-                    const qty = x.qty * castsPerSecond * (1 - preservation / 100);
-                    if (items[runeID].providesRune && items[runeID].providesRune.length > 1) {
-                        combinationRunes[runeID] = qty + (combinationRunes[runeID] || 0);
-                    } else {
-                        runes[runeID] = qty + (runes[runeID] || 0);
+                // average rune breakdown
+                data.usedRunesBreakdown = {};
+                monsterIDs.map(monsterID =>
+                    this.monsterSimData[this.simID(monsterID, dungeonID)]
+                ).forEach(mData => {
+                    for (const runeID in mData.usedRunesBreakdown) {
+                        if (data.usedRunesBreakdown[runeID] === undefined) {
+                            data.usedRunesBreakdown[runeID] = 0;
+                        }
+                        data.usedRunesBreakdown[runeID] += mData.usedRunesBreakdown[runeID] * mData.killTimeS / data.killTimeS;
                     }
                 });
             }
