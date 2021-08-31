@@ -250,15 +250,6 @@
              * Updates the chance to receive your selected loot when killing monsters
              */
             updateDropChance() {
-                /*if (this.app.isViewingDungeon && this.app.viewedDungeonID < MICSR.dungeons.length && !this.godDungeonIDs.includes(this.app.viewedDungeonID)) {
-                    MICSR.dungeons[this.app.viewedDungeonID].monsters.forEach((monsterID) => {
-                        if (!this.monsterSimData[monsterID]) {
-                            return;
-                        }
-                        this.monsterSimData[monsterID].updateDropChance = 0;
-                    });
-                    return;
-                }*/
                 const updateMonsterDropChance = (monsterID, data) => {
                     if (!data) {
                         return;
@@ -269,14 +260,7 @@
                 };
 
                 // Set data for monsters in combat zones
-                combatAreas.forEach((area) => {
-                    area.monsters.forEach(monsterID => updateMonsterDropChance(monsterID, this.monsterSimData[monsterID]));
-                });
-                const bardID = 139;
-                updateMonsterDropChance(bardID, this.monsterSimData[bardID]);
-                slayerAreas.forEach((area) => {
-                    area.monsters.forEach(monsterID => updateMonsterDropChance(monsterID, this.monsterSimData[monsterID]));
-                });
+                this.app.monsterIDs.forEach(monsterID => updateMonsterDropChance(monsterID, this.monsterSimData[monsterID]));
                 // compute dungeon drop rates
                 for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
                     const monsterList = MICSR.dungeons[dungeonID].monsters;
@@ -429,18 +413,13 @@
                         }
                     };
                     // Set data for monsters in combat zones
-                    combatAreas.forEach((area) => {
-                        area.monsters.forEach(monsterID => updateMonsterSignetChance(monsterID, this.monsterSimData[monsterID]));
-                    });
-                    const bardID = 139;
-                    updateMonsterSignetChance(bardID, this.monsterSimData[bardID]);
-                    slayerAreas.forEach((area) => {
-                        area.monsters.forEach(monsterID => updateMonsterSignetChance(monsterID, this.monsterSimData[monsterID]));
-                    });
+                    this.app.monsterIDs.forEach(monsterID => updateMonsterSignetChance(monsterID, this.monsterSimData[monsterID]));
+                    // Set data for dungeons
                     for (let i = 0; i < MICSR.dungeons.length; i++) {
                         const monsterID = MICSR.dungeons[i].monsters[MICSR.dungeons[i].monsters.length - 1];
                         updateMonsterSignetChance(monsterID, this.dungeonSimData[i]);
                     }
+                    // Set data for auto slayer
                     for (let i = 0; i < this.slayerTaskMonsters.length; i++) {
                         // TODO: signet rolls for auto slayer
                         this.slayerSimData[i].signetChance = undefined;

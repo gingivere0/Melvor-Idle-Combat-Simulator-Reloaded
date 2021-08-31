@@ -90,13 +90,8 @@
                     autoSlayer: {},
                 }
 
-                const bardID = 139;
                 // export Combat Areas, Wandering Bard, and Slayer Areas
-                [
-                    ...combatAreas.map(area => area.monsters).reduce((a, b) => a.concat(b), []),
-                    bardID,
-                    ...slayerAreas.map(area => area.monsters).reduce((a, b) => a.concat(b), []),
-                ].forEach(monsterID => this.exportEntity(
+                this.app.monsterIDs.forEach(monsterID => this.exportEntity(
                     exportData.monsters,
                     monsterID,
                     this.simulator.monsterSimFilter[monsterID],

@@ -856,22 +856,9 @@
                 const dataSet = [];
                 if (!this.parent.isViewingDungeon) {
                     // Compile data from monsters in combat zones
-                    combatAreas.forEach((area) => {
-                        area.monsters.forEach((monsterID) => {
-                            if (isKillTime) dataMultiplier = this.monsterSimData[monsterID].killTimeS;
-                            dataSet.push((this.monsterSimFilter[monsterID] && this.monsterSimData[monsterID].simSuccess) ? this.monsterSimData[monsterID][keyValue] * dataMultiplier : NaN);
-                        });
-                    });
-                    // Wandering Bard
-                    const bardID = 139;
-                    if (isKillTime) dataMultiplier = this.monsterSimData[bardID].killTimeS;
-                    dataSet.push((this.monsterSimFilter[bardID] && this.monsterSimData[bardID].simSuccess) ? this.monsterSimData[bardID][keyValue] * dataMultiplier : NaN);
-                    // Compile data from monsters in slayer zones
-                    slayerAreas.forEach((area) => {
-                        area.monsters.forEach((monsterID) => {
-                            if (isKillTime) dataMultiplier = this.monsterSimData[monsterID].killTimeS;
-                            dataSet.push((this.monsterSimFilter[monsterID] && this.monsterSimData[monsterID].simSuccess) ? this.monsterSimData[monsterID][keyValue] * dataMultiplier : NaN);
-                        });
+                    this.parent.monsterIDs.forEach((monsterID) => {
+                        if (isKillTime) dataMultiplier = this.monsterSimData[monsterID].killTimeS;
+                        dataSet.push((this.monsterSimFilter[monsterID] && this.monsterSimData[monsterID].simSuccess) ? this.monsterSimData[monsterID][keyValue] * dataMultiplier : NaN);
                     });
                     // Perform simulation of monsters in dungeons
                     for (let i = 0; i < MICSR.dungeons.length; i++) {
@@ -921,19 +908,8 @@
                 const dataSet = [];
                 if (!this.parent.isViewingDungeon) {
                     // Compile data from monsters in combat zones
-                    combatAreas.forEach((area) => {
-                        area.monsters.forEach((monsterID) => {
-                            dataSet.push(this.monsterSimData[monsterID]);
-                        });
-                    });
-                    // Wandering Bard
-                    const bardID = 139;
-                    dataSet.push(this.monsterSimData[bardID]);
-                    // Compile data from monsters in slayer zones
-                    slayerAreas.forEach((area) => {
-                        area.monsters.forEach((monsterID) => {
-                            dataSet.push(this.monsterSimData[monsterID]);
-                        });
+                    this.parent.monsterIDs.forEach((monsterID) => {
+                        dataSet.push(this.monsterSimData[monsterID]);
                     });
                     // Perform simulation of monsters in dungeons
                     for (let i = 0; i < MICSR.dungeons.length; i++) {

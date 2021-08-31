@@ -141,6 +141,14 @@
                     question: 'assets/media/main/question.svg',
                 };
 
+                // monster IDs
+                const bardID = 139;
+                this.monsterIDs = [
+                    ...combatAreas.map(area => area.monsters).reduce((a, b) => a.concat(b), []),
+                    bardID,
+                    ...slayerAreas.map(area => area.monsters).reduce((a, b) => a.concat(b), []),
+                ]
+
                 // combat pet IDs
                 this.petIDs = [
                     2, // FM pet
@@ -266,7 +274,6 @@
                         this.barType.push(this.barTypes.monster);
                     });
                 });
-                const bardID = 139;
                 this.barMonsterIDs.push(bardID);
                 this.barType.push(this.barTypes.monster);
                 slayerAreas.forEach((area) => {
@@ -2221,18 +2228,9 @@
             toggleMonsterSims() {
                 const newState = !this.monsterToggleState;
                 this.monsterToggleState = newState;
-                // Create List of non-dungeon monsters
-                combatAreas.forEach((area) => {
-                    area.monsters.forEach((monsterID) => {
-                        this.simulator.monsterSimFilter[monsterID] = newState;
-                    });
-                });
-                const bardID = 139;
-                this.simulator.monsterSimFilter[bardID] = newState;
-                slayerAreas.forEach((area) => {
-                    area.monsters.forEach((monsterID) => {
-                        this.simulator.monsterSimFilter[monsterID] = newState;
-                    });
+                // Set all non-dungeon monsters to newState
+                this.monsterIDs.forEach((monsterID) => {
+                    this.simulator.monsterSimFilter[monsterID] = newState;
                 });
                 this.updatePlotData();
                 this.plotter.crossImagesPerSetting();
