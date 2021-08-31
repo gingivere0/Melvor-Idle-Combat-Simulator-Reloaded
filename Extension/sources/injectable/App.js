@@ -2370,7 +2370,10 @@
                             this.getMonsterName(monsterID),
                             monsterID,
                             MONSTERS[monsterID].media,
-                            this.simulator.monsterSimData[this.simulator.simID(monsterID, dungeonID)],
+                            this.simulator.monsterSimData[this.simulator.simID(
+                                monsterID,
+                                dungeonID >= MICSR.dungeons.length ? undefined : dungeonID,
+                            )],
                         );
                     }
                 } else {
