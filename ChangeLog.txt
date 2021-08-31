@@ -1,3 +1,18 @@
+v1.5.6
+    Cleanup simulation options card
+    Compute average rune breakdown
+    Fix simID bug for auto slayer monsters
+    Clear settings JSON import field
+    Fix gp bugs and add alchemy calculation, #62
+    Extract monsterID list
+    Fix spell bugs, #61
+    Rename simulation options
+    Add empty import to reset settings
+    Add default values for missing import data
+    Fix initial hp bug, #63
+    Add export/import for heal after death setting
+    Move heal after death button to sim options
+
 v1.5.5
     Replace tsv data export with JSON data export
 

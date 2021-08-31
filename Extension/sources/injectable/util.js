@@ -37,7 +37,7 @@
         // combat sim version
         MICSR.majorVersion = 1;
         MICSR.minorVersion = 5;
-        MICSR.patchVersion = 5;
+        MICSR.patchVersion = 6;
         MICSR.preReleaseVersion = undefined;
         MICSR.version = `v${MICSR.majorVersion}.${MICSR.minorVersion}.${MICSR.patchVersion}`;
         if (MICSR.preReleaseVersion !== undefined) {
