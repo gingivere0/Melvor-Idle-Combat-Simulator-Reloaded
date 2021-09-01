@@ -1,3 +1,6 @@
+v1.5.7
+    Fix undefined exportOptionsCard bug
+
 v1.5.6
     Cleanup simulation options card
     Compute average rune breakdown
