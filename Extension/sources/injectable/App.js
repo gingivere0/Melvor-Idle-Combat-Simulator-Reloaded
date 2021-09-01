@@ -313,7 +313,6 @@
                 }
 
                 // Setup the default state of the UI
-                this.exportOptionsCard.outerContainer.style.display = 'none';
                 this.plotter.timeDropdown.selectedIndex = this.initialTimeUnitIndex;
                 this.subInfoCard.container.style.display = 'none';
                 this.plotter.petSkillDropdown.style.display = 'none';
