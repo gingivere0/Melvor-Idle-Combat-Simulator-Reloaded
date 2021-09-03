@@ -1,3 +1,6 @@
+v1.5.9
+    Fix tab container bugs
+
 v1.5.8
     Fix Consumables bugs, add storage of consumables data, #60
     Update data when consumables setting change, #60
