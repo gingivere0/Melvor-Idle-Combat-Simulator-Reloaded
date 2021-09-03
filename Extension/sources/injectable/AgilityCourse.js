@@ -142,11 +142,9 @@
                 } else {
                     this.tmpModifiers.addModifiers(obstacle.modifiers);
                 }
-                for (let prop in obstacle.modifiers) {
-                    MICSR.showModifiersInstance.printRelevantModifiers({[prop]: this.tmpModifiers[prop]}, this.filter.tag).forEach(toPrint => {
-                        passives += `<div class="${toPrint[1]}">${toPrint[0]}</div>`;
-                    });
-                }
+                MICSR.showModifiersInstance.printRelevantModifiers(this.tmpModifiers, this.filter.tag).forEach(toPrint => {
+                    passives += `<div class="${toPrint[1]}">${toPrint[0]}</div>`;
+                });
                 this.tmpModifiers.reset();
                 return passives;
             }
