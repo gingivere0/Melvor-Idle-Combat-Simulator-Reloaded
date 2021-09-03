@@ -314,8 +314,6 @@
                     'slayerXpPerSecond',
                     'prayerXpPerSecond',
                     'summoningXpPerSecond',
-                    // kill time
-                    'killTimeS',
                     // loot gains
                     'gpPerSecond',
                     'dropChance',
@@ -325,6 +323,7 @@
                 const gpFactor = (data.killTimeS + data.alchTimeS) / (data.killTimeS * factor + data.alchTimeS);
                 data.adjustedRates.gpPerSecond = data.gpPerSecond * gpFactor;
                 // kills per second
+                data.adjustedRates.killTimeS = data.killTimeS * factor;
                 data.adjustedRates.killsPerSecond = 1 / data.adjustedRates.killTimeS;
             }
 
