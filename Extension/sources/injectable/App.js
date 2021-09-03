@@ -1954,7 +1954,7 @@
                     const simID = this.simulator.simID(queueItem.monsterID, ids.dungeonID);
                     this.simulator.monsterSimData[simID] = this.manager.convertSlowSimToResult(simResult, MICSR.trials);
                 });
-                this.simulator.performPostSimAnalysis();
+                this.simulator.performPostSimAnalysis(true);
                 this.updateDisplayPostSim();
                 const processingTime = performance.now() - startTimeStamp;
                 MICSR.log(`Simulation took ${processingTime / 1000}s.`);

@@ -670,7 +670,7 @@
             }
 
             /** Performs all data analysis post queue completion */
-            performPostSimAnalysis() {
+            performPostSimAnalysis(first = false) {
                 // Perform calculation of dungeon stats
                 for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
                     this.computeAverageSimData(this.dungeonSimFilter[dungeonID], this.dungeonSimData[dungeonID], MICSR.dungeons[dungeonID].monsters, dungeonID);
@@ -684,32 +684,35 @@
                 for (let slayerTaskID = 0; slayerTaskID < this.slayerTaskMonsters.length; slayerTaskID++) {
                     this.slayerSimData[slayerTaskID].killTimeS /= this.slayerTaskMonsters[slayerTaskID].length;
                 }
-                // Update other data
-                this.parent.loot.update();
-                MICSR.log(`Elapsed Simulation Time: ${performance.now() - this.simStartTime}ms`);
-                // store simulation
-                if (this.parent.trackHistory) {
-                    const monsterSimData = {};
-                    for (const id in this.monsterSimData) {
-                        monsterSimData[id] = {...this.monsterSimData[id]};
-                    }
-                    const save = {
-                        settings: this.parent.import.exportSettings(),
-                        export: '',
-                        monsterSimData: monsterSimData,
-                        dungeonSimData: this.dungeonSimData.map(x => {
-                            return {...x};
-                        }),
-                        slayerSimData: this.slayerSimData.map(x => {
-                            return {...x};
-                        }),
-                    }
-                    save.export = JSON.stringify(save.settings, null, 1);
-                    this.parent.savedSimulations.push(save);
-                    this.parent.createCompareCard();
-                }
                 // scale
                 this.parent.consumables.update();
+                // Update other data
+                this.parent.loot.update();
+                // log time and save result
+                if (first) {
+                    MICSR.log(`Elapsed Simulation Time: ${performance.now() - this.simStartTime}ms`);
+                    // store simulation
+                    if (this.parent.trackHistory) {
+                        const monsterSimData = {};
+                        for (const id in this.monsterSimData) {
+                            monsterSimData[id] = {...this.monsterSimData[id]};
+                        }
+                        const save = {
+                            settings: this.parent.import.exportSettings(),
+                            export: '',
+                            monsterSimData: monsterSimData,
+                            dungeonSimData: this.dungeonSimData.map(x => {
+                                return {...x};
+                            }),
+                            slayerSimData: this.slayerSimData.map(x => {
+                                return {...x};
+                            }),
+                        }
+                        save.export = JSON.stringify(save.settings, null, 1);
+                        this.parent.savedSimulations.push(save);
+                        this.parent.createCompareCard();
+                    }
+                }
             }
 
             /** Starts processing simulation jobs */
@@ -727,7 +730,7 @@
                             }
                         }
                     } else {
-                        this.performPostSimAnalysis();
+                        this.performPostSimAnalysis(true);
                         this.parent.updateDisplayPostSim();
                     }
                 }
@@ -760,7 +763,7 @@
                     });
                     if (allDone) {
                         this.simInProgress = false;
-                        this.performPostSimAnalysis();
+                        this.performPostSimAnalysis(true);
                         this.parent.updateDisplayPostSim();
                         if (this.isTestMode) {
                             this.testCount++;

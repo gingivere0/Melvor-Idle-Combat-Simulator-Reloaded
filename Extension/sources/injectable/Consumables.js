@@ -42,6 +42,8 @@
                     this,
                     'applyRates',
                     this.applyRates,
+                    25,
+                    () => this.updateData(),
                 );
                 this.showAll = false;
                 this.card.addToggleRadio(
@@ -189,6 +191,13 @@
                 }
                 this.consumables[id].seconds = seconds;
                 // update
+                if (this.applyRates) {
+                    this.updateData();
+                }
+            }
+
+            updateData() {
+                this.simulator.performPostSimAnalysis();
                 this.app.updatePlotData();
                 this.app.updateZoneInfoCard();
             }
