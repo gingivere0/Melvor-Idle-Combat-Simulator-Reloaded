@@ -227,12 +227,12 @@
                 return {value: value, alchTime: alchTime};
             }
 
-            computeGP(basePerSecond, killTime, f, ...args) {
+            computeGP(data, f, ...args) {
                 const monsterValue = this.computeValueAlchs(f, ...args);
                 const value = monsterValue.value;
-                const alchTime = monsterValue.alchTime;
-                const excludeAlchTime = basePerSecond + value / killTime;
-                return (excludeAlchTime * killTime) / (killTime + alchTime);
+                data.alchTimeS = monsterValue.alchTime;
+                const excludeAlchTime = data.baseGpPerSecond + value / data.killTimeS;
+                data.gpPerSecond = (excludeAlchTime * data.killTimeS) / (data.killTimeS + data.alchTimeS);
             }
 
             /**
@@ -246,9 +246,8 @@
                         if (!this.monsterSimData[simID]) {
                             return;
                         }
-                        this.monsterSimData[simID].gpPerSecond = this.computeGP(
-                            this.monsterSimData[simID].baseGpPerSecond,
-                            this.monsterSimData[simID].killTimeS,
+                        this.computeGP(
+                            this.monsterSimData[simID],
                             'computeDungeonMonsterValue',
                             monsterID,
                         );
@@ -259,9 +258,8 @@
                             return;
                         }
                         if (this.monsterSimData[monsterID].simSuccess) {
-                            this.monsterSimData[monsterID].gpPerSecond = this.computeGP(
-                                this.monsterSimData[monsterID].baseGpPerSecond,
-                                this.monsterSimData[monsterID].killTimeS,
+                            this.computeGP(
+                                this.monsterSimData[monsterID],
                                 'computeMonsterValue',
                                 monsterID,
                             );
@@ -275,9 +273,8 @@
                             return;
                         }
                         if (this.dungeonSimData[i].simSuccess) {
-                            this.dungeonSimData[i].gpPerSecond = this.computeGP(
-                                this.dungeonSimData[i].baseGpPerSecond,
-                                this.dungeonSimData[i].killTimeS,
+                            this.computeGP(
+                                this.dungeonSimData[i],
                                 'computeDungeonValue',
                                 i,
                             );
