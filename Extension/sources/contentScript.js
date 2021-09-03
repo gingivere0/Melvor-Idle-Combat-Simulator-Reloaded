@@ -74,6 +74,7 @@ function injectScripts() {
         'AgilityCourse',
         'Card',
         'CombatData',
+        'Consumables',
         'DataExport',
         'Import',
         'Loot',

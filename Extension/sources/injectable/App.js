@@ -25,6 +25,7 @@
         'AgilityCourse',
         'Card',
         'CombatData',
+        'Consumables',
         'DataExport',
         'Import',
         'Plotter',
@@ -243,6 +244,7 @@
                 this.createLootOptionsCard();
                 this.createSimulationAndExportCard();
                 this.createCompareCard();
+                this.createConsumablesCard();
                 // Add Combat Stat Display Card
                 this.createCombatStatDisplayCard();
                 // Individual simulation info card
@@ -936,7 +938,8 @@
                     this.loot.alchemyCutoff,
                     0,
                     Infinity,
-                    (event) => this.alchemyCutoffInputOnChange(event));
+                    (event) => this.alchemyCutoffInputOnChange(event),
+                );
             }
 
             buildItemDropList() {
@@ -1102,6 +1105,17 @@
                 this.simulator.dungeonSimData = simulation.dungeonSimData;
                 this.simulator.slayerSimData = simulation.slayerSimData;
                 this.updateDisplayPostSim();
+            }
+
+            createConsumablesCard() {
+                if (!this.consumablesCard) {
+                    this.trackHistory = false;
+                    this.savedSimulations = [];
+                    this.consumablesCard = this.mainTabCard.addTab('Consumables', this.media.statistics, '', '150px');
+                } else {
+                    this.consumablesCard.clearContainer();
+                }
+                this.consumables = new MICSR.Consumables(this);
             }
 
             /** Adds a multi-button with equipment to the equipment select popup
@@ -1885,6 +1899,7 @@
                 this.plotter.plotType = event.currentTarget.value;
                 this.plotter.plotID = event.currentTarget.selectedIndex;
                 this.simulator.selectedPlotIsTime = this.plotTypes[event.currentTarget.selectedIndex].isTime;
+                this.simulator.selectedPlotScales = this.plotTypes[event.currentTarget.selectedIndex].scale;
                 if (this.simulator.selectedPlotIsTime) {
                     this.plotter.timeDropdown.style.display = '';
                 } else {
@@ -2020,6 +2035,7 @@
             timeUnitDropdownOnChange(event) {
                 this.timeMultiplier = this.timeMultipliers[event.currentTarget.selectedIndex];
                 this.simulator.selectedPlotIsTime = this.plotTypes[this.plotter.plotID].isTime;
+                this.simulator.selectedPlotScales = this.plotTypes[this.plotter.plotID].scale;
                 this.selectedTime = this.timeOptions[event.currentTarget.selectedIndex];
                 this.selectedTimeShorthand = this.timeShorthand[event.currentTarget.selectedIndex];
                 // Updated Signet chance
@@ -2280,11 +2296,8 @@
                 for (let i = 0; i < this.plotTypes.length; i++) {
                     const dataKey = this.plotTypes[i].value;
                     const outElem = document.getElementById(`MCS ${dataKey} Output`);
-                    let dataMultiplier = (this.plotTypes[i].scale) ? this.timeMultiplier : 1;
-                    if (dataMultiplier === -1) dataMultiplier = data.killTimeS;
-                    if (dataKey === 'petChance') dataMultiplier = 1;
                     outElem.textContent = updateInfo && !isNaN(data[dataKey])
-                        ? MICSR.mcsFormatNum(data[dataKey] * dataMultiplier, 4)
+                        ? MICSR.mcsFormatNum(this.simulator.getValue(true, data, dataKey, this.plotTypes[i].scale), 4)
                         : 'N/A';
                 }
                 if (data.deathRate > 0) {

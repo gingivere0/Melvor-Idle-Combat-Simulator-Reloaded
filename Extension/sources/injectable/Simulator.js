@@ -92,6 +92,7 @@
                 this.currentSim = this.initCurrentSim();
                 // Options for time multiplier
                 this.selectedPlotIsTime = true;
+                this.selectedPlotScales = true;
                 // Test Settings
                 this.isTestMode = false;
                 this.testMax = 10;
@@ -678,12 +679,10 @@
                     this.computeAverageSimData(this.slayerSimFilter[slayerTaskID], this.slayerSimData[slayerTaskID], this.slayerTaskMonsters[slayerTaskID]);
                     // correct average kps for auto slayer
                     this.slayerSimData[slayerTaskID].killsPerSecond *= this.slayerTaskMonsters[slayerTaskID].length;
-                    // correct average kill time for auto slayer
+                }
+                // correct average kill time for auto slayer
+                for (let slayerTaskID = 0; slayerTaskID < this.slayerTaskMonsters.length; slayerTaskID++) {
                     this.slayerSimData[slayerTaskID].killTimeS /= this.slayerTaskMonsters[slayerTaskID].length;
-                    // log monster IDs
-                    if (this.slayerTaskMonsters[slayerTaskID].length) {
-                        MICSR.log(`Tier ${slayerTaskID} auto slayer task list`, this.slayerTaskMonsters[slayerTaskID]);
-                    }
                 }
                 // Update other data
                 this.parent.loot.update();
@@ -709,6 +708,8 @@
                     this.parent.savedSimulations.push(save);
                     this.parent.createCompareCard();
                 }
+                // scale
+                this.parent.consumables.update();
             }
 
             /** Starts processing simulation jobs */
@@ -845,41 +846,28 @@
              * @return {number[]}
              */
             getDataSet(keyValue) {
-                let dataMultiplier = 1;
-                if (this.selectedPlotIsTime) {
-                    dataMultiplier = this.parent.timeMultiplier;
-                }
-                let isKillTime = (this.parent.timeMultiplier === -1 && this.selectedPlotIsTime);
-                if (keyValue === 'petChance') {
-                    isKillTime = false;
-                    dataMultiplier = 1;
-                }
                 const dataSet = [];
+                const isSignet = keyValue === 'signetChance';
                 if (!this.parent.isViewingDungeon) {
                     // Compile data from monsters in combat zones
-                    this.parent.monsterIDs.forEach((monsterID) => {
-                        if (isKillTime) dataMultiplier = this.monsterSimData[monsterID].killTimeS;
-                        dataSet.push((this.monsterSimFilter[monsterID] && this.monsterSimData[monsterID].simSuccess) ? this.monsterSimData[monsterID][keyValue] * dataMultiplier : NaN);
+                    this.parent.monsterIDs.forEach(monsterID => {
+                        dataSet.push(this.getBarValue(this.monsterSimFilter[monsterID], this.monsterSimData[monsterID], keyValue));
                     });
                     // Perform simulation of monsters in dungeons
-                    for (let i = 0; i < MICSR.dungeons.length; i++) {
-                        if (isKillTime) dataMultiplier = this.dungeonSimData[i].killTimeS;
-                        dataSet.push((this.dungeonSimFilter[i] && this.dungeonSimData[i].simSuccess) ? this.dungeonSimData[i][keyValue] * dataMultiplier : NaN);
+                    for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
+                        dataSet.push(this.getBarValue(this.dungeonSimFilter[dungeonID], this.dungeonSimData[dungeonID], keyValue));
                     }
                     // Perform simulation of monsters in slayer tasks
-                    for (let i = 0; i < this.slayerTaskMonsters.length; i++) {
-                        if (isKillTime) dataMultiplier = this.slayerSimData[i].killTimeS;
-                        dataSet.push((this.slayerSimFilter[i] && this.slayerSimData[i].simSuccess) ? this.slayerSimData[i][keyValue] * dataMultiplier : NaN);
+                    for (let taskID = 0; taskID < this.slayerTaskMonsters.length; taskID++) {
+                        dataSet.push(this.getBarValue(this.slayerSimFilter[taskID], this.slayerSimData[taskID], keyValue));
                     }
                 } else if (this.parent.viewedDungeonID < MICSR.dungeons.length) {
                     // dungeons
                     const dungeonID = this.parent.viewedDungeonID;
-                    const isSignet = keyValue === 'signetChance';
                     MICSR.dungeons[dungeonID].monsters.forEach((monsterID) => {
                         const simID = this.simID(monsterID, dungeonID);
                         if (!isSignet) {
-                            if (isKillTime) dataMultiplier = this.monsterSimData[simID].killTimeS;
-                            dataSet.push((this.monsterSimData[simID].simSuccess) ? this.monsterSimData[simID][keyValue] * dataMultiplier : NaN);
+                            dataSet.push(this.getBarValue(true, this.monsterSimData[simID], keyValue));
                         } else {
                             dataSet.push(0);
                         }
@@ -887,22 +875,54 @@
                     if (isSignet) {
                         const bossId = MICSR.dungeons[dungeonID].monsters[MICSR.dungeons[dungeonID].monsters.length - 1];
                         const simID = this.simID(bossId, dungeonID);
-                        dataSet[dataSet.length - 1] = (this.monsterSimData[simID].simSuccess) ? this.monsterSimData[simID][keyValue] * dataMultiplier : NaN;
+                        dataSet[dataSet.length - 1] = this.getBarValue(true, this.monsterSimData[simID], keyValue);
                     }
                 } else {
                     // slayer tasks
                     const taskID = this.parent.viewedDungeonID - MICSR.dungeons.length;
-                    const isSignet = keyValue === 'signetChance';
                     this.slayerTaskMonsters[taskID].forEach(monsterID => {
                         if (!isSignet) {
-                            if (isKillTime) dataMultiplier = this.monsterSimData[monsterID].killTimeS;
-                            dataSet.push((this.monsterSimData[monsterID].simSuccess) ? this.monsterSimData[monsterID][keyValue] * dataMultiplier : NaN);
+                            dataSet.push(this.getBarValue(true, this.monsterSimData[monsterID], keyValue));
                         } else {
                             dataSet.push(0);
                         }
                     });
                 }
                 return dataSet;
+            }
+
+            getValue(filter, data, keyValue, scale) {
+                if (filter && data.simSuccess) {
+                    return this.getAdjustedData(data, keyValue) * this.getTimeMultiplier(data, keyValue, scale);
+                }
+                return NaN;
+            }
+
+            getBarValue(filter, data, keyValue) {
+                return this.getValue(filter, data, keyValue, this.selectedPlotScales);
+            }
+
+            getTimeMultiplier(data, keyValue, scale) {
+                let dataMultiplier = 1;
+                if (scale) {
+                    dataMultiplier = this.parent.timeMultiplier;
+                }
+                if (this.parent.timeMultiplier === -1 && scale) {
+                    dataMultiplier = this.getAdjustedData(data, 'killTimeS');
+                }
+                if (keyValue === 'petChance') {
+                    dataMultiplier = 1;
+                }
+                return dataMultiplier;
+            }
+
+            getAdjustedData(data, tag) {
+                if (this.parent.consumables.applyRates) {
+                    if (data.adjustedRates[tag] !== undefined) {
+                        return data.adjustedRates[tag];
+                    }
+                }
+                return data[tag];
             }
 
             getRawData() {
