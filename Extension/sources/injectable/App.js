@@ -135,11 +135,17 @@
                     mastery: 'assets/media/main/mastery_header.png',
                     statistics: 'assets/media/main/statistics_header.svg',
                     loot: 'assets/media/bank/chapeau_noir.png',
-                    summoning: 'assets/media/skills/summoning/summoning.png',
+                    summoning: 'assets/media/skills/summoning/summoning.svg',
                     synergy: 'assets/media/skills/summoning/synergy.svg',
                     synergyLock: 'assets/media/skills/summoning/synergy_locked.svg',
                     stamina: 'assets/media/main/stamina.png',
                     question: 'assets/media/main/question.svg',
+                    airRune: items[CONSTANTS.item.Air_Rune].media,
+                    mistRune: items[CONSTANTS.item.Mist_Rune].media,
+                    bank: 'assets/media/main/bank_header.svg',
+                    herblore: 'assets/media/skills/herblore/herblore.svg',
+                    cooking: 'assets/media/skills/cooking/cooking.svg',
+                    fletching: 'assets/media/skills/fletching/fletching.svg',
                 };
 
                 // monster IDs
@@ -325,6 +331,8 @@
                 this.updatePlotData();
                 // slayer sim is off by default, so toggle auto slayer off
                 this.toggleSlayerSims(!this.slayerToggleState, false);
+                // load from local storage
+                this.consumables.loadRates();
             }
 
             printRelevantModifiers(modifiers, options = {}) {
@@ -1111,7 +1119,11 @@
                 if (!this.consumablesCard) {
                     this.trackHistory = false;
                     this.savedSimulations = [];
-                    this.consumablesCard = this.mainTabCard.addTab('Consumables', this.media.statistics, '', '150px');
+                    this.consumablesCard = this.mainTabCard.addPremadeTab(
+                        'Consumables',
+                        this.media.bank,
+                        new MICSR.TabCard('', false, this.mainTabCard.container, '100%', '150px'),
+                    );
                 } else {
                     this.consumablesCard.clearContainer();
                 }

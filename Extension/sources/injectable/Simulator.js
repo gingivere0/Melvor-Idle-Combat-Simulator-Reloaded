@@ -684,10 +684,10 @@
                 for (let slayerTaskID = 0; slayerTaskID < this.slayerTaskMonsters.length; slayerTaskID++) {
                     this.slayerSimData[slayerTaskID].killTimeS /= this.slayerTaskMonsters[slayerTaskID].length;
                 }
-                // scale
-                this.parent.consumables.update();
                 // Update other data
                 this.parent.loot.update();
+                // scale
+                this.parent.consumables.update();
                 // log time and save result
                 if (first) {
                     MICSR.log(`Elapsed Simulation Time: ${performance.now() - this.simStartTime}ms`);

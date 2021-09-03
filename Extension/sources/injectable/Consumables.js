@@ -34,6 +34,9 @@
                 this.card = this.app.consumablesCard;
                 this.player = this.app.player;
                 this.simulator = this.app.simulator;
+                // add export and import
+                this.card.addButton('Export Rates', () => this.exportConsumableData());
+                this.card.addTextInput('Import Rates:', '', event => this.importConsumableData(event));
                 // toggles
                 this.applyRates = false;
                 this.card.addToggleRadio(
@@ -55,48 +58,46 @@
                     25,
                     () => this.updateView(),
                 );
-                this.card.container.appendChild(document.createElement('br'));
-                // add export and import
-                this.card.addButton('Export Rates', () => this.exportConsumableData());
-                this.card.addTextInput('Import Rates:', '', event => this.importConsumableData(event));
-                this.card.container.appendChild(document.createElement('br'));
                 // add consumables
                 this.initConsumables();
-                // update view
             }
 
             initConsumables() {
                 // consumables list
                 this.consumables = {};
-                // prayer points
-                this.addConsumableInput('pp', 'Prayer Points', () => false);
-                this.card.container.appendChild(document.createElement('br'));
+                // global costs
+                this.card.addSectionTitle('Seconds per Consumable');
+                this.addConsumableInput(this.card, 'pp', 'Prayer Points', () => false);
+                this.addConsumableInput(this.card, 'potion', 'Potion', () => false);
+                this.addConsumableInput(this.card, 'food', 'Food', () => false);
+                this.addConsumableInput(this.card, 'rune', 'Runes', () => false);
+                this.addConsumableInput(this.card, 'combination', 'Combination Runes', () => false, 'rune');
+                this.addConsumableInput(this.card, 'ammo', 'Ammo', () => false);
+                this.addConsumableInput(this.card, 'summon', 'Familiar Tablets', () => false);
+                // tab
+                this.card.addTabMenu();
                 // potions
-                this.addConsumableInput('potion', 'Potion', () => false);
+                const potionCard = new MICSR.Card(this.card.container, '', '100px');
                 herbloreItemData.filter(data => data.category === 0).map(data => data.itemID[0]).forEach(potionID =>
-                    this.addConsumableInput(potionID, items[potionID].name.replace('Potion I', 'Potion'), () => this.player.potionID !== -1 && potionID === herbloreItemData[this.player.potionID].itemID[0], 'potion')
+                    this.addConsumableInput(potionCard, potionID, items[potionID].name.replace('Potion I', 'Potion'), () => this.player.potionID !== -1 && potionID === herbloreItemData[this.player.potionID].itemID[0], 'potion')
                 );
-                this.card.container.appendChild(document.createElement('br'));
                 // food
-                this.addConsumableInput('food', 'Food', () => false);
+                const foodCard = new MICSR.Card(this.card.container, '', '100px');
                 items.filter(item => this.app.filterIfHasKey('healsFor', item)).map(food => food.id).forEach(foodID =>
-                    this.addItemInput(foodID, () => foodID === this.player.food.currentSlot.item.id, 'food')
+                    this.addItemInput(foodCard, foodID, () => foodID === this.player.food.currentSlot.item.id, 'food')
                 );
-                this.card.container.appendChild(document.createElement('br'));
                 // runes
-                this.addConsumableInput('rune', 'Runes', () => false);
+                const runesCard = new MICSR.Card(this.card.container, '', '100px');
                 items.filter(x => x.runecraftingCategory === 0).map(rune => rune.id).forEach(runeID =>
-                    this.addItemInput(runeID, () => this.runesInUse[runeID], 'rune')
+                    this.addItemInput(runesCard, runeID, () => this.runesInUse[runeID], 'rune')
                 );
-                this.card.container.appendChild(document.createElement('br'));
                 // combination runes
-                this.addConsumableInput('combination', 'Combination Runes', () => false, 'rune');
+                const combinationCard = new MICSR.Card(this.card.container, '', '100px');
                 combinations.forEach(runeID =>
-                    this.addItemInput(runeID, () => this.runesInUse[runeID], 'combination')
+                    this.addItemInput(combinationCard, runeID, () => this.runesInUse[runeID], 'combination')
                 );
-                this.card.container.appendChild(document.createElement('br'));
                 // ammo
-                this.addConsumableInput('ammo', 'Ammo', () => false);
+                const ammoCard = new MICSR.Card(this.card.container, '', '100px');
                 [
                     {
                         id: 'arrow',
@@ -119,26 +120,39 @@
                         ammoType: 3,
                     },
                 ].forEach(ammoInfo => {
-                    this.addConsumableInput(ammoInfo.id, ammoInfo.name, () => false, 'ammo');
+                    this.addConsumableInput(ammoCard, ammoInfo.id, ammoInfo.name, () => false, 'ammo');
                     items.filter(x => x.ammoType === ammoInfo.ammoType).map(ammo => ammo.id).forEach(ammoID =>
-                        this.addItemInput(ammoID, () => ammoID === this.player.equipmentID(equipmentSlotData.Quiver.id), ammoInfo.id)
+                        this.addItemInput(ammoCard, ammoID, () => ammoID === this.player.equipmentID(equipmentSlotData.Quiver.id), ammoInfo.id)
                     );
                 });
-                this.card.container.appendChild(document.createElement('br'));
                 // summons
-                this.addConsumableInput('summon', 'Familiar Tablets', () => false);
+                const summonCard = new MICSR.Card(this.card.container, '', '100px');
                 items.filter(x => x.equipmentStats && x.equipmentStats.find(y => y.key === 'summoningMaxhit')).map(x => x.id).forEach(summonID =>
-                    this.addItemInput(summonID, () => this.player.equipmentIDs().includes(summonID), 'summon')
+                    this.addItemInput(summonCard, summonID, () => this.player.equipmentIDs().includes(summonID), 'summon')
                 );
-                this.card.container.appendChild(document.createElement('br'));
+                // add the tab cards
+                [
+                    {name: 'Potions', media: this.app.media.herblore, card: potionCard,},
+                    {name: 'Food', media: this.app.media.cooking, card: foodCard,},
+                    {name: 'Runes', media: this.app.media.airRune, card: runesCard,},
+                    {name: 'Combination Runes', media: this.app.media.mistRune, card: combinationCard,},
+                    {name: 'Ammunition', media: this.app.media.fletching, card: ammoCard,},
+                    {name: 'Familiars', media: this.app.media.summoning, card: summonCard},
+                ].forEach(cardInfo =>
+                    this.card.addPremadeTab(
+                        cardInfo.name,
+                        cardInfo.media,
+                        cardInfo.card,
+                    )
+                )
             }
 
-            addItemInput(itemID, check, override) {
+            addItemInput(card, itemID, check, override) {
                 const item = items[itemID];
-                this.addConsumableInput(itemID, item.name, check, override);
+                this.addConsumableInput(card, itemID, item.name, check, override);
             }
 
-            addConsumableInput(id, name, check, override) {
+            addConsumableInput(card, id, name, check, override) {
                 this.consumables[id] = {
                     check: check,
                     name: name,
@@ -146,7 +160,7 @@
                     seconds: undefined,
                     children: [],
                 };
-                this.card.addNumberInput(
+                card.addNumberInput(
                     name,
                     '',
                     0,
@@ -183,6 +197,7 @@
                     seconds = undefined;
                 }
                 this.setConsumableSeconds(id, seconds);
+                this.saveRates();
             }
 
             setConsumableSeconds(id, seconds) {
@@ -202,25 +217,47 @@
                 this.app.updateZoneInfoCard();
             }
 
-            exportConsumableData() {
+            getExportData() {
                 const settings = {};
                 for (const id in this.consumables) {
                     settings[id] = this.consumables[id].seconds;
                 }
-                const data = JSON.stringify(settings, null, 1);
-                this.app.popExport(data);
+                return JSON.stringify(settings, null, 1);
+            }
+
+            exportConsumableData() {
+                this.app.popExport(this.getExportData());
             }
 
             importConsumableData(event) {
+                this.importFromJSON(event.currentTarget.value);
+                this.saveRates();
+            }
+
+            saveRates() {
+                localStorage.setItem('MICSR-Consumables', this.getExportData());
+            }
+
+            loadRates() {
+                const json = localStorage.getItem('MICSR-Consumables');
+                if (json === null) {
+                    return;
+                }
+                this.importFromJSON(json);
+            }
+
+            importFromJSON(json) {
                 let settings;
                 try {
-                    settings = JSON.parse(event.currentTarget.value)
+                    settings = JSON.parse(json)
                 } catch {
                     this.app.notify('Ignored invalid JSON consumable settings!', 'danger');
                     settings = {};
                 }
+                // wipes everything by setting unimported values to undefined
                 for (const id in this.consumables) {
                     this.consumables[id].seconds = settings[id];
+                    document.getElementById(`MCS ${this.consumables[id].name} Input`).value = settings[id] ?? '';
                 }
             }
 
