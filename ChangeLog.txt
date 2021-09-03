@@ -1,3 +1,13 @@
+v1.5.8
+    Fix Consumables bugs, add storage of consumables data, #60
+    Update data when consumables setting change, #60
+    Update consumables view on setup change, #60
+    Add Consumables class to track resource consumption, #60
+    Refactor Loot.computeGP
+    Fix v1.5.7 version number
+    Fix dungeon gp drop bug, #64
+    Fix obstacle SkillModifiers bug, this resolves an issue in Melvor Obstacle Filter
+
 v1.5.7
     Fix undefined exportOptionsCard bug
 
