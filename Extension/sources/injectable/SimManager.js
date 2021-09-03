@@ -195,6 +195,16 @@
             }
 
             progressDungeon() {
+                // do not progress the dungeon!
+                if (this.areaData.dropBones) {
+                    this.dropEnemyBones();
+                }
+                // check if we killed the last monster (length - 1 since we do not increase the progress!)
+                if (this.dungeonProgress === this.areaData.monsters.length - 1) {
+                    this.dropEnemyGP();
+                    // TODO: roll for dungeon pets?
+                    // TODO: add bonus coal on dungeon completion?
+                }
             }
 
             dropEnemyBones() {
