@@ -67,34 +67,34 @@
                 // consumables list
                 this.consumables = {};
                 // prayer points
-                this.addConsumableInput('pp', 'Prayer Points', () => true);
+                this.addConsumableInput('pp', 'Prayer Points', () => false);
                 this.card.container.appendChild(document.createElement('br'));
                 // potions
-                this.addConsumableInput('potion', 'Potion', () => true);
+                this.addConsumableInput('potion', 'Potion', () => false);
                 herbloreItemData.filter(data => data.category === 0).map(data => data.itemID[0]).forEach(potionID =>
                     this.addConsumableInput(potionID, items[potionID].name.replace('Potion I', 'Potion'), () => this.player.potionID !== -1 && potionID === herbloreItemData[this.player.potionID].itemID[0], 'potion')
                 );
                 this.card.container.appendChild(document.createElement('br'));
                 // food
-                this.addConsumableInput('food', 'Food', () => true);
+                this.addConsumableInput('food', 'Food', () => false);
                 items.filter(item => this.app.filterIfHasKey('healsFor', item)).map(food => food.id).forEach(foodID =>
                     this.addItemInput(foodID, () => foodID === this.player.food.currentSlot.item.id, 'food')
                 );
                 this.card.container.appendChild(document.createElement('br'));
                 // runes
-                this.addConsumableInput('rune', 'Runes', () => true);
+                this.addConsumableInput('rune', 'Runes', () => false);
                 items.filter(x => x.runecraftingCategory === 0).map(rune => rune.id).forEach(runeID =>
                     this.addItemInput(runeID, () => this.runesInUse[runeID], 'rune')
                 );
                 this.card.container.appendChild(document.createElement('br'));
                 // combination runes
-                this.addConsumableInput('combination', 'Combination Runes', () => true, 'rune');
+                this.addConsumableInput('combination', 'Combination Runes', () => false, 'rune');
                 combinations.forEach(runeID =>
                     this.addItemInput(runeID, () => this.runesInUse[runeID], 'combination')
                 );
                 this.card.container.appendChild(document.createElement('br'));
                 // ammo
-                this.addConsumableInput('ammo', 'Ammo', () => true);
+                this.addConsumableInput('ammo', 'Ammo', () => false);
                 [
                     {
                         id: 'arrow',
@@ -117,14 +117,14 @@
                         ammoType: 3,
                     },
                 ].forEach(ammoInfo => {
-                    this.addConsumableInput(ammoInfo.id, ammoInfo.name, () => true, 'ammo');
+                    this.addConsumableInput(ammoInfo.id, ammoInfo.name, () => false, 'ammo');
                     items.filter(x => x.ammoType === ammoInfo.ammoType).map(ammo => ammo.id).forEach(ammoID =>
                         this.addItemInput(ammoID, () => ammoID === this.player.equipmentID(equipmentSlotData.Quiver.id), ammoInfo.id)
                     );
                 });
                 this.card.container.appendChild(document.createElement('br'));
                 // summons
-                this.addConsumableInput('summon', 'Familiar Tablets', () => true);
+                this.addConsumableInput('summon', 'Familiar Tablets', () => false);
                 items.filter(x => x.equipmentStats && x.equipmentStats.find(y => y.key === 'summoningMaxhit')).map(x => x.id).forEach(summonID =>
                     this.addItemInput(summonID, () => this.player.equipmentIDs().includes(summonID), 'summon')
                 );
@@ -142,6 +142,7 @@
                     name: name,
                     override: override,
                     seconds: undefined,
+                    children: [],
                 };
                 this.card.addNumberInput(
                     name,
@@ -150,6 +151,19 @@
                     Infinity,
                     event => this.setConsumableSecondsFromEvent(event, id),
                 );
+                if (override !== undefined) {
+                    this.consumables[override].children.push(id);
+                }
+            }
+
+            genericCheck(id) {
+                const consumable = this.consumables[id];
+                for (const childID of consumable.children) {
+                    if (this.genericCheck(childID)) {
+                        return true;
+                    }
+                }
+                return consumable.check();
             }
 
             updateView() {
@@ -157,7 +171,7 @@
                 for (const id in this.consumables) {
                     const consumable = this.consumables[id];
                     const element = document.getElementById(`MCS ${consumable.name} Input`).parentElement;
-                    element.style.display = this.showAll || consumable.check() ? '' : 'none';
+                    element.style.display = this.showAll || this.genericCheck(id) ? '' : 'none';
                 }
             }
 

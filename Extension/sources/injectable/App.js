@@ -2477,6 +2477,7 @@
                     }
                 });
                 this.setSummoningSynergyText();
+                this.consumables.updateView();
             }
 
             /**
