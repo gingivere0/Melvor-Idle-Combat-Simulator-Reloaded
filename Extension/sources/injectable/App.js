@@ -695,7 +695,7 @@
                 this.spellSelectCard = this.mainTabCard.addPremadeTab(
                     'Spells',
                     this.media.spellbook,
-                    new MICSR.TabCard('', false, this.mainTabCard.container, '100%', '150px'),
+                    new MICSR.TabCard('', false, this.mainTabCard.tabContainer, '100%', '150px'),
                 );
                 // add title for spellbook tab
                 this.spellSelectCard.addSectionTitle('Spells');
@@ -1116,17 +1116,11 @@
             }
 
             createConsumablesCard() {
-                if (!this.consumablesCard) {
-                    this.trackHistory = false;
-                    this.savedSimulations = [];
-                    this.consumablesCard = this.mainTabCard.addPremadeTab(
-                        'Consumables',
-                        this.media.bank,
-                        new MICSR.TabCard('', false, this.mainTabCard.container, '100%', '150px'),
-                    );
-                } else {
-                    this.consumablesCard.clearContainer();
-                }
+                this.consumablesCard = this.mainTabCard.addPremadeTab(
+                    'Consumables',
+                    this.media.bank,
+                    new MICSR.TabCard('consumables', false, this.mainTabCard.tabContainer, '100%', '150px'),
+                );
                 this.consumables = new MICSR.Consumables(this);
             }
 
