@@ -118,6 +118,7 @@
 
                 // create settings object
                 const settings = {
+                    version: MICSR.version,
                     // lists
                     course: chosenAgilityObstacles,
                     courseMastery: MASTERY[CONSTANTS.skill.Agility].xp.map(x => x > 13034431),
