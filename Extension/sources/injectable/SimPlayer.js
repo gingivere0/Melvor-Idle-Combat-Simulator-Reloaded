@@ -162,6 +162,47 @@
                 this.isManualEating = false;
                 // gp, skillXP, PETS, slayercoins
                 this.resetGains();
+                // conditionalModifiers
+                this.conditionalModifiers = new Map();
+                conditionalModifierData.forEach(data => this.conditionalModifiers.set(data.itemID, {...data}));
+            }
+
+            computeConditionalWatchLists() {
+                this.bankConditionWatchLists.clear();
+                this.gloveConditionWatchLists.clear();
+                this.hitpointConditionWatchLists.clear();
+                this.synergy_1_2_isActive = false;
+                this.equipment.slotArray.forEach((slot) => {
+                    const item = slot.item;
+                    if (slot.providesStats) {
+                        const condition = this.conditionalModifiers.get(item.id);
+                        if (condition !== undefined) {
+                            switch (condition.type) {
+                                case "GloveCharges": {
+                                    let watchList = this.gloveConditionWatchLists.get(condition.gloveID);
+                                    if (watchList === undefined) {
+                                        watchList = [];
+                                        this.gloveConditionWatchLists.set(condition.gloveID, watchList);
+                                    }
+                                    watchList.push(condition);
+                                }
+                                    break;
+                                case "BankItem": {
+                                    let watchList = this.bankConditionWatchLists.get(condition.bankItemID);
+                                    if (watchList === undefined) {
+                                        watchList = [];
+                                        this.bankConditionWatchLists.set(condition.bankItemID, watchList);
+                                    }
+                                    watchList.push(condition);
+                                }
+                                    break;
+                                case "Hitpoints":
+                                    this.hitpointConditionWatchLists.add(condition);
+                                    break;
+                            }
+                        }
+                    }
+                });
             }
 
             resetGains() {

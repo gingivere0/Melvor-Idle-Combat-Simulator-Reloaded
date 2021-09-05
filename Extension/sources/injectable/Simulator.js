@@ -215,7 +215,7 @@
                     {name: 'combatSkills', data: combatSkills},
                     {name: 'combatTriangle', data: combatTriangle},
                     {name: 'combinations', data: combinations},
-                    {name: 'conditionalModifiers', data: conditionalModifiers},
+                    {name: 'conditionalModifierData', data: conditionalModifierData},
                     {name: 'CONSTANTS', data: CONSTANTS},
                     {name: 'CURSES', data: CURSES},
                     {name: 'DotTypeIDs', data: DotTypeIDs},
