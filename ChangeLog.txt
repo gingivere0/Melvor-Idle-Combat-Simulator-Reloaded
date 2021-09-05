@@ -1,3 +1,7 @@
+v1.5.11
+    Fix version warning on set import
+    Fix conditional modifier bug
+
 v1.5.10
     Fix inverse kill time scaling, #60
 
