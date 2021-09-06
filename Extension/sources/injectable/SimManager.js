@@ -124,8 +124,8 @@
 
             convertSlowSimToResult(simResult, targetTrials) {
                 const data = {};
-                const gps = simResult.gainsPerSecond
-                const ticksPerSecond = 1000 / TICK_INTERVAL
+                const gps = simResult.gainsPerSecond;
+                const ticksPerSecond = 1000 / TICK_INTERVAL;
                 const trials = simResult.killCount + simResult.deathCount;
                 // success
                 data.simSuccess = simResult.success;
@@ -159,7 +159,7 @@
                 data.highestDamageTaken = gps.highestDamageTaken;
                 data.lowestHitpoints = gps.lowestHitpoints;
                 // kill time
-                data.killTimeS = simResult.tickCount / ticksPerSecond / trials;
+                data.killTimeS = simResult.tickCount / ticksPerSecond / simResult.killCount;
                 data.killsPerSecond = 1 / data.killTimeS;
                 // loot gains
                 data.baseGpPerSecond = gps.gp; // gpPerSecond is computed from this
