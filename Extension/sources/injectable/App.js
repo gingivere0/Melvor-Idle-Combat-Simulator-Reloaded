@@ -140,8 +140,8 @@
                     synergyLock: 'assets/media/skills/summoning/synergy_locked.svg',
                     stamina: 'assets/media/main/stamina.png',
                     question: 'assets/media/main/question.svg',
-                    airRune: items[CONSTANTS.item.Air_Rune].media,
-                    mistRune: items[CONSTANTS.item.Mist_Rune].media,
+                    airRune: getItemMedia(CONSTANTS.item.Air_Rune),
+                    mistRune: getItemMedia(CONSTANTS.item.Mist_Rune),
                     bank: 'assets/media/main/bank_header.svg',
                     herblore: 'assets/media/skills/herblore/herblore.svg',
                     cooking: 'assets/media/skills/cooking/cooking.svg',
@@ -469,7 +469,7 @@
                     equipmentSelectCard.addSectionTitle('Food');
                     const menuItems = [MICSR.emptyItems.Food, ...items].filter((item) => this.filterIfHasKey('healsFor', item));
                     menuItems.sort((a, b) => b.healsFor - a.healsFor);
-                    const buttonMedia = menuItems.map((item) => item.media);
+                    const buttonMedia = menuItems.map((item) => this.getItemMedia(item));
                     const buttonIds = menuItems.map((item) => this.getItemName(item.id));
                     const buttonCallbacks = menuItems.map((item) => () => this.equipFood(item.id));
                     const tooltips = menuItems.map((item) => this.getFoodTooltip(item));
@@ -565,7 +565,7 @@
                     img.src = 'assets/media/skills/combat/food_empty.svg';
                     img.style.border = '1px solid red';
                 } else {
-                    img.src = items[itemID].media;
+                    img.src = getItemMedia(itemID);
                     img.style.border = '';
                 }
                 img._tippy.setContent(this.getFoodTooltip(items[itemID]));
@@ -818,7 +818,7 @@
                 for (let i = 0; i < herbloreItemData.length; i++) {
                     if (herbloreItemData[i].category === 0) {
                         const potion = items[herbloreItemData[i].itemID[0]];
-                        potionSources.push(potion.media);
+                        potionSources.push(getItemMedia(potion.id));
                         potionNames.push(this.getPotionName(i));
                         potionCallbacks.push((e) => this.potionImageButtonOnClick(e, i));
                         tooltips.push(this.getPotionTooltip(potion));
@@ -1137,7 +1137,7 @@
                     return x ? x : 0;
                 }
                 menuItems.sort((a, b) => sortKey(a) - sortKey(b));
-                const buttonMedia = menuItems.map((item) => item.media);
+                const buttonMedia = menuItems.map((item) => this.getItemMedia(item));
                 const buttonIds = menuItems.map((item) => this.getItemName(item.id));
                 const buttonCallbacks = menuItems.map((item) => () => this.equipItem(equipmentSlot, item.id));
                 const tooltips = menuItems.map((item) => this.getEquipmentTooltip(equipmentSlot, item));
@@ -1482,7 +1482,7 @@
                 const slotKey = EquipmentSlots[equipmentSlot];
                 const img = document.getElementById(`MCS ${slotKey} Image`);
                 const item = MICSR.getItem(itemId, slotKey);
-                img.src = item.media;
+                img.src = this.getItemMedia(item);
                 img._tippy.setContent(this.getEquipmentTooltip(equipmentSlot, item));
                 if (occupy && item.occupiesSlots) {
                     item.occupiesSlots.forEach(slot => this.setEquipmentImage(equipmentSlotData[slot].id, itemId, false));
@@ -2537,7 +2537,7 @@
                 this.combatPotionIDs.forEach((potionId) => {
                     const potion = items[herbloreItemData[potionId].itemID[potionTier]];
                     const img = document.getElementById(`MCS ${this.getPotionName(potionId)} Button Image`);
-                    img.src = potion.media;
+                    img.src = getItemMedia(potion.id);
                     img.parentElement._tippy.setContent(this.getPotionTooltip(potion));
                 });
             }
@@ -2634,6 +2634,13 @@
                 } else {
                     return this.replaceApostrophe(items[itemID].name);
                 }
+            }
+
+            getItemMedia(item) {
+                if (item.id === -1) {
+                    return item.media;
+                }
+                return getItemMedia(item.id);
             }
 
             /**
