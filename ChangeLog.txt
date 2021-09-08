@@ -1,3 +1,9 @@
+v1.5.12
+    Fix slayer xp for v0.21?1111, #66
+    Fix potential consumables bug
+    Use getItemMedia to get item images
+    Fix kph in case of player deaths
+
 v1.5.11
     Fix version warning on set import
     Fix conditional modifier bug
