@@ -262,7 +262,7 @@
             }
 
             getConsumableCostInSeconds(id) {
-                if (id === undefined) {
+                if (id === undefined || id === -1) {
                     return 0;
                 }
                 const consumable = this.consumables[id];
@@ -331,30 +331,32 @@
                 // compute factor
                 let factor = 1;
                 // pp
-                if (data.ppConsumedPerSecond) {
+                if (data.ppConsumedPerSecond > 0) {
                     factor += data.ppConsumedPerSecond * this.getConsumableCostInSeconds('pp');
                 }
                 // potion
-                if (data.potionsUsedPerSecond) {
+                if (data.potionsUsedPerSecond > 0) {
                     const potionID = herbloreItemData[this.player.potionID].itemID[0];
                     factor += data.potionsUsedPerSecond * this.getConsumableCostInSeconds(potionID);
                 }
                 // food
-                if (data.atePerSecond) {
+                if (data.atePerSecond > 0) {
                     const foodID = this.player.food.currentSlot.item.id;
                     factor += data.atePerSecond * this.getConsumableCostInSeconds(foodID);
                 }
                 // runes
                 for (const runeID in data.usedRunesBreakdown) {
-                    factor += data.usedRunesBreakdown[runeID] * this.getConsumableCostInSeconds(runeID);
+                    if (data.usedRunesBreakdown[runeID] > 0) {
+                        factor += data.usedRunesBreakdown[runeID] * this.getConsumableCostInSeconds(runeID);
+                    }
                 }
                 // ammo
-                if (data.ammoUsedPerSecond) {
+                if (data.ammoUsedPerSecond > 0) {
                     const ammoID = this.player.equipmentID(equipmentSlotData.Quiver.id);
                     factor += data.ammoUsedPerSecond * this.getConsumableCostInSeconds(ammoID);
                 }
                 // familiars
-                if (data.tabletsUsedPerSecond) {
+                if (data.tabletsUsedPerSecond > 0) {
                     [
                         MICSR.melvorCombatSim.player.equipmentID(EquipmentSlots.Summon1),
                         MICSR.melvorCombatSim.player.equipmentID(EquipmentSlots.Summon2),
