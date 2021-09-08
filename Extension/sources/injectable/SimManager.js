@@ -219,8 +219,8 @@
                 this.dropEnemyLoot();
                 this.dropEnemyGP();
                 let slayerXPReward = 0;
-                if (this.enemy.data.slayerXP) {
-                    slayerXPReward += this.enemy.data.slayerXP;
+                if (this.areaType === 'Slayer') {
+                    slayerXPReward += this.enemy.stats.maxHitpoints / numberMultiplier / 2;
                 }
                 if (this.onSlayerTask) {
                     this.player.rewardSlayerCoins();
