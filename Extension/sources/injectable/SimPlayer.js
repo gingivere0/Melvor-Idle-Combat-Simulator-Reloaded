@@ -119,6 +119,25 @@
                 this.summonBar = undefined;
             }
 
+            // get grandparent addHitpoints
+            get characterAddHitpoints() {
+                return Character.prototype.addHitpoints;
+            }
+
+            // get grandparent setHitpoints
+            get characterSetHitpoints() {
+                return Character.prototype.setHitpoints;
+            }
+
+            addHitpoints(amount) {
+                this.characterAddHitpoints(amount);
+                this.updateHPConditionals();
+            }
+
+            setHitpoints(value) {
+                this.characterSetHitpoints(value);
+            }
+
             addItemStat() {
             }
 
