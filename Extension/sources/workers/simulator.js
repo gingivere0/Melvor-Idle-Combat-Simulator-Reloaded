@@ -51,6 +51,16 @@
                 event.data.functionNames.forEach(name => {
                     eval(event.data.functions[name]);
                 });
+                // update modifierData functions
+                for (const m in modifierData) {
+                    if (modifierData[m].modifyValue !== undefined) {
+                        if (modifierData[m].modifyValue === 'modifyValue') {
+                            modifierData[m].modifyValue = MICSR[`${m}ModifyValue`];
+                        } else {
+                            modifierData[m].modifyValue = MICSR[modifierData[m].modifyValue];
+                        }
+                    }
+                }
                 // classes
                 event.data.classNames.forEach(name => {
                     eval(event.data.classes[name]);

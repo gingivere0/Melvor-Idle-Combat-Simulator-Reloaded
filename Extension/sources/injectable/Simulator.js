@@ -186,10 +186,32 @@
                     }
                 }
                 const modifierDataClone = {};
+                const modifyValueMethods = [
+                    {
+                        name: 'MICSR.divideByNumberMultiplier',
+                        data: divideByNumberMultiplier.toString().replace('function ', 'MICSR.').replace(/(\(.*\)){/, ' = $1 => {')
+                    },
+                    {
+                        name: 'MICSR.milliToSeconds',
+                        data: milliToSeconds.toString().replace('function ', 'MICSR.').replace(/(\(.*\)){/, ' = $1 => {')
+                    },
+                    {
+                        name: 'MICSR.multiplyByNumberMultiplier',
+                        data: multiplyByNumberMultiplier.toString().replace('function ', 'MICSR.').replace(/(\(.*\)){/, ' = $1 => {')
+                    },
+                ]
                 for (const slot in modifierData) {
+                    const modifyValue = modifierData[slot].modifyValue?.name;
+                    if (modifyValue === 'modifyValue') {
+                        modifyValueMethods.push({
+                            name: `MICSR.${slot}ModifyValue`,
+                            data: `MICSR.${slot}ModifyValue=${modifierData[slot].modifyValue.toString()}`
+                        });
+                    }
                     modifierDataClone[slot] = {
                         ...modifierData[slot],
                         format: '',
+                        modifyValue: modifyValue,
                     }
                 }
                 // constants
@@ -284,7 +306,7 @@
                         name: 'checkRequirements', data: (...args) => {/*console.log('checkRequirements', ...args); */
                             return true;
                         }
-                    }, // TODO: what calls this? It should call SimPlayer.checkRequirements
+                    },
                     {name: 'clampValue', data: clampValue},
                     {name: 'damageReducer', data: damageReducer},
                     {name: 'formatNumber', data: formatNumber},
@@ -306,19 +328,25 @@
                     {name: 'numberWithCommas', data: numberWithCommas},
                     {name: 'rollInteger', data: rollInteger},
                     {name: 'rollPercentage', data: rollPercentage},
+                    {name: 'roundToTickInterval', data: roundToTickInterval},
                     // MICSR functions
                     {
                         name: 'MICSR.addAgilityModifiers',
-                        data: `MICSR.addAgilityModifiers = ${MICSR.addAgilityModifiers}`
+                        data: MICSR.addAgilityModifiers,
                     },
                     {
                         name: 'MICSR.getModifierValue',
-                        data: `MICSR.getModifierValue = ${MICSR.getModifierValue}`
+                        data: MICSR.getModifierValue,
                     },
                 ];
                 const functions = {};
                 functionNames.forEach(func => {
                     functions[func.name] = `${func.name} = ${func.data.toString().replace(`function ${func.name}`, 'function')}`;
+                });
+                // modify value cloned functions
+                modifyValueMethods.forEach(func => {
+                    functions[func.name] = func.data;
+                    functionNames.push(func)
                 });
                 // classes
                 const classNames = [
@@ -332,6 +360,7 @@
                     {name: 'EquipSlot', data: EquipSlot},
                     {name: 'MICSR.ShowModifiers', data: MICSR.ShowModifiers},
                     {name: 'NotificationQueue', data: NotificationQueue},
+                    {name: 'PlayerStats', data: PlayerStats},
                     {name: 'TargetModifiers', data: TargetModifiers},
                     {name: 'Timer', data: Timer},
                     {name: 'SlayerTask', data: SlayerTask},
