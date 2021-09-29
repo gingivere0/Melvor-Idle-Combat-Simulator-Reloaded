@@ -68,12 +68,19 @@
                         'autoEatTier',
                     ],
                 }
+                //
+                this.activeTriangleData = super.activeTriangle;
             }
+
+            get activeTriangle() {
+                return this.activeTriangleData;
+            }
+
 
             initForWebWorker() {
                 currentGamemode = this.currentGamemode;
                 numberMultiplier = combatTriangle[GAMEMODES[currentGamemode].numberMultiplier];
-                this.activeTriangle = combatTriangle[GAMEMODES[currentGamemode].combatTriangle];
+                this.activeTriangleData = combatTriangle[GAMEMODES[currentGamemode].combatTriangle];
                 // recompute stats
                 this.updateForEquipmentChange();
                 this.resetGains();
