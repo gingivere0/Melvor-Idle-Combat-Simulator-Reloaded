@@ -1216,6 +1216,10 @@
                 return item.ammoType === type || item.id === -1;
             }
 
+            filterNoAmmoType(item) {
+                return item.ammoType === undefined || item.id === -1;
+            }
+
             /**
              * Filter an item array by the ammoType
              * @param {number} type
@@ -1413,6 +1417,8 @@
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(2, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('Throwing Knives');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(3, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
+                    equipmentSelectCard.addSectionTitle('Other');
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterNoAmmoType(item), x => x.name);
                 } else if (equipmentSlot === equipmentSlotData.Passive.id) {
                     equipmentSelectCard.addSectionTitle('Magic Damage');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterMagicDamage(item), x => x.name);
