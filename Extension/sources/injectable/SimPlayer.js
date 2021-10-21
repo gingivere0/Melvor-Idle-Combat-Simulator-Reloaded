@@ -190,44 +190,35 @@
                 this.resetGains();
                 // conditionalModifiers
                 this.conditionalModifiers = new Map();
-                conditionalModifierData.forEach(data => this.conditionalModifiers.set(data.itemID, {...data}));
+                itemConditionalModifiers.forEach((itemCondition) => {
+                    this.conditionalModifiers.set(itemCondition.itemID, itemCondition.conditionals);
+                });
             }
 
-            computeConditionalWatchLists() {
-                this.bankConditionWatchLists.clear();
-                this.gloveConditionWatchLists.clear();
-                this.hitpointConditionWatchLists.clear();
-                this.synergy_1_2_isActive = false;
+            computeConditionalListeners() {
+                // Reset the listener sets
+                Object.values(this.conditionalListeners).forEach((list) => list.clear());
+                // Equipped Items
                 this.equipment.slotArray.forEach((slot) => {
                     const item = slot.item;
                     if (slot.providesStats) {
-                        const condition = this.conditionalModifiers.get(item.id);
-                        if (condition !== undefined) {
-                            switch (condition.type) {
-                                case "GloveCharges": {
-                                    let watchList = this.gloveConditionWatchLists.get(condition.gloveID);
-                                    if (watchList === undefined) {
-                                        watchList = [];
-                                        this.gloveConditionWatchLists.set(condition.gloveID, watchList);
-                                    }
-                                    watchList.push(condition);
-                                }
-                                    break;
-                                case "BankItem": {
-                                    let watchList = this.bankConditionWatchLists.get(condition.bankItemID);
-                                    if (watchList === undefined) {
-                                        watchList = [];
-                                        this.bankConditionWatchLists.set(condition.bankItemID, watchList);
-                                    }
-                                    watchList.push(condition);
-                                }
-                                    break;
-                                case "Hitpoints":
-                                    this.hitpointConditionWatchLists.add(condition);
-                                    break;
-                            }
+                        const conditionals = this.conditionalModifiers.get(item.id);
+                        if (conditionals !== undefined) {
+                            this.registerConditionalListeners(conditionals);
                         }
                     }
+                });
+                // Summoning Synergy
+                const args = this.getSummoningIDs();
+                if (isSynergyUnlocked(...args)) {
+                    const synergy = getSummoningSynergy(...args);
+                    if (synergy.conditionalModifiers !== undefined)
+                        this.registerConditionalListeners(synergy.conditionalModifiers);
+                }
+                // Equipment Synergy
+                this.activeItemSynergies.forEach((synergy) => {
+                    if (synergy.conditionalModifiers !== undefined)
+                        this.registerConditionalListeners(synergy.conditionalModifiers);
                 });
             }
 
@@ -380,19 +371,20 @@
             }
 
             addConditionalModifiers() {
-                [
-                    this.bankConditionWatchLists,
-                    this.gloveConditionWatchLists,
-                ].forEach(watchLists => {
-                    watchLists.forEach(conditions => {
-                        conditions.forEach((condition) => {
+                this.conditionalListeners.All.forEach((conditional) => {
+                    if (conditional.target === ModifierTarget.Player &&
+                        !conditional.hooks.includes('PlayerHitpoints') &&
+                        (
                             // for the combat simulator we always assume the bank and glove conditions are true
                             // instead of skipping the entire conditional, we set condition.active to true in case this is used elsewhere
-                            condition.active = true;
-                            if (condition.active)
-                                this.modifiers.addModifiers(condition.modifiers);
-                        });
-                    });
+                            conditional.hooks.includes('BankItem')
+                            || conditional.hooks.includes('GloveCharges')
+                            // other conditions are still checked, TODO: if there are multiple conditions, one of which is bank or glove charge, the others are not checked
+                            || conditional.condition(this)
+                        )) {
+                        this.modifiers.addModifiers(conditional.modifiers);
+                        conditional.isActive = true;
+                    }
                 });
             }
 
