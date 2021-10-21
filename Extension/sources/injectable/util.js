@@ -32,13 +32,13 @@
         MICSR.shortName = 'Combat Simulator';
 
         // compatible game version
-        MICSR.gameVersion = 'Alpha v0.22';
+        MICSR.gameVersion = 'BETA v0.23';
 
         // combat sim version
         MICSR.majorVersion = 1;
-        MICSR.minorVersion = 5;
-        MICSR.patchVersion = 13;
-        MICSR.preReleaseVersion = undefined;
+        MICSR.minorVersion = 6;
+        MICSR.patchVersion = 0;
+        MICSR.preReleaseVersion = 0;
         MICSR.version = `v${MICSR.majorVersion}.${MICSR.minorVersion}.${MICSR.patchVersion}`;
         if (MICSR.preReleaseVersion !== undefined) {
             MICSR.version = `${MICSR.version}-${MICSR.preReleaseVersion}`;
