@@ -61,6 +61,26 @@
                         }
                     }
                 }
+                // update itemConditionalModifiers
+                for (let i = 0; i < itemConditionalModifiers.length; i++) {
+                    for (let j = 0; j < itemConditionalModifiers[i].conditionals; j++) {
+                        itemConditionalModifiers[i].conditionals[j].condition = MICSR[`itemConditionalModifiers-condition-${i}-${j}`];
+                    }
+                }
+                const conditionalModifiers = new Map();
+                itemConditionalModifiers.forEach((itemCondition) => {
+                    conditionalModifiers.set(itemCondition.itemID, itemCondition.conditionals);
+                });
+                // update SUMMONING functions
+                for (const i in SUMMONING.Synergies) {
+                    for (const j in SUMMONING.Synergies[i]) {
+                        if (SUMMONING.Synergies[i][j].conditionalModifiers) {
+                            for (let k = 0; k < SUMMONING.Synergies[i][j].conditionalModifiers.length; k++) {
+                                SUMMONING.Synergies[i][j].conditionalModifiers[k].condition = MICSR[`SUMMONING-conditional-${i}-${j}-${k}`];
+                            }
+                        }
+                    }
+                }
                 // classes
                 event.data.classNames.forEach(name => {
                     eval(event.data.classes[name]);

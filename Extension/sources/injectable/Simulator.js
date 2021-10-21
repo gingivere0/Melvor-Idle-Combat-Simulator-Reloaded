@@ -186,7 +186,7 @@
                     }
                 }
                 const modifierDataClone = {};
-                const modifyValueMethods = [
+                const cloneBackupMethods = [
                     {
                         name: 'MICSR.divideByNumberMultiplier',
                         data: divideByNumberMultiplier.toString().replace('function ', 'MICSR.').replace(/(\(.*\)){/, ' = $1 => {')
@@ -203,7 +203,7 @@
                 for (const slot in modifierData) {
                     const modifyValue = modifierData[slot].modifyValue?.name;
                     if (modifyValue === 'modifyValue') {
-                        modifyValueMethods.push({
+                        cloneBackupMethods.push({
                             name: `MICSR.${slot}ModifyValue`,
                             data: `MICSR.${slot}ModifyValue=${modifierData[slot].modifyValue.toString()}`
                         });
@@ -212,6 +212,52 @@
                         ...modifierData[slot],
                         format: '',
                         modifyValue: modifyValue,
+                    }
+                }
+                // clone itemConditionalModifiers
+                const itemConditionalModifiersClone = [
+                    ...itemConditionalModifiers,
+                ];
+                for (let i = 0; i < itemConditionalModifiersClone.length; i++) {
+                    itemConditionalModifiersClone[i] = {...itemConditionalModifiersClone[i]};
+                    for (let j = 0; j < itemConditionalModifiersClone[i].conditionals.length; j++) {
+                        const condition = itemConditionalModifiersClone[i].conditionals[j].condition.toString();
+                        itemConditionalModifiersClone[i].conditionals[j] = {
+                            ...itemConditionalModifiersClone[i].conditionals[j],
+                            condition: condition,
+                        };
+                        cloneBackupMethods.push({
+                            name: `MICSR["itemConditionalModifiers-condition-${i}-${j}"]`,
+                            data: `MICSR["itemConditionalModifiers-condition-${i}-${j}"]=${condition}`
+                        });
+                    }
+                }
+                // clone SUMMONING
+                const summoningClone = {
+                    ...SUMMONING,
+                };
+                summoningClone.Synergies = {};
+                for (const i in SUMMONING.Synergies) {
+                    summoningClone.Synergies[i] = {};
+                    for (const j in SUMMONING.Synergies[i]) {
+                        summoningClone.Synergies[i][j] = {
+                            ...SUMMONING.Synergies[i][j],
+                            description: SUMMONING.Synergies[i][j].description,
+                        };
+                        if (summoningClone.Synergies[i][j].conditionalModifiers) {
+                            summoningClone.Synergies[i][j].conditionalModifiers = [...summoningClone.Synergies[i][j].conditionalModifiers];
+                            for (let k = 0; k < summoningClone.Synergies[i][j].conditionalModifiers.length; k++) {
+                                const condition = summoningClone.Synergies[i][j].conditionalModifiers[k].condition.toString();
+                                summoningClone.Synergies[i][j].conditionalModifiers[k] = {
+                                    ...summoningClone.Synergies[i][j].conditionalModifiers[k],
+                                    condition: condition,
+                                };
+                                cloneBackupMethods.push({
+                                    name: `MICSR["SUMMONING-conditional-${i}-${j}-${k}"]`,
+                                    data: `MICSR["SUMMONING-conditional-${i}-${j}-${k}"]=${condition}`
+                                });
+                            }
+                        }
                     }
                 }
                 // constants
@@ -237,7 +283,6 @@
                     {name: 'combatSkills', data: combatSkills},
                     {name: 'combatTriangle', data: combatTriangle},
                     {name: 'combinations', data: combinations},
-                    {name: 'conditionalModifierData', data: conditionalModifierData},
                     {name: 'CONSTANTS', data: CONSTANTS},
                     {name: 'CURSES', data: CURSES},
                     {name: 'DotTypeIDs', data: DotTypeIDs},
@@ -253,6 +298,7 @@
                     {name: 'gp', data: 1e9}, // required for confetti crossbow
                     {name: 'herbloreItemData', data: herbloreItemData},
                     {name: 'markOfDeathEffect', data: markOfDeathEffect},
+                    {name: 'itemConditionalModifiers', data: itemConditionalModifiersClone},
                     {name: 'items', data: items},
                     {name: 'modifierData', data: modifierDataClone},
                     {name: 'MONSTERS', data: MONSTERS},
@@ -273,7 +319,7 @@
                     {name: 'SPELLS', data: SPELLS},
                     {name: 'stackingEffects', data: stackingEffects},
                     {name: 'Stats', data: {}},
-                    {name: 'SUMMONING', data: SUMMONING},
+                    {name: 'SUMMONING', data: summoningClone},
                     {name: 'summoningData', data: summoningData},
                     {name: 'summoningItems', data: summoningItems},
                     {name: 'synergyElements', data: {}},
@@ -344,7 +390,7 @@
                     functions[func.name] = `${func.name} = ${func.data.toString().replace(`function ${func.name}`, 'function')}`;
                 });
                 // modify value cloned functions
-                modifyValueMethods.forEach(func => {
+                cloneBackupMethods.forEach(func => {
                     functions[func.name] = func.data;
                     functionNames.push(func)
                 });
