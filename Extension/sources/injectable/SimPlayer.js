@@ -742,6 +742,9 @@
                     case 'SlayerItem':
                         met = this.modifiers.bypassSlayerItems > 0 || this.equipment.checkForItemID(requirement.itemID);
                         break;
+                    case 'ShopPurchase':
+                        met = true;
+                        break;
                 }
                 return met;
             }
