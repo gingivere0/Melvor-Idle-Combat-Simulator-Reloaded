@@ -210,7 +210,7 @@
                 });
                 // Summoning Synergy
                 const args = this.getSummoningIDs();
-                if (isSynergyUnlocked(...args)) {
+                if (this.isSynergyUnlocked(...args)) {
                     const synergy = getSummoningSynergy(...args);
                     if (synergy.conditionalModifiers !== undefined)
                         this.registerConditionalListeners(synergy.conditionalModifiers);
@@ -401,24 +401,51 @@
                 // other shop modifiers are not relevant for combat sim at this point
             }
 
-            addSummonSynergyModifiers() {
+            isSynergyUnlocked(summon1, summon2) {
                 if (!this.summoningSynergy) {
-                    return;
+                    return false;
                 }
-                const summons = [
-                    this.equipment.slots.Summon1.item.summoningID,
-                    this.equipment.slots.Summon2.item.summoningID,
-                ];
-                const synergies = SUMMONING.Synergies[Math.min(...summons)];
-                if (!synergies) {
-                    return;
+                const minID = Math.min(summon1, summon2);
+                const maxID = Math.max(summon1, summon2);
+                return SUMMONING.Synergies[minID] !== undefined && SUMMONING.Synergies[minID][maxID] !== undefined;
+            }
+
+            addSummonSynergyModifiers() {
+                const args = this.getSummoningIDs();
+                if (this.isSynergyUnlocked(...args)) {
+                    const modifiers = getSummonSynergyModifiers(...args);
+                    this.modifiers.addModifiers(modifiers);
                 }
-                const synergy = synergies[Math.max(...summons)];
-                if (!synergy) {
-                    return;
+            }
+
+
+            computeTargetModifiers() {
+                this.targetModifiers.reset();
+                this.equipment.slotArray.forEach((slot) => {
+                    const item = slot.item;
+                    if (slot.providesStats) {
+                        if (item.enemyModifiers !== undefined) {
+                            this.targetModifiers.addModifiers(item.enemyModifiers);
+                        }
+                    }
+                });
+                const args = this.getSummoningIDs();
+                if (this.isSynergyUnlocked(...args)) {
+                    const modifiers = getSummonSynergyEnemyModifiers(...args);
+                    this.targetModifiers.addModifiers(modifiers);
                 }
-                // add the synergy modifiers
-                this.modifiers.addModifiers(synergy.modifiers);
+                if (this.modifiers.summoningSynergy_1_12 > 0 && this.manager.onSlayerTask) {
+                    this.targetModifiers.addModifiers({
+                        decreasedGlobalAccuracy: this.modifiers.summoningSynergy_1_12,
+                    });
+                }
+                if (this.modifiers.summoningSynergy_1_2 > 0) {
+                    this.synergy_1_2_isActive.enemy = this.hitpoints === this.stats.maxHitpoints;
+                    if (this.synergy_1_2_isActive.enemy) {
+                        const mult = this.modifiers.summoningSynergy_1_2;
+                        this.targetModifiers.addModifiers(items[CONSTANTS.item.Summoning_Familiar_Occultist].enemyModifiers, mult, mult);
+                    }
+                }
             }
 
             getCurrentSynergy() {
@@ -622,15 +649,6 @@
                     return false;
                 }
                 return this.equipment.checkForItemID(summoningItems[summonID1].itemID) && this.equipment.checkForItemID(summoningItems[summonID2].itemID);
-            }
-
-            isSynergyUnlocked(summon1, summon2) {
-                if (!this.summoningSynergy) {
-                    return false;
-                }
-                const minID = Math.min(summon1, summon2);
-                const maxID = Math.max(summon1, summon2);
-                return SUMMONING.Synergies[minID] !== undefined && SUMMONING.Synergies[minID][maxID] !== undefined;
             }
 
             removeSummonCharge(slot, charges = 1) {
