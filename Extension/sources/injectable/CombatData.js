@@ -21,7 +21,6 @@
 (() => {
 
     const reqs = [
-        'statNames',
         'util',
     ];
 

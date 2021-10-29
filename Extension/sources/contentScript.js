@@ -66,9 +66,6 @@ function injectScripts() {
         'MICSR',
         // common
         'util',
-        // independent definitions
-        'specialNames',
-        'statNames',
         'modifierNames',
         // class files
         'AgilityCourse',
