@@ -81,6 +81,26 @@
                         }
                     }
                 }
+                // update itemSynergies conditional modifiers
+                for (let i = 0; i < itemSynergies.length; i++) {
+                    if (itemSynergies[i].conditionalModifiers) {
+                        for (let j = 0; j < itemSynergies[i].conditionalModifiers.length; j++) {
+                            itemSynergies[i].conditionalModifiers[j].condition = MICSR[`itemSynergies-conditional-${i}-${j}`];
+                        }
+                    }
+                }
+                // create itemSynergyMap
+                const itemSynergyMap = new Map();
+                itemSynergies.forEach((synergy) => {
+                    synergy.items.forEach((item) => {
+                        let existingSynergies = itemSynergyMap.get(item);
+                        if (existingSynergies === undefined) {
+                            existingSynergies = [];
+                            itemSynergyMap.set(item, existingSynergies);
+                        }
+                        existingSynergies.push(synergy);
+                    });
+                });
                 // classes
                 event.data.classNames.forEach(name => {
                     eval(event.data.classes[name]);

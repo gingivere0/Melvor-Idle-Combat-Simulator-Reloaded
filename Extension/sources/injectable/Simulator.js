@@ -259,6 +259,26 @@
                         }
                     }
                 }
+                // clone itemSynergies
+                const itemSynergiesClone = [];
+                itemSynergies.forEach((synergy, i) => {
+                    const clone = {...synergy};
+                    if (synergy.conditionalModifiers) {
+                        clone.conditionalModifiers = [];
+                        synergy.conditionalModifiers.forEach((conditionalModifier, j) => {
+                            const condition = conditionalModifier.condition.toString();
+                            clone.conditionalModifiers.push({
+                                ...conditionalModifier,
+                                condition: condition,
+                            })
+                            cloneBackupMethods.push({
+                                name: `MICSR["itemSynergies-conditional-${i}-${j}"]`,
+                                data: `MICSR["itemSynergies-conditional-${i}-${j}"]=${condition}`
+                            });
+                        });
+                    }
+                    itemSynergiesClone.push(clone);
+                });
                 // constants
                 const constantNames = [
                     // actual constants
@@ -299,6 +319,7 @@
                     {name: 'markOfDeathEffect', data: markOfDeathEffect},
                     {name: 'itemConditionalModifiers', data: itemConditionalModifiersClone},
                     {name: 'items', data: items},
+                    {name: 'itemSynergies', data: itemSynergiesClone},
                     {name: 'modifierData', data: modifierDataClone},
                     {name: 'MONSTERS', data: MONSTERS},
                     {name: 'PETS', data: PETS},
