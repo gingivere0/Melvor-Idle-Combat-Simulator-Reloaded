@@ -27,7 +27,7 @@
         const MICSR = window.MICSR;
 
         /**
-         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.3, latest version can be found at:
+         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.6, latest version can be found at:
          * https://raw.githubusercontent.com/gmiclotte/melvor-scripts/master/Show-Modifiers/Show-Modifiers.js
          * TODO: instead of copying it, pull it as a required file or something? No idea how to go about that.
          */
@@ -179,6 +179,7 @@
                         'AltMagicSkillXP',
                         'AltMagicRunePreservation',
                     ],
+                    astrology: [],
                     cooking: [
                         'ChanceSuccessfulCook',
                         'ChancePerfectCookGlobal',
@@ -192,7 +193,9 @@
                         'FarmingYield',
                         'AllotmentSeedCost',
                     ],
-                    firemaking: [],
+                    firemaking: [
+                        'ChanceForDiamondFiremaking',
+                    ],
                     fishing: [
                         'FishingSpecialChance',
                     ],
@@ -327,6 +330,8 @@
                         'summoningSynergy_12_14',
                         'summoningSynergy_13_14',
                         'increasedChanceToPreserveFood',
+                        'allowLootContainerStacking',
+                        'infiniteLootContainer',
                     ],
                     hitpoints: [
                         'decreasedRegenerationInterval',
@@ -374,6 +379,9 @@
                     // specific skills
                     agility: [],
                     altMagic: [],
+                    astrology: [
+                        'increasedBaseStardustDropQty',
+                    ],
                     cooking: [
                         'decreasedSecondaryFoodBurnChance',
                         'summoningSynergy_3_9',
@@ -585,7 +593,7 @@
                 );
 
                 // gathering skills
-                this.gatheringSkills = ['Woodcutting', 'Fishing', 'Mining', 'Thieving', 'Farming', 'Agility'];
+                this.gatheringSkills = ['Woodcutting', 'Fishing', 'Mining', 'Thieving', 'Farming', 'Agility', 'Astrology'];
                 this.gatheringSkills.forEach(name => {
                     this.relevantModifiers[name] = this.getModifierNames(
                         [
