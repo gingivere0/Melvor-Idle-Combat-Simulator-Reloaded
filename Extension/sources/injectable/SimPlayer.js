@@ -392,6 +392,10 @@
                 MICSR.addAgilityModifiers(this.course, this.courseMastery, this.pillar, this.modifiers);
             }
 
+            addAstrologyModifiers() {
+                // TODO
+            }
+
             addShopModifiers() {
                 // auto eat modifiers
                 for (let tier = 0; tier <= this.autoEatTier; tier++) {
