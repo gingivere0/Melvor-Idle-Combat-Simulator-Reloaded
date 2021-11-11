@@ -396,6 +396,21 @@
                 // TODO
             }
 
+            addMiscModifiers() {
+                // Knight's Defender
+                if (this.equipment.checkForItemID(CONSTANTS.item.Knights_Defender) && this.attackType === 'melee') {
+                    this.modifiers.addModifiers({
+                        decreasedAttackInterval: 100,
+                        decreasedDamageReduction: 3,
+                    });
+                }
+                if (this.modifiers.increasedNonMagicPoisonChance > 0 && this.attackType !== 'magic') {
+                    this.modifiers.addModifiers({
+                        increasedChanceToApplyPoison: this.modifiers.increasedNonMagicPoisonChance,
+                    });
+                }
+            }
+
             addShopModifiers() {
                 // auto eat modifiers
                 for (let tier = 0; tier <= this.autoEatTier; tier++) {
