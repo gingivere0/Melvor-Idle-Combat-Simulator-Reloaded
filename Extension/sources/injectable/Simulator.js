@@ -300,6 +300,7 @@
                     },
                     {name: 'combatPassives', data: combatPassives},
                     {name: 'combatSkills', data: combatSkills},
+                    {name: 'CombatStats', data: {}},
                     {name: 'combatTriangle', data: combatTriangle},
                     {name: 'combinations', data: combinations},
                     {name: 'CONSTANTS', data: CONSTANTS},
@@ -318,9 +319,11 @@
                     {name: 'gp', data: 1e9}, // required for confetti crossbow
                     {name: 'herbloreItemData', data: herbloreItemData},
                     {name: 'markOfDeathEffect', data: markOfDeathEffect},
+                    {name: 'MonsterStats', data: {}},
                     {name: 'itemConditionalModifiers', data: itemConditionalModifiersClone},
                     {name: 'items', data: items},
                     {name: 'Items', data: Items},
+                    {name: 'ItemStats', data: {}},
                     {name: 'itemSynergies', data: itemSynergiesClone},
                     {name: 'modifierData', data: modifierDataClone},
                     {name: 'Monsters', data: Monsters},
@@ -357,11 +360,6 @@
                     // character data // TODO: wipe these from SimPlayer
                     {name: 'bank', data: []},
                     {name: 'bankCache', data: {}},
-                    {
-                        name: 'itemStats', data: itemStats.map(_ => {
-                            return {stats: []};
-                        })
-                    },
                     {name: 'skillLevel', data: skillLevel},
                     {name: 'petUnlocked', data: petUnlocked},
                 ];
@@ -388,6 +386,7 @@
                     {name: 'getMonsterArea', data: getMonsterArea},
                     {name: 'getMonsterCombatLevel', data: getMonsterCombatLevel},
                     {name: 'getNumberMultiplierValue', data: getNumberMultiplierValue},
+                    {name: 'getSummoningSynergy', data: getSummoningSynergy},
                     {name: 'getSummonSynergyEnemyModifiers', data: getSummonSynergyEnemyModifiers},
                     {name: 'isEquipment', data: isEquipment},
                     {name: 'isFood', data: isFood},
@@ -400,6 +399,7 @@
                     {name: 'rollInteger', data: rollInteger},
                     {name: 'rollPercentage', data: rollPercentage},
                     {name: 'roundToTickInterval', data: roundToTickInterval},
+                    {name: 'showCommas', data: showCommas}, // TODO: wipe references to this method?
                     // MICSR functions
                     {
                         name: 'MICSR.addAgilityModifiers',
