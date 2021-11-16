@@ -141,6 +141,9 @@
             addItemStat() {
             }
 
+            trackPrayerStats() {
+            }
+
             trackWeaponStat() {
             }
 
