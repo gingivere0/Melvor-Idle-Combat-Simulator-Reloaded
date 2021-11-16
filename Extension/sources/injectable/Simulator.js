@@ -168,6 +168,7 @@
                 });
             }
 
+            // TODO: refactor intializeWorker
             /**
              * Intializes a simulation worker
              * @param {Worker} worker
@@ -342,6 +343,7 @@
                     {name: 'attackStyles', data: attackStyles},
                     {name: 'AttackStyles', data: AttackStyles},
                     {name: 'AURORAS', data: AURORAS},
+                    {name: 'bleedReflectEffect', data: bleedReflectEffect},
                     {name: 'burnEffect', data: burnEffect},
                     {name: 'combatAreas', data: combatAreas},
                     {
@@ -358,6 +360,7 @@
                     {name: 'CURSES', data: CURSES},
                     {name: 'DotTypeIDs', data: DotTypeIDs},
                     {name: 'DUNGEONS', data: DUNGEONS},
+                    {name: 'elementalEffects', data: elementalEffects},
                     {name: 'emptyFood', data: emptyFood},
                     {name: 'enemyHTMLElements', data: {}},
                     {name: 'emptyItem', data: emptyItem},
@@ -370,6 +373,7 @@
                     {name: 'gp', data: 1e9}, // required for confetti crossbow
                     {name: 'herbloreItemData', data: herbloreItemData},
                     {name: 'markOfDeathEffect', data: markOfDeathEffect},
+                    {name: 'ModifierTarget', data: ModifierTarget},
                     {name: 'MonsterStats', data: {}},
                     {name: 'itemConditionalModifiers', data: itemConditionalModifiersClone},
                     {name: 'items', data: items},
@@ -377,12 +381,15 @@
                     {name: 'ItemStats', data: {}},
                     {name: 'itemSynergies', data: itemSynergiesClone},
                     {name: 'modifierData', data: modifierDataClone},
+                    {name: 'ModifierEffectSubtype', data: ModifierEffectSubtype},
                     {name: 'Monsters', data: Monsters},
                     {name: 'MONSTERS', data: MONSTERS},
                     {name: 'PETS', data: PETS},
                     {name: 'playerHTMLElements', data: {}},
                     {name: 'poisonEffect', data: poisonEffect},
                     {name: 'PRAYER', data: PRAYER},
+                    {name: 'Prayers', data: Prayers},
+                    {name: 'PrayerStats', data: {}},
                     {
                         name: 'SETTINGS', data: {
                             performance: {},
@@ -427,18 +434,24 @@
                             return true;
                         }
                     },
+                    {name: 'allConditions', data: allConditions},
+                    {name: 'anyCondition', data: anyCondition},
                     {name: 'clampValue', data: clampValue},
                     {name: 'damageReducer', data: damageReducer},
+                    {name: 'enemyHasDotCondition', data: enemyHasDotCondition},
+                    {name: 'enemyHasEffectCondition', data: enemyHasEffectCondition},
                     {name: 'formatNumber', data: formatNumber},
                     {name: 'getAttackFromID', data: getAttackFromID},
                     {name: 'getBankId', data: getBankId},
                     {name: 'getBaseSummoningXP', data: getBaseSummoningXP},
                     {name: 'getDamageRoll', data: getDamageRoll},
+                    {name: 'getLangString', data: (key, id) => `${key}${id}`},
                     {name: 'getMonsterArea', data: getMonsterArea},
                     {name: 'getMonsterCombatLevel', data: getMonsterCombatLevel},
                     {name: 'getNumberMultiplierValue', data: getNumberMultiplierValue},
                     {name: 'getSummoningSynergy', data: getSummoningSynergy},
                     {name: 'getSummonSynergyEnemyModifiers', data: getSummonSynergyEnemyModifiers},
+                    {name: 'getSummonSynergyModifiers', data: getSummonSynergyModifiers},
                     {name: 'isEquipment', data: isEquipment},
                     {name: 'isFood', data: isFood},
                     {name: 'isSeedItem', data: isSeedItem},
@@ -447,10 +460,15 @@
                     {name: 'isWeapon', data: isWeapon},
                     {name: 'maxDamageReducer', data: maxDamageReducer},
                     {name: 'numberWithCommas', data: numberWithCommas},
+                    {name: 'playerHasDotCondition', data: playerHasDotCondition},
+                    {name: 'playerHasEffectCondition', data: playerHasEffectCondition},
+                    {name: 'playerHitpointsBelowCondition', data: playerHitpointsBelowCondition},
+                    {name: 'playerHitpointsAboveCondition', data: playerHitpointsAboveCondition},
                     {name: 'rollInteger', data: rollInteger},
                     {name: 'rollPercentage', data: rollPercentage},
                     {name: 'roundToTickInterval', data: roundToTickInterval},
                     {name: 'showCommas', data: showCommas}, // TODO: wipe references to this method?
+                    {name: 'typeVsTypeCondition', data: typeVsTypeCondition},
                     // MICSR functions
                     {
                         name: 'MICSR.addAgilityModifiers',
