@@ -63,7 +63,7 @@
                 }
                 // update itemConditionalModifiers
                 for (let i = 0; i < itemConditionalModifiers.length; i++) {
-                    for (let j = 0; j < itemConditionalModifiers[i].conditionals; j++) {
+                    for (let j = 0; j < itemConditionalModifiers[i].conditionals.length; j++) {
                         itemConditionalModifiers[i].conditionals[j].condition = MICSR[`itemConditionalModifiers-condition-${i}-${j}`];
                     }
                 }
