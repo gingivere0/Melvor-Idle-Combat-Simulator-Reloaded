@@ -219,15 +219,17 @@
                 ];
                 for (let i = 0; i < itemConditionalModifiersClone.length; i++) {
                     itemConditionalModifiersClone[i] = {...itemConditionalModifiersClone[i]};
+                    itemConditionalModifiersClone[i].conditionals = [...itemConditionalModifiersClone[i].conditionals];
                     for (let j = 0; j < itemConditionalModifiersClone[i].conditionals.length; j++) {
                         const condition = itemConditionalModifiersClone[i].conditionals[j].condition.toString();
                         itemConditionalModifiersClone[i].conditionals[j] = {
                             ...itemConditionalModifiersClone[i].conditionals[j],
-                            condition: condition,
                         };
+                        itemConditionalModifiersClone[i].conditionals[j].condition = condition;
                         cloneBackupMethods.push({
                             name: `MICSR["itemConditionalModifiers-condition-${i}-${j}"]`,
-                            data: `MICSR["itemConditionalModifiers-condition-${i}-${j}"]=${condition}`
+                            data: `MICSR["itemConditionalModifiers-condition-${i}-${j}"]=${condition}`,
+                            condition: condition,
                         });
                     }
                 }
@@ -253,7 +255,8 @@
                                 };
                                 cloneBackupMethods.push({
                                     name: `MICSR["SUMMONING-conditional-${i}-${j}-${k}"]`,
-                                    data: `MICSR["SUMMONING-conditional-${i}-${j}-${k}"]=${condition}`
+                                    data: `MICSR["SUMMONING-conditional-${i}-${j}-${k}"]=${condition}`,
+                                    condition: condition,
                                 });
                             }
                         }
@@ -273,12 +276,60 @@
                             })
                             cloneBackupMethods.push({
                                 name: `MICSR["itemSynergies-conditional-${i}-${j}"]`,
-                                data: `MICSR["itemSynergies-conditional-${i}-${j}"]=${condition}`
+                                data: `MICSR["itemSynergies-conditional-${i}-${j}"]=${condition}`,
+                                condition: condition,
                             });
                         });
                     }
                     itemSynergiesClone.push(clone);
                 });
+                // fix conditionals that are created by a function
+                const backupsToReplace = [
+                    bankCondition().toString(),
+                    gloveCondition().toString(),
+                    playerHitpointsBelowCondition().toString(),
+                    playerHitpointsAboveCondition().toString(),
+                    playerHasDotCondition().toString(),
+                    enemyHasDotCondition().toString(),
+                    playerHasEffectCondition().toString(),
+                    enemyHasEffectCondition().toString(),
+                    typeVsTypeCondition().toString(),
+                    allConditions().toString(),
+                    anyCondition().toString(),
+                ];
+                const replacements = {
+                    'MICSR["itemConditionalModifiers-condition-0-0"]': "(player)=>{return true;}", // bankCondition
+                    'MICSR["itemConditionalModifiers-condition-1-0"]': "playerHitpointsBelowCondition(50)",
+                    'MICSR["itemConditionalModifiers-condition-2-0"]': "(player)=>{return true;}", // glove condition
+                    'MICSR["itemConditionalModifiers-condition-3-0"]': "(player)=>{return true;}", // glove condition
+                    'MICSR["itemConditionalModifiers-condition-4-0"]': "(player)=>{return true;}", // glove condition
+                    'MICSR["itemConditionalModifiers-condition-5-0"]': "(player)=>{return true;}", // glove condition
+                    'MICSR["itemConditionalModifiers-condition-6-0"]': "(player)=>{return true;}", // glove condition
+                    'MICSR["itemConditionalModifiers-condition-7-0"]': "playerHitpointsBelowCondition(100)",
+                    'MICSR["itemConditionalModifiers-condition-8-0"]': "typeVsTypeCondition('melee', 'ranged')",
+                    'MICSR["itemConditionalModifiers-condition-9-0"]': "typeVsTypeCondition('ranged', 'magic')",
+                    'MICSR["itemConditionalModifiers-condition-10-0"]': "typeVsTypeCondition('magic', 'melee')",
+                    'MICSR["SUMMONING-conditional-1-2-0"]': "playerHitpointsAboveCondition(100)",
+                    'MICSR["SUMMONING-conditional-1-2-1"]': "playerHitpointsAboveCondition(100)",
+                    'MICSR["SUMMONING-conditional-6-15-0"]': "enemyHasDotCondition('Burn')",
+                    'MICSR["itemSynergies-conditional-3-0"]': "playerHasDotCondition('Poison')",
+                    'MICSR["itemSynergies-conditional-3-1"]': "enemyHasDotCondition('Poison')",
+                    'MICSR["itemSynergies-conditional-4-0"]': "anyCondition([" +
+                        "playerHasEffectCondition(ModifierEffectSubtype.Slow)," +
+                        "playerHasEffectCondition(ModifierEffectSubtype.Frostburn)," +
+                        "playerHasDotCondition('Burn')," +
+                        "])",
+                    'MICSR["itemSynergies-conditional-5-0"]': "playerHasDotCondition('Bleed')",
+                }
+                for (const backup of cloneBackupMethods) {
+                    if (backupsToReplace.includes(backup.condition)) {
+                        if (replacements[backup.name]) {
+                            backup.data = `${backup.name}=${replacements[backup.name]}`;
+                        } else {
+                            MICSR.warn('Unexpected conditional method', backup.name, backup.condition);
+                        }
+                    }
+                }
                 // constants
                 const constantNames = [
                     // actual constants
