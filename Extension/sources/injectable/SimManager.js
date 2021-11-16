@@ -207,6 +207,9 @@
                 }
             }
 
+            dropSignetHalfB() {
+            }
+
             dropEnemyBones() {
             }
 
