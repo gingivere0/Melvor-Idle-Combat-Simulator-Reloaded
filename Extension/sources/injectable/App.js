@@ -145,6 +145,9 @@
                     herblore: 'assets/media/skills/herblore/herblore.svg',
                     cooking: 'assets/media/skills/cooking/cooking.svg',
                     fletching: 'assets/media/skills/fletching/fletching.svg',
+                    astrology: 'assets/media/skills/astrology/astrology.svg',
+                    standardStar: 'assets/media/skills/astrology/star_standard.svg',
+                    uniqueStar: 'assets/media/skills/astrology/star_unique.svg',
                 };
 
                 // monster IDs
@@ -246,6 +249,7 @@
                 this.createPotionSelectCard();
                 this.createPetSelectCard();
                 this.createAgilitySelectCard();
+                this.createAstrologySelectCard();
                 this.createLootOptionsCard();
                 this.createSimulationAndExportCard();
                 this.createCompareCard();
@@ -851,6 +855,70 @@
                     this.agilitySelectCard.clearContainer();
                 }
                 this.agilityCourse.createAgilityCourseContainer(this.agilitySelectCard, this.agilityCourse.filters[0]);
+            }
+
+            createAstrologySelectCard() {
+                if (!this.astrologySelectCard) {
+                    this.astrologySelectCard = this.mainTabCard.addTab('Astrology', this.media.astrology, '', '100px');
+                } else {
+                    this.astrologySelectCard.clearContainer();
+                }
+                this.astrologySelectCard.addSectionTitle('Astrology');
+                const card = this.astrologySelectCard;
+                for (const constellation of ASTROLOGY) {
+                    const cc = card.createCCContainer();
+                    // constellation symbol and skills
+                    cc.appendChild(card.createImage(constellation.media, 40));
+                    cc.appendChild(card.createImage(SKILLS[constellation.skills[0]].media, 20));
+                    cc.appendChild(card.createImage(SKILLS[constellation.skills[1]].media, 20));
+                    // image buttons to open modifier selection
+                    cc.appendChild(card.createImage(this.media.standardStar, 40));
+                    // add constellation to astrology card
+                    card.container.appendChild(cc);
+                    // add popup
+                    const stdMod = [];
+                    constellation.skills.forEach(skillID => {
+                        if (!MICSR.showModifiersInstance.relevantModifiers.combat.skillIDs.includes(skillID)) {
+                            return;
+                        }
+                        // all skills have increasedSkillXP
+                        stdMod.push([skillID, 'increasedSkillXP']);
+                        // summoning has no other relevant modifiers
+                        if (Skills.Summoning === skillID) {
+                            return;
+                        }
+                        // combat modifiers for all cb skills
+                        stdMod.push([undefined, 'increasedGPFromMonsters']);
+                        stdMod.push([undefined, 'increasedGlobalAccuracy']);
+                        // increasedHiddenSkillLevel or increasedSlayerCoins
+                        if ([Skills.Hitpoints, Skills.Slayer, Skills.Prayer].includes(skillID)) {
+                            stdMod.push([undefined, 'increasedSlayerCoins']);
+                        } else {
+                            stdMod.push([skillID, 'increasedHiddenSkillLevel']);
+                        }
+                    });
+                    const alreadyAdded = [];
+                    stdMod.forEach(x => {
+                        const skillID = x[0];
+                        const modifier = x[1];
+                        if (skillID !== undefined) {
+                            card.addNumberInput(Skills[skillID] + ' ' + modifier, 0, 0, 15, () => {
+                            });
+                        } else if (alreadyAdded.includes(modifier)) {
+                            card.addNumberInput(modifier, 0, 0, 15, () => {
+                            });
+                            alreadyAdded.push(modifier);
+                        }
+                    });
+                    // unique modifiers
+                    const uniqMod = constellation.uniqueModifiers.filter(m =>
+                        melvorShowModifiers.relevantModifiers.combat.names.includes(m)
+                        || melvorShowModifiers.relevantModifiers.combat.names.includes(m.substring(9))
+                    );
+                    cc.appendChild(card.createImage(this.media.uniqueStar, 40));
+                    uniqMod.forEach(m => card.addNumberInput(m, 0, 0, 15, () => {
+                    }));
+                }
             }
 
             agilityCourseCallback() {
