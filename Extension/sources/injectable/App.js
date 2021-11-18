@@ -857,6 +857,10 @@
                 this.agilityCourse.createAgilityCourseContainer(this.agilitySelectCard, this.agilityCourse.filters[0]);
             }
 
+            agilityCourseCallback() {
+                this.updateCombatStats();
+            }
+
             createAstrologySelectCard() {
                 if (!this.astrologySelectCard) {
                     this.astrologySelectCard = this.mainTabCard.addTab('Astrology', this.media.astrology, '', '100px');
@@ -866,6 +870,10 @@
                 this.astrologySelectCard.addSectionTitle('Astrology');
                 const card = this.astrologySelectCard;
                 for (const constellation of ASTROLOGY) {
+                    // create constellation modifier object
+                    const activeConstellationModifiers = {};
+                    this.player.activeAstrologyModifiers.push(activeConstellationModifiers);
+                    // create constellation container
                     const cc = card.createCCContainer();
                     // constellation symbol and skills
                     cc.appendChild(card.createImage(constellation.media, 40));
@@ -902,11 +910,25 @@
                         const skillID = x[0];
                         const modifier = x[1];
                         if (skillID !== undefined) {
-                            card.addNumberInput(Skills[skillID] + ' ' + modifier, 0, 0, 15, () => {
+                            card.addNumberInput(Skills[skillID] + ' ' + modifier, 0, 0, 15, (event) => {
+                                activeConstellationModifiers[modifier] = activeConstellationModifiers[modifier].map(y => {
+                                    if (y[0] !== skillID) {
+                                        return y;
+                                    }
+                                    return [y[0], parseInt(event.currentTarget.value)];
+                                });
+                                this.updateCombatStats();
                             });
+                            if (activeConstellationModifiers[modifier] === undefined) {
+                                activeConstellationModifiers[modifier] = [];
+                            }
+                            activeConstellationModifiers[modifier].push([skillID, 0]);
                         } else if (alreadyAdded.includes(modifier)) {
-                            card.addNumberInput(modifier, 0, 0, 15, () => {
+                            card.addNumberInput(modifier, 0, 0, 15, (event) => {
+                                activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
+                                this.updateCombatStats();
                             });
+                            activeConstellationModifiers[modifier] = 0;
                             alreadyAdded.push(modifier);
                         }
                     });
@@ -916,13 +938,14 @@
                         || melvorShowModifiers.relevantModifiers.combat.names.includes(m.substring(9))
                     );
                     cc.appendChild(card.createImage(this.media.uniqueStar, 40));
-                    uniqMod.forEach(m => card.addNumberInput(m, 0, 0, 15, () => {
-                    }));
+                    uniqMod.forEach(modifier => {
+                        card.addNumberInput(modifier, 0, 0, 15, (event) => {
+                            activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
+                            this.updateCombatStats();
+                        });
+                        activeConstellationModifiers[modifier] = 0;
+                    });
                 }
-            }
-
-            agilityCourseCallback() {
-                this.updateCombatStats();
             }
 
             createLootOptionsCard() {

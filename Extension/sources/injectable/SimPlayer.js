@@ -66,6 +66,7 @@
                         'potionTier',
                         'potionID',
                         'autoEatTier',
+                        'activeAstrologyModifiers', // this is an array of dictionaries, but it (de)serializes fine
                     ],
                 }
                 //
@@ -196,6 +197,8 @@
                 itemConditionalModifiers.forEach((itemCondition) => {
                     this.conditionalModifiers.set(itemCondition.itemID, itemCondition.conditionals);
                 });
+                // activeAstrologyModifiers
+                this.activeAstrologyModifiers = [];
             }
 
             computeConditionalListeners() {
@@ -396,7 +399,9 @@
             }
 
             addAstrologyModifiers() {
-                // TODO
+                for (let i = 0; i < this.activeAstrologyModifiers.length; i++) {
+                    this.modifiers.addModifiers(this.activeAstrologyModifiers[i]);
+                }
             }
 
             addMiscModifiers() {
