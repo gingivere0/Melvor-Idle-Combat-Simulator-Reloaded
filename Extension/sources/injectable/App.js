@@ -1383,21 +1383,13 @@
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
                         return this.filterByTwoHanded(true, item) && this.filterByWeaponType('melee', item);
                     }, x => this.getItemLevelReq(x, CONSTANTS.skill.Attack));
-                    equipmentSelectCard.addSectionTitle('Bows');
+                    equipmentSelectCard.addSectionTitle('1H Ranged');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByAmmoReq(0, item) && this.filterByWeaponType('ranged', item);
+                        return this.filterByTwoHanded(false, item) && this.filterByWeaponType('ranged', item);
                     }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
-                    equipmentSelectCard.addSectionTitle('Crossbows');
+                    equipmentSelectCard.addSectionTitle('2H Ranged');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByAmmoReq(1, item) && this.filterByWeaponType('ranged', item);
-                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
-                    equipmentSelectCard.addSectionTitle('Javelins');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByAmmoReq(2, item) && this.filterByWeaponType('ranged', item);
-                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
-                    equipmentSelectCard.addSectionTitle('Throwing Knives');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
-                        return this.filterByAmmoReq(3, item) && this.filterByWeaponType('ranged', item);
+                        return this.filterByTwoHanded(true, item) && this.filterByWeaponType('ranged', item);
                     }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
                     equipmentSelectCard.addSectionTitle('1H Magic');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
