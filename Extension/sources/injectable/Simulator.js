@@ -396,7 +396,7 @@
                         }
                     },
                     {name: 'SHOP', data: SHOP},
-                    {name: 'skillName', data: skillName},
+                    {name: 'Skills', data: Skills},
                     {name: 'SKILLS', data: SKILLS},
                     {name: 'slayerAreas', data: slayerAreas},
                     {name: 'slayerTaskData', data: SlayerTask.data},
