@@ -116,10 +116,36 @@
                     autoEatTier++;
                 });
 
+                // get the active astrology modifiers
+                const astrologyModifiers = [];
+                for (const constellation of [activeAstrologyModifiers[1]]) {
+                    const modifiers = {};
+                    for (const idx in constellation) {
+                        const ms = constellation[idx];
+                        for (const m in ms) {
+                            if (modifiers[m] === undefined) {
+                                modifiers[m] = ms[m].push === undefined ? 0 : [];
+                            }
+                            if (ms[m].push === undefined) {
+                                modifiers[m] += ms[m];
+                            } else {
+                                const i = modifiers[m].findIndex(x => x[0] === ms[m][0][0]);
+                                if (i === -1) {
+                                    modifiers[m].push(...ms[m]);
+                                } else {
+                                    modifiers[m][i][1] += ms[m][0][1];
+                                }
+                            }
+                        }
+                    }
+                    astrologyModifiers.push(modifiers);
+                }
+
                 // create settings object
                 const settings = {
                     version: MICSR.version,
                     // lists
+                    astrologyModifiers: astrologyModifiers,
                     course: chosenAgilityObstacles,
                     courseMastery: MASTERY[CONSTANTS.skill.Agility].xp.map(x => x > 13034431),
                     equipment: player.equipmentSets[setID].slotArray.map(x => x.occupiedBy === 'None' ? x.item.id : -1),
