@@ -27,7 +27,7 @@
         const MICSR = window.MICSR;
 
         /**
-         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.6, latest version can be found at:
+         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.8, latest version can be found at:
          * https://raw.githubusercontent.com/gmiclotte/melvor-scripts/master/Show-Modifiers/Show-Modifiers.js
          * TODO: instead of copying it, pull it as a required file or something? No idea how to go about that.
          */
@@ -707,8 +707,8 @@
             getModifierNames(setNames, skillIDs) {
                 // add skill based on skillID
                 skillIDs.forEach(id => {
-                    if (!setNames.includes(skillName[id])) {
-                        setNames.push(skillName[id].toLowerCase());
+                    if (!setNames.includes(Skills[id])) {
+                        setNames.push(Skills[id].toLowerCase());
                     }
                 });
                 // add melee based on att/str skillID
