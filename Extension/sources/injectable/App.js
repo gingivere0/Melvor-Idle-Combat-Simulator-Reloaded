@@ -934,8 +934,8 @@
                     });
                     // unique modifiers
                     const uniqMod = constellation.uniqueModifiers.filter(m =>
-                        melvorShowModifiers.relevantModifiers.combat.names.includes(m)
-                        || melvorShowModifiers.relevantModifiers.combat.names.includes(m.substring(9))
+                        MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m)
+                        || MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m.substring(9))
                     );
                     cc.appendChild(card.createImage(this.media.uniqueStar, 40));
                     uniqMod.forEach(modifier => {
