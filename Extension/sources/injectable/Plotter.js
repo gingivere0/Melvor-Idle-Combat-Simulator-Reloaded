@@ -533,6 +533,9 @@
 
     let loadCounter = 0;
     const waitLoadOrder = (reqs, setup, id) => {
+        if (typeof characterSelected === typeof undefined) {
+            return;
+        }
         if (characterSelected && !characterLoading) {
             loadCounter++;
         }
