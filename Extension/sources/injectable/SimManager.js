@@ -95,7 +95,7 @@
             // create new Sim Enemy
             createNewEnemy() {
                 this.enemy = new MICSR.SimEnemy(MONSTERS[this.selectedMonster], this);
-                this.enemy.isAfflicted = (this.areaData === DUNGEONS[CONSTANTS.dungeon.Into_the_Mist]);
+                this.enemy.isAfflicted = (this.areaData === DUNGEONS[Dungeons.Into_the_Mist]);
             }
 
             // reset sim stats

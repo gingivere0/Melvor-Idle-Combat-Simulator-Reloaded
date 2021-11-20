@@ -122,7 +122,7 @@
 
         MICSR.dungeons = [];
         DUNGEONS.forEach(dungeon => MICSR.dungeons.push({...dungeon}));
-        MICSR.dungeons[CONSTANTS.dungeon.Into_the_Mist].monsters = [147, 148, 149];
+        MICSR.dungeons[Dungeons.Into_the_Mist].monsters = [147, 148, 149];
 
         /**
          }
