@@ -90,7 +90,7 @@
                 totBars += SlayerTask.data.length;
                 for (const slayerTask of SlayerTask.data) {
                     this.barNames.push(slayerTask.display);
-                    this.barImageSrc.push(SKILLS[CONSTANTS.skill.Slayer].media);
+                    this.barImageSrc.push(SKILLS[Skills.Slayer].media);
                 }
 
                 this.plotContainer = document.createElement('div');

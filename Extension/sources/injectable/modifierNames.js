@@ -520,15 +520,15 @@
                         'combat',
                     ],
                     [
-                        CONSTANTS.skill.Attack,
-                        CONSTANTS.skill.Strength,
-                        CONSTANTS.skill.Ranged,
-                        CONSTANTS.skill.Magic,
-                        CONSTANTS.skill.Defence,
-                        CONSTANTS.skill.Hitpoints,
-                        CONSTANTS.skill.Prayer,
-                        CONSTANTS.skill.Slayer,
-                        CONSTANTS.skill.Summoning,
+                        Skills.Attack,
+                        Skills.Strength,
+                        Skills.Ranged,
+                        Skills.Magic,
+                        Skills.Defence,
+                        Skills.Hitpoints,
+                        Skills.Prayer,
+                        Skills.Slayer,
+                        Skills.Summoning,
                     ],
                 );
 
@@ -539,13 +539,13 @@
                         'combat',
                     ],
                     [
-                        CONSTANTS.skill.Attack,
-                        CONSTANTS.skill.Strength,
-                        CONSTANTS.skill.Defence,
-                        CONSTANTS.skill.Hitpoints,
-                        CONSTANTS.skill.Prayer,
-                        CONSTANTS.skill.Slayer,
-                        CONSTANTS.skill.Summoning,
+                        Skills.Attack,
+                        Skills.Strength,
+                        Skills.Defence,
+                        Skills.Hitpoints,
+                        Skills.Prayer,
+                        Skills.Slayer,
+                        Skills.Summoning,
                     ],
                 );
 
@@ -556,12 +556,12 @@
                         'combat',
                     ],
                     [
-                        CONSTANTS.skill.Ranged,
-                        CONSTANTS.skill.Defence,
-                        CONSTANTS.skill.Hitpoints,
-                        CONSTANTS.skill.Prayer,
-                        CONSTANTS.skill.Slayer,
-                        CONSTANTS.skill.Summoning,
+                        Skills.Ranged,
+                        Skills.Defence,
+                        Skills.Hitpoints,
+                        Skills.Prayer,
+                        Skills.Slayer,
+                        Skills.Summoning,
                     ],
                 );
 
@@ -573,12 +573,12 @@
                         'hitpoints',
                     ],
                     [
-                        CONSTANTS.skill.Magic,
-                        CONSTANTS.skill.Defence,
-                        CONSTANTS.skill.Hitpoints,
-                        CONSTANTS.skill.Prayer,
-                        CONSTANTS.skill.Slayer,
-                        CONSTANTS.skill.Summoning,
+                        Skills.Magic,
+                        Skills.Defence,
+                        Skills.Hitpoints,
+                        Skills.Prayer,
+                        Skills.Slayer,
+                        Skills.Summoning,
                     ],
                 );
 
@@ -588,7 +588,7 @@
                         'skilling',
                     ],
                     [
-                        CONSTANTS.skill.Slayer,
+                        Skills.Slayer,
                     ],
                 );
 
@@ -602,7 +602,7 @@
                             'mastery',
                         ],
                         [
-                            CONSTANTS.skill[name]
+                            Skills[name]
                         ],
                     );
                     const lname = name.toLowerCase();
@@ -629,7 +629,7 @@
                     this.relevantModifiers[name] = this.getModifierNames(
                         setNames,
                         [
-                            CONSTANTS.skill[name]
+                            Skills[name]
                         ],
                     );
                 });
@@ -712,7 +712,7 @@
                     }
                 });
                 // add melee based on att/str skillID
-                if (skillIDs.includes(CONSTANTS.skill.Attack) || skillIDs.includes(CONSTANTS.skill.Strength)) {
+                if (skillIDs.includes(Skills.Attack) || skillIDs.includes(Skills.Strength)) {
                     if (!setNames.includes('melee')) {
                         setNames.push('melee');
                     }

@@ -164,7 +164,7 @@
             replaceGlobals() {
                 // skillLevel
                 this.skillLevel = skillLevel.map(_ => 1);
-                this.skillLevel[CONSTANTS.skill.Hitpoints] = 10;
+                this.skillLevel[Skills.Hitpoints] = 10;
                 // currentGamemode, numberMultiplier
                 this.currentGamemode = currentGamemode;
                 // petUnlocked
@@ -517,14 +517,14 @@
                     this.addXP(gain.skill, gain.ratio * damage);
                 });
                 // Hitpoints
-                this.addXP(CONSTANTS.skill.Hitpoints, damage * 1.33);
+                this.addXP(Skills.Hitpoints, damage * 1.33);
                 // Prayer
                 let prayerRatio = 0;
                 this.activePrayers.forEach((pID) => {
                     return (prayerRatio += PRAYER[pID].pointsPerPlayer);
                 });
                 if (prayerRatio > 0) {
-                    this.addXP(CONSTANTS.skill.Prayer, prayerRatio * damage);
+                    this.addXP(Skills.Prayer, prayerRatio * damage);
                 }
                 // pets
                 this.petRolls[attackInterval] = 1 + (this.petRolls[attackInterval] | 0);
@@ -661,7 +661,7 @@
 
             getFoodHealingBonus(item) {
                 let bonus = this.modifiers.increasedFoodHealingValue - this.modifiers.decreasedFoodHealingValue;
-                const sID = CONSTANTS.skill.Cooking;
+                const sID = Skills.Cooking;
                 if (item.masteryID !== undefined && item.masteryID[0] === sID && this.cookingMastery) {
                     bonus += 20;
                 }

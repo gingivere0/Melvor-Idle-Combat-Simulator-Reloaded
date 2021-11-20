@@ -131,15 +131,15 @@
                 data.simSuccess = simResult.success;
                 data.reason = undefined;
                 // xp rates
-                data.xpPerSecond = gps.skillXP[CONSTANTS.skill.Attack]
-                    + gps.skillXP[CONSTANTS.skill.Strength]
-                    + gps.skillXP[CONSTANTS.skill.Defence]
-                    + gps.skillXP[CONSTANTS.skill.Ranged]
-                    + gps.skillXP[CONSTANTS.skill.Magic]; // TODO: this depends on attack style
-                data.hpXpPerSecond = gps.skillXP[CONSTANTS.skill.Hitpoints];
-                data.slayerXpPerSecond = gps.skillXP[CONSTANTS.skill.Slayer];
-                data.prayerXpPerSecond = gps.skillXP[CONSTANTS.skill.Prayer];
-                data.summoningXpPerSecond = gps.skillXP[CONSTANTS.skill.Summoning];
+                data.xpPerSecond = gps.skillXP[Skills.Attack]
+                    + gps.skillXP[Skills.Strength]
+                    + gps.skillXP[Skills.Defence]
+                    + gps.skillXP[Skills.Ranged]
+                    + gps.skillXP[Skills.Magic]; // TODO: this depends on attack style
+                data.hpXpPerSecond = gps.skillXP[Skills.Hitpoints];
+                data.slayerXpPerSecond = gps.skillXP[Skills.Slayer];
+                data.prayerXpPerSecond = gps.skillXP[Skills.Prayer];
+                data.summoningXpPerSecond = gps.skillXP[Skills.Summoning];
                 // consumables
                 data.ppConsumedPerSecond = gps.usedPrayerPoints;
                 data.ammoUsedPerSecond = gps.usedAmmo;
@@ -230,7 +230,7 @@
                     slayerXPReward += this.enemy.stats.maxHitpoints / numberMultiplier;
                 }
                 if (slayerXPReward > 0)
-                    this.player.addXP(CONSTANTS.skill.Slayer, slayerXPReward);
+                    this.player.addXP(Skills.Slayer, slayerXPReward);
             }
 
             selectMonster(monsterID, areaData) {

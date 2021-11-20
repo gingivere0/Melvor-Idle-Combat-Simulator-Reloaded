@@ -513,7 +513,7 @@
                 }
                 if (petSkills.includes(this.petSkill)) {
                     const timeMultiplier = (this.app.timeMultiplier === -1) ? simResult.killTimeS : this.app.timeMultiplier;
-                    const petSkillLevel = this.player.skillLevel[CONSTANTS.skill[this.petSkill]] + 1;
+                    const petSkillLevel = this.player.skillLevel[Skills[this.petSkill]] + 1;
                     for (const simID in this.monsterSimData) {
                         const simResult = this.monsterSimData[simID];
                         simResult.petChance = 100 * (1 - this.chanceForNoPet(simResult, timeMultiplier, petSkillLevel));

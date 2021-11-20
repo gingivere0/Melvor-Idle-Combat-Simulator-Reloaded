@@ -169,9 +169,9 @@
 
                 // Forced equipment sorting
                 this.force = {
-                    [CONSTANTS.skill.Defence]: [Items.Slayer_Helmet_Basic, Items.Slayer_Platebody_Basic],
-                    [CONSTANTS.skill.Ranged]: [Items.Slayer_Cowl_Basic, Items.Slayer_Leather_Body_Basic],
-                    [CONSTANTS.skill.Magic]: [Items.Slayer_Wizard_Hat_Basic, Items.Slayer_Wizard_Robes_Basic, Items.Enchanted_Shield],
+                    [Skills.Defence]: [Items.Slayer_Helmet_Basic, Items.Slayer_Platebody_Basic],
+                    [Skills.Ranged]: [Items.Slayer_Cowl_Basic, Items.Slayer_Leather_Body_Basic],
+                    [Skills.Magic]: [Items.Slayer_Wizard_Hat_Basic, Items.Slayer_Wizard_Robes_Basic, Items.Enchanted_Shield],
                 };
 
                 // Generate equipment subsets
@@ -201,10 +201,10 @@
                 // Sort equipment subsets
                 for (const slot in equipmentSlotData) {
                     const slotId = equipmentSlotData[slot].id;
-                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Attack) - this.getItemLevelReq(b, CONSTANTS.skill.Attack));
-                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Defence) - this.getItemLevelReq(b, CONSTANTS.skill.Defence));
-                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Ranged) - this.getItemLevelReq(b, CONSTANTS.skill.Ranged));
-                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, CONSTANTS.skill.Magic) - this.getItemLevelReq(b, CONSTANTS.skill.Magic));
+                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, Skills.Attack) - this.getItemLevelReq(b, Skills.Attack));
+                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, Skills.Defence) - this.getItemLevelReq(b, Skills.Defence));
+                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, Skills.Ranged) - this.getItemLevelReq(b, Skills.Ranged));
+                    this.equipmentSubsets[slotId].sort((a, b) => this.getItemLevelReq(a, Skills.Magic) - this.getItemLevelReq(b, Skills.Magic));
                     if (slotId === equipmentSlotData.Quiver.id) {
                         this.equipmentSubsets[slotId].sort((a, b) => (a.ammoType || 0) - (b.ammoType || 0));
                     }
@@ -1255,7 +1255,7 @@
             }
 
             getItemLevelReq(item, skillID) {
-                if (skillID === CONSTANTS.skill.Summoning) {
+                if (skillID === Skills.Summoning) {
                     return item.summoningLevel | 0;
                 }
                 let req = 0;
@@ -1284,9 +1284,9 @@
                     return true;
                 }
                 const skillIDs = [
-                    CONSTANTS.skill.Defence,
-                    CONSTANTS.skill.Ranged,
-                    CONSTANTS.skill.Magic,
+                    Skills.Defence,
+                    Skills.Ranged,
+                    Skills.Magic,
                 ]
                 for (let skillID of skillIDs) {
                     if (this.getItemLevelReq(item, skillID) || (this.force[skillID] && this.force[skillID].includes(item.id))) {
@@ -1357,7 +1357,7 @@
                 if (item.modifiers === undefined) {
                     return false;
                 }
-                if (item.modifiers.increasedSkillXP && item.modifiers.increasedSkillXP.filter(x => x[0] === CONSTANTS.skill.Slayer).length > 0) {
+                if (item.modifiers.increasedSkillXP && item.modifiers.increasedSkillXP.filter(x => x[0] === Skills.Slayer).length > 0) {
                     return true;
                 }
                 return item.modifiers.increasedSlayerAreaEffectNegationFlat > 0
@@ -1445,18 +1445,18 @@
                 if (triSplit.includes(equipmentSlot)) {
                     equipmentSelectCard.addSectionTitle('Melee');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot,
-                        item => this.filterIfHasLevelReq(item, CONSTANTS.skill.Defence),
-                        x => this.filterIfHasLevelReq(x, CONSTANTS.skill.Defence)
+                        item => this.filterIfHasLevelReq(item, Skills.Defence),
+                        x => this.filterIfHasLevelReq(x, Skills.Defence)
                     );
                     equipmentSelectCard.addSectionTitle('Ranged');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot,
-                        item => this.filterIfHasLevelReq(item, CONSTANTS.skill.Ranged),
-                        x => this.filterIfHasLevelReq(x, CONSTANTS.skill.Ranged)
+                        item => this.filterIfHasLevelReq(item, Skills.Ranged),
+                        x => this.filterIfHasLevelReq(x, Skills.Ranged)
                     );
                     equipmentSelectCard.addSectionTitle('Magic');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot,
-                        item => this.filterIfHasLevelReq(item, CONSTANTS.skill.Magic),
-                        x => this.filterIfHasLevelReq(x, CONSTANTS.skill.Magic)
+                        item => this.filterIfHasLevelReq(item, Skills.Magic),
+                        x => this.filterIfHasLevelReq(x, Skills.Magic)
                     );
                     if (this.equipmentSubsets[equipmentSlot].filter((item) => this.filterIfHasNoLevelReq(item)).length > 1) {
                         equipmentSelectCard.addSectionTitle('Other');
@@ -1469,36 +1469,36 @@
                     equipmentSelectCard.addSectionTitle('1H Melee');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
                         return this.filterByTwoHanded(false, item) && this.filterByWeaponType('melee', item);
-                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Attack));
+                    }, x => this.getItemLevelReq(x, Skills.Attack));
                     equipmentSelectCard.addSectionTitle('2H Melee');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
                         return this.filterByTwoHanded(true, item) && this.filterByWeaponType('melee', item);
-                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Attack));
+                    }, x => this.getItemLevelReq(x, Skills.Attack));
                     equipmentSelectCard.addSectionTitle('1H Ranged');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
                         return this.filterByTwoHanded(false, item) && this.filterByWeaponType('ranged', item);
-                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
+                    }, x => this.getItemLevelReq(x, Skills.Ranged));
                     equipmentSelectCard.addSectionTitle('2H Ranged');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
                         return this.filterByTwoHanded(true, item) && this.filterByWeaponType('ranged', item);
-                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
+                    }, x => this.getItemLevelReq(x, Skills.Ranged));
                     equipmentSelectCard.addSectionTitle('1H Magic');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
                         return this.filterByTwoHanded(false, item) && this.filterByWeaponType('magic', item);
-                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Magic));
+                    }, x => this.getItemLevelReq(x, Skills.Magic));
                     equipmentSelectCard.addSectionTitle('2H Magic');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => {
                         return this.filterByTwoHanded(true, item) && this.filterByWeaponType('magic', item);
-                    }, x => this.getItemLevelReq(x, CONSTANTS.skill.Magic));
+                    }, x => this.getItemLevelReq(x, Skills.Magic));
                 } else if (equipmentSlot === 9) {
                     equipmentSelectCard.addSectionTitle('Arrows');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(0, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(0, item), x => this.getItemLevelReq(x, Skills.Ranged));
                     equipmentSelectCard.addSectionTitle('Bolts');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(1, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(1, item), x => this.getItemLevelReq(x, Skills.Ranged));
                     equipmentSelectCard.addSectionTitle('Javelins');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(2, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(2, item), x => this.getItemLevelReq(x, Skills.Ranged));
                     equipmentSelectCard.addSectionTitle('Throwing Knives');
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(3, item), x => this.getItemLevelReq(x, CONSTANTS.skill.Ranged));
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterByAmmoType(3, item), x => this.getItemLevelReq(x, Skills.Ranged));
                     equipmentSelectCard.addSectionTitle('Other');
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterNoAmmoType(item), x => x.name);
                 } else if (equipmentSlot === equipmentSlotData.Passive.id) {
@@ -1510,9 +1510,9 @@
                     this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterRemainingPassive(item), x => x.name);
                 } else if (equipmentSlot === equipmentSlotData.Summon1.id || equipmentSlot === equipmentSlotData.Summon2.id) {
                     equipmentSelectCard.addSectionTitle('Combat Familiars')
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, true), x => this.getItemLevelReq(x, CONSTANTS.skill.Summoning));
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, true), x => this.getItemLevelReq(x, Skills.Summoning));
                     equipmentSelectCard.addSectionTitle('Non-Combat Familiars')
-                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, false), x => this.getItemLevelReq(x, CONSTANTS.skill.Summoning));
+                    this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, (item) => this.filterCombatSummon(item, false), x => this.getItemLevelReq(x, Skills.Summoning));
                 } else {
                     throw Error(`Invalid equipmentSlot: ${equipmentSlot}`);
                 }
@@ -1662,7 +1662,7 @@
                     const levelReqs = item.equipRequirements.find(x => x.type === 'Level');
                     if (levelReqs) {
                         this.skillKeys.forEach(skill => {
-                            const levelReq = levelReqs.levels.find(x => x.skill === CONSTANTS.skill[skill]);
+                            const levelReq = levelReqs.levels.find(x => x.skill === Skills[skill]);
                             if (levelReq) {
                                 requirements.push(`${skill} Level ${levelReq.level}`);
                             }
@@ -1718,7 +1718,7 @@
             levelInputOnChange(event, skillName) {
                 const newLevel = parseInt(event.currentTarget.value);
                 if (newLevel >= 1) {
-                    this.player.skillLevel[CONSTANTS.skill[skillName]] = newLevel;
+                    this.player.skillLevel[Skills[skillName]] = newLevel;
                     // Update Spell and Prayer Button UIS, and deselect things if they become invalid
                     if (skillName === 'Magic') {
                         this.updateSpellOptions();
@@ -1756,8 +1756,8 @@
             prayerButtonOnClick(event, prayerID) {
                 // Escape if prayer level is not reached
                 const prayer = PRAYER[prayerID];
-                if (!this.player.activePrayers.has(prayerID) && this.player.skillLevel[CONSTANTS.skill.Prayer] < prayer.prayerLevel) {
-                    notifyPlayer(CONSTANTS.skill.Prayer, `${this.getPrayerName(prayerID)} requires level ${prayer.prayerLevel} Prayer.`, 'danger');
+                if (!this.player.activePrayers.has(prayerID) && this.player.skillLevel[Skills.Prayer] < prayer.prayerLevel) {
+                    notifyPlayer(Skills.Prayer, `${this.getPrayerName(prayerID)} requires level ${prayer.prayerLevel} Prayer.`, 'danger');
                     return;
                 }
                 let prayerChanged = false;
@@ -1771,7 +1771,7 @@
                         this.selectButton(event.currentTarget);
                         prayerChanged = true;
                     } else {
-                        notifyPlayer(CONSTANTS.skill.Prayer, 'You can only have 2 prayers active at once.', 'danger');
+                        notifyPlayer(Skills.Prayer, 'You can only have 2 prayers active at once.', 'danger');
                     }
                 }
                 if (prayerChanged) {
@@ -1846,7 +1846,7 @@
                 this.player.spellSelection[spellType] = -1;
                 // send message if required
                 if (message) {
-                    notifyPlayer(CONSTANTS.skill.Magic, message, 'danger');
+                    notifyPlayer(Skills.Magic, message, 'danger');
                 }
             }
 
@@ -1858,12 +1858,12 @@
                 // get spell
                 const spell = this.combatData.spells[spellType][spellID];
                 // Escape for not meeting the level/item requirement
-                if (this.player.skillLevel[CONSTANTS.skill.Magic] < spell.magicLevelRequired) {
-                    notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires level ${spell.magicLevelRequired} Magic.`, 'danger');
+                if (this.player.skillLevel[Skills.Magic] < spell.magicLevelRequired) {
+                    notifyPlayer(Skills.Magic, `${spell.name} requires level ${spell.magicLevelRequired} Magic.`, 'danger');
                     return;
                 }
                 if (spell.requiredItem !== undefined && spell.requiredItem !== -1 && !this.player.equipmentIDs().includes(spell.requiredItem)) {
-                    notifyPlayer(CONSTANTS.skill.Magic, `${spell.name} requires ${this.getItemName(spell.requiredItem)}.`, 'danger');
+                    notifyPlayer(Skills.Magic, `${spell.name} requires ${this.getItemName(spell.requiredItem)}.`, 'danger');
                     return;
                 }
                 // remove previous selection
@@ -1879,7 +1879,7 @@
                 this.player.spellSelection[spellType] = spellID;
                 // send message if required
                 if (message) {
-                    notifyPlayer(CONSTANTS.skill.Magic, message, 'danger');
+                    notifyPlayer(Skills.Magic, message, 'danger');
                 }
             }
 
@@ -1905,7 +1905,7 @@
                     }
                     if (this.combatData.spells[spellType][spellSelection[spellType]] === undefined) {
                         this.player.spellSelection[spellType] = -1;
-                        notifyPlayer(CONSTANTS.skill.Magic, `disabled invalid ${spellType} ${spellSelection[spellType]}`, 'danger');
+                        notifyPlayer(Skills.Magic, `disabled invalid ${spellType} ${spellSelection[spellType]}`, 'danger');
                     }
                 });
                 // check that at least one spell is selected
@@ -2439,7 +2439,7 @@
                         this.setZoneInfoCard(
                             SlayerTask.data[taskID].display,
                             taskID,
-                            SKILLS[CONSTANTS.skill.Slayer].media,
+                            SKILLS[Skills.Slayer].media,
                             this.simulator.slayerSimData[taskID],
                         );
                     } else {
@@ -2503,7 +2503,7 @@
             updateSpellOptions() {
                 this.player.computeAttackType();
                 this.player.checkMagicUsage();
-                const magicLevel = this.player.skillLevel[CONSTANTS.skill.Magic];
+                const magicLevel = this.player.skillLevel[Skills.Magic];
                 const setSpellsPerLevel = (spell, spellID, spellType) => {
                     if (spell.magicLevelRequired > magicLevel) {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
@@ -2528,7 +2528,7 @@
                     if (spell.requiredItem === -1) {
                         return;
                     }
-                    if (this.player.equipmentIDs().includes(spell.requiredItem) && this.player.skillLevel[CONSTANTS.skill.Magic] >= spell.magicLevelRequired) {
+                    if (this.player.equipmentIDs().includes(spell.requiredItem) && this.player.skillLevel[Skills.Magic] >= spell.magicLevelRequired) {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                     } else {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
@@ -2541,13 +2541,13 @@
              * Updates the prayers that display in the prayer selection card, based on if the player can use it
              */
             updatePrayerOptions() {
-                const prayerLevel = this.player.skillLevel[CONSTANTS.skill.Prayer];
+                const prayerLevel = this.player.skillLevel[Skills.Prayer];
                 PRAYER.forEach((prayer, i) => {
                     if (prayer.prayerLevel > prayerLevel) {
                         document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = this.media.question;
                         if (this.player.activePrayers.has(i)) {
                             this.prayerButtonOnClick({currentTarget: document.getElementById(`MCS ${this.getPrayerName(i)} Button`)}, i);
-                            notifyPlayer(CONSTANTS.skill.Prayer, `${this.getPrayerName(i)} has been de-selected. It requires level ${prayer.prayerLevel} Prayer.`, 'danger');
+                            notifyPlayer(Skills.Prayer, `${this.getPrayerName(i)} has been de-selected. It requires level ${prayer.prayerLevel} Prayer.`, 'danger');
                         }
                     } else {
                         document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = prayer.media;

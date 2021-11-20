@@ -59,7 +59,7 @@
             summoningSynergy: true,
             useCombinationRunes: false,
         }
-        MICSR.defaultSettings.levels[CONSTANTS.skill.Hitpoints] = 10;
+        MICSR.defaultSettings.levels[Skills.Hitpoints] = 10;
 
         /**
          * Class to handle importing
@@ -96,8 +96,8 @@
                 const foodSelected = player.food.currentSlot.item;
                 // get cooking mastery for foodSelected
                 const foodMastery = foodSelected.masteryID;
-                const cookingMastery = foodSelected.id > -1 && foodMastery && foodMastery[0] === CONSTANTS.skill.Cooking
-                    && exp.xp_to_level(MASTERY[CONSTANTS.skill.Cooking].xp[foodMastery[1]]) > 99;
+                const cookingMastery = foodSelected.id > -1 && foodMastery && foodMastery[0] === Skills.Cooking
+                    && exp.xp_to_level(MASTERY[Skills.Cooking].xp[foodMastery[1]]) > 99;
 
                 // get the player's auto eat tier
                 let autoEatTier = -1;
@@ -147,7 +147,7 @@
                     // lists
                     astrologyModifiers: astrologyModifiers,
                     course: chosenAgilityObstacles,
-                    courseMastery: MASTERY[CONSTANTS.skill.Agility].xp.map(x => x > 13034431),
+                    courseMastery: MASTERY[Skills.Agility].xp.map(x => x > 13034431),
                     equipment: player.equipmentSets[setID].slotArray.map(x => x.occupiedBy === 'None' ? x.item.id : -1),
                     levels: skillXP.map(x => Math.max(1, exp.xp_to_level(x) - 1)),
                     petUnlocked: petUnlocked,
@@ -158,7 +158,7 @@
                     aurora: player.spellSelection.aurora,
                     autoEatTier: autoEatTier,
                     cookingMastery: cookingMastery,
-                    cookingPool: getMasteryPoolProgress(CONSTANTS.skill.Cooking) >= 95,
+                    cookingPool: getMasteryPoolProgress(Skills.Cooking) >= 95,
                     currentGamemode: currentGamemode,
                     curse: player.spellSelection.curse,
                     foodSelected: foodSelected.id,
@@ -280,7 +280,7 @@
 
             importLevels(levels) {
                 this.app.skillKeys.forEach(key => {
-                    document.getElementById(`MCS ${key} Input`).value = levels[CONSTANTS.skill[key]];
+                    document.getElementById(`MCS ${key} Input`).value = levels[Skills[key]];
                 });
                 this.app.player.skillLevel = [...levels];
             }
