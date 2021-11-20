@@ -102,9 +102,9 @@
                 // get the player's auto eat tier
                 let autoEatTier = -1;
                 [
-                    CONSTANTS.shop.general.Auto_Eat_Tier_I,
-                    CONSTANTS.shop.general.Auto_Eat_Tier_II,
-                    CONSTANTS.shop.general.Auto_Eat_Tier_III,
+                    GeneralShopPurchases.Auto_Eat_Tier_I,
+                    GeneralShopPurchases.Auto_Eat_Tier_II,
+                    GeneralShopPurchases.Auto_Eat_Tier_III,
                 ].forEach(id => {
                     if (shopItemsPurchased.size === 0) {
                         return;
