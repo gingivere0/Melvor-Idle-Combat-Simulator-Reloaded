@@ -139,8 +139,8 @@
                     synergyLock: 'assets/media/skills/summoning/synergy_locked.svg',
                     stamina: 'assets/media/main/stamina.png',
                     question: 'assets/media/main/question.svg',
-                    airRune: getItemMedia(CONSTANTS.item.Air_Rune),
-                    mistRune: getItemMedia(CONSTANTS.item.Mist_Rune),
+                    airRune: getItemMedia(Items.Air_Rune),
+                    mistRune: getItemMedia(Items.Mist_Rune),
                     bank: 'assets/media/main/bank_header.svg',
                     herblore: 'assets/media/skills/herblore/herblore.svg',
                     cooking: 'assets/media/skills/cooking/cooking.svg',
@@ -169,9 +169,9 @@
 
                 // Forced equipment sorting
                 this.force = {
-                    [CONSTANTS.skill.Defence]: [CONSTANTS.item.Slayer_Helmet_Basic, CONSTANTS.item.Slayer_Platebody_Basic],
-                    [CONSTANTS.skill.Ranged]: [CONSTANTS.item.Slayer_Cowl_Basic, CONSTANTS.item.Slayer_Leather_Body_Basic],
-                    [CONSTANTS.skill.Magic]: [CONSTANTS.item.Slayer_Wizard_Hat_Basic, CONSTANTS.item.Slayer_Wizard_Robes_Basic, CONSTANTS.item.Enchanted_Shield],
+                    [CONSTANTS.skill.Defence]: [Items.Slayer_Helmet_Basic, Items.Slayer_Platebody_Basic],
+                    [CONSTANTS.skill.Ranged]: [Items.Slayer_Cowl_Basic, Items.Slayer_Leather_Body_Basic],
+                    [CONSTANTS.skill.Magic]: [Items.Slayer_Wizard_Hat_Basic, Items.Slayer_Wizard_Robes_Basic, Items.Enchanted_Shield],
                 };
 
                 // Generate equipment subsets

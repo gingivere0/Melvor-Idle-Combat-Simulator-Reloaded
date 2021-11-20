@@ -406,7 +406,7 @@
 
             addMiscModifiers() {
                 // Knight's Defender
-                if (this.equipment.checkForItemID(CONSTANTS.item.Knights_Defender) && this.attackType === 'melee') {
+                if (this.equipment.checkForItemID(Items.Knights_Defender) && this.attackType === 'melee') {
                     this.modifiers.addModifiers({
                         decreasedAttackInterval: 100,
                         decreasedDamageReduction: 3,
@@ -470,7 +470,7 @@
                     this.synergy_1_2_isActive.enemy = this.hitpoints === this.stats.maxHitpoints;
                     if (this.synergy_1_2_isActive.enemy) {
                         const mult = this.modifiers.summoningSynergy_1_2;
-                        this.targetModifiers.addModifiers(items[CONSTANTS.item.Summoning_Familiar_Occultist].enemyModifiers, mult, mult);
+                        this.targetModifiers.addModifiers(items[Items.Summoning_Familiar_Occultist].enemyModifiers, mult, mult);
                     }
                 }
             }

@@ -129,9 +129,9 @@
                 // loot and signet are affected by loot chance
                 monsterValue += this.computeDropTableValue(monsterID);
                 if (this.modifiers.allowSignetDrops) {
-                    monsterValue += this.getItemValue(CONSTANTS.item.Signet_Ring_Half_B) * getMonsterCombatLevel(monsterID) / 500000;
+                    monsterValue += this.getItemValue(Items.Signet_Ring_Half_B) * getMonsterCombatLevel(monsterID) / 500000;
                 } else {
-                    monsterValue += this.getItemValue(CONSTANTS.item.Gold_Topaz_Ring) * getMonsterCombatLevel(monsterID) / 500000;
+                    monsterValue += this.getItemValue(Items.Gold_Topaz_Ring) * getMonsterCombatLevel(monsterID) / 500000;
                 }
                 monsterValue *= this.computeLootChance(monsterID);
                 // bones drops are not affected by loot chance
@@ -191,7 +191,7 @@
                     }
                 }
                 if (this.modifiers.allowSignetDrops) {
-                    dungeonValue += this.getItemValue(CONSTANTS.item.Signet_Ring_Half_B) * getMonsterCombatLevel(MICSR.dungeons[dungeonID].monsters[MICSR.dungeons[dungeonID].monsters.length - 1]) / 500000;
+                    dungeonValue += this.getItemValue(Items.Signet_Ring_Half_B) * getMonsterCombatLevel(MICSR.dungeons[dungeonID].monsters[MICSR.dungeons[dungeonID].monsters.length - 1]) / 500000;
                 }
                 return dungeonValue;
             }
