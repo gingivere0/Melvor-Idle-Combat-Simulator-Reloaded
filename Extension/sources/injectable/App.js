@@ -923,7 +923,7 @@
                                 activeConstellationModifiers[modifier] = [];
                             }
                             activeConstellationModifiers[modifier].push([skillID, 0]);
-                        } else if (alreadyAdded.includes(modifier)) {
+                        } else if (!alreadyAdded.includes(modifier)) {
                             card.addNumberInput(modifier, 0, 0, 15, (event) => {
                                 activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
                                 this.updateCombatStats();
