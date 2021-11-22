@@ -359,6 +359,7 @@
                     {name: 'CONSTANTS', data: CONSTANTS},
                     {name: 'CURSES', data: CURSES},
                     {name: 'DotTypeIDs', data: DotTypeIDs},
+                    {name: 'Dungeons', data: Dungeons},
                     {name: 'DUNGEONS', data: DUNGEONS},
                     {name: 'elementalEffects', data: elementalEffects},
                     {name: 'emptyFood', data: emptyFood},
@@ -370,6 +371,7 @@
                     {name: 'formatNumberSetting', data: formatNumberSetting},
                     {name: 'frostBurnEffect', data: frostBurnEffect},
                     {name: 'GAMEMODES', data: GAMEMODES},
+                    {name: 'GeneralShopPurchases', data: GeneralShopPurchases},
                     {name: 'gp', data: 1e9}, // required for confetti crossbow
                     {name: 'herbloreItemData', data: herbloreItemData},
                     {name: 'markOfDeathEffect', data: markOfDeathEffect},
