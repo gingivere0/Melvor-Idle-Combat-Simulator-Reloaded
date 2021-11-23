@@ -881,71 +881,79 @@
                     cc.appendChild(card.createImage(SKILLS[constellation.skills[1]].media, 20));
                     // image buttons to open modifier selection
                     cc.appendChild(card.createImage(this.media.standardStar, 40));
+                    cc.appendChild(card.createImage(this.media.uniqueStar, 40));
                     // add constellation to astrology card
                     card.container.appendChild(cc);
                     // add popup
-                    const stdMod = [];
-                    constellation.skills.forEach(skillID => {
-                        if (!MICSR.showModifiersInstance.relevantModifiers.combat.skillIDs.includes(skillID)) {
-                            return;
-                        }
-                        // all skills have increasedSkillXP
-                        stdMod.push([skillID, 'increasedSkillXP']);
-                        // summoning has no other relevant modifiers
-                        if (Skills.Summoning === skillID) {
-                            return;
-                        }
-                        // combat modifiers for all cb skills
-                        stdMod.push([undefined, 'increasedGPFromMonsters']);
-                        stdMod.push([undefined, 'increasedGlobalAccuracy']);
-                        // increasedHiddenSkillLevel or increasedSlayerCoins
-                        if ([Skills.Hitpoints, Skills.Slayer, Skills.Prayer].includes(skillID)) {
-                            stdMod.push([undefined, 'increasedSlayerCoins']);
-                        } else {
-                            stdMod.push([skillID, 'increasedHiddenSkillLevel']);
-                        }
-                    });
-                    const alreadyAdded = [];
-                    stdMod.forEach(x => {
-                        const skillID = x[0];
-                        const modifier = x[1];
-                        if (skillID !== undefined) {
-                            card.addNumberInput(Skills[skillID] + ' ' + modifier, 0, 0, 15, (event) => {
-                                activeConstellationModifiers[modifier] = activeConstellationModifiers[modifier].map(y => {
-                                    if (y[0] !== skillID) {
-                                        return y;
-                                    }
-                                    return [y[0], parseInt(event.currentTarget.value)];
-                                });
-                                this.updateCombatStats();
+                    this.createStandardAstrologyModifiers(card, constellation, activeConstellationModifiers);
+                    this.createUniqueAstrologyModifiers(card, constellation, activeConstellationModifiers);
+                }
+            }
+
+            createStandardAstrologyModifiers(card, constellation, activeConstellationModifiers) {
+                const stdMod = [];
+                constellation.skills.forEach(skillID => {
+                    if (!MICSR.showModifiersInstance.relevantModifiers.combat.skillIDs.includes(skillID)) {
+                        return;
+                    }
+                    // all skills have increasedSkillXP
+                    stdMod.push([skillID, 'increasedSkillXP']);
+                    // summoning has no other relevant modifiers
+                    if (Skills.Summoning === skillID) {
+                        return;
+                    }
+                    // combat modifiers for all cb skills
+                    stdMod.push([undefined, 'increasedGPFromMonsters']);
+                    stdMod.push([undefined, 'increasedGlobalAccuracy']);
+                    // increasedHiddenSkillLevel or increasedSlayerCoins
+                    if ([Skills.Hitpoints, Skills.Slayer, Skills.Prayer].includes(skillID)) {
+                        stdMod.push([undefined, 'increasedSlayerCoins']);
+                    } else {
+                        stdMod.push([skillID, 'increasedHiddenSkillLevel']);
+                    }
+                });
+                const alreadyAdded = [];
+                stdMod.forEach(x => {
+                    const skillID = x[0];
+                    const modifier = x[1];
+                    if (skillID !== undefined) {
+                        card.addNumberInput(Skills[skillID] + ' ' + modifier, 0, 0, 15, (event) => {
+                            activeConstellationModifiers[modifier] = activeConstellationModifiers[modifier].map(y => {
+                                if (y[0] !== skillID) {
+                                    return y;
+                                }
+                                return [y[0], parseInt(event.currentTarget.value)];
                             });
-                            if (activeConstellationModifiers[modifier] === undefined) {
-                                activeConstellationModifiers[modifier] = [];
-                            }
-                            activeConstellationModifiers[modifier].push([skillID, 0]);
-                        } else if (!alreadyAdded.includes(modifier)) {
-                            card.addNumberInput(modifier, 0, 0, 15, (event) => {
-                                activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
-                                this.updateCombatStats();
-                            });
-                            activeConstellationModifiers[modifier] = 0;
-                            alreadyAdded.push(modifier);
+                            this.updateCombatStats();
+                        });
+                        if (activeConstellationModifiers[modifier] === undefined) {
+                            activeConstellationModifiers[modifier] = [];
                         }
-                    });
-                    // unique modifiers
-                    const uniqMod = constellation.uniqueModifiers.filter(m =>
-                        MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m)
-                        || MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m.substring(9))
-                    );
-                    cc.appendChild(card.createImage(this.media.uniqueStar, 40));
-                    uniqMod.forEach(modifier => {
+                        activeConstellationModifiers[modifier].push([skillID, 0]);
+                    } else if (!alreadyAdded.includes(modifier)) {
                         card.addNumberInput(modifier, 0, 0, 15, (event) => {
                             activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
                             this.updateCombatStats();
                         });
                         activeConstellationModifiers[modifier] = 0;
+                        alreadyAdded.push(modifier);
+                    }
+                });
+            }
+
+            createUniqueAstrologyModifiers(card, constellation, activeConstellationModifiers) {
+                // unique modifiers
+                const uniqMod = constellation.uniqueModifiers.filter(m =>
+                    MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m)
+                    || MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m.substring(9))
+                );
+                uniqMod.forEach(modifier => {
+                    card.addNumberInput(modifier, 0, 0, 15, (event) => {
+                        activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
+                        this.updateCombatStats();
                     });
-                }
+                    activeConstellationModifiers[modifier] = 0;
+                });
             }
 
             createLootOptionsCard() {
