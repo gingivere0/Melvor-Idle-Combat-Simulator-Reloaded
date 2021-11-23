@@ -332,6 +332,7 @@
                 this.updatePrayerOptions();
                 this.updateCombatStats();
                 this.updatePlotData();
+                this.toggleAstrologySelectCard();
                 // slayer sim is off by default, so toggle auto slayer off
                 this.toggleSlayerSims(!this.slayerToggleState, false);
                 // load from local storage
@@ -862,35 +863,103 @@
             }
 
             createAstrologySelectCard() {
+                let initial = false;
                 if (!this.astrologySelectCard) {
                     this.astrologySelectCard = this.mainTabCard.addTab('Astrology', this.media.astrology, '', '100px');
+                    this.astrologySelected = undefined;
+                    initial = true;
                 } else {
                     this.astrologySelectCard.clearContainer();
                 }
                 this.astrologySelectCard.addSectionTitle('Astrology');
+                this.constellationContainers = [];
+                this.constellationModifierContainers = [];
                 const card = this.astrologySelectCard;
+                let index = 0;
                 for (const constellation of ASTROLOGY) {
+                    const constellationIndex = index;
+                    index += 1;
                     // create constellation modifier object
-                    const activeConstellationModifiers = {};
-                    this.player.activeAstrologyModifiers.push(activeConstellationModifiers);
+                    let activeConstellationModifiers = {};
+                    if (initial) {
+                        this.player.activeAstrologyModifiers.push(activeConstellationModifiers);
+                    } else {
+                        activeConstellationModifiers = this.player.activeAstrologyModifiers[constellationIndex]
+                    }
                     // create constellation container
                     const cc = card.createCCContainer();
+                    this.constellationContainers.push(cc);
+                    if ([0, 2, 7].includes(constellationIndex)) {
+                        this.constellationModifierContainers.push([]);
+                        continue;
+                    }
                     // constellation symbol and skills
-                    cc.appendChild(card.createImage(constellation.media, 40));
+                    const constellationImage = card.createImageButton(
+                        constellation.media,
+                        `constellation-${constellationIndex}`,
+                        () => {
+                        },
+                        'Small',
+                    );
+                    cc.appendChild(card.createLabel(`${constellation.name} (${constellation.level})`));
+                    cc.appendChild(constellationImage);
                     cc.appendChild(card.createImage(SKILLS[constellation.skills[0]].media, 20));
                     cc.appendChild(card.createImage(SKILLS[constellation.skills[1]].media, 20));
-                    // image buttons to open modifier selection
-                    cc.appendChild(card.createImage(this.media.standardStar, 40));
-                    cc.appendChild(card.createImage(this.media.uniqueStar, 40));
+                    const standardLabel = card.createLabel(`+${'x'}%`)
+                    standardLabel.id = `MICSR-${constellation}-standard-percentage`;
+                    cc.appendChild(standardLabel);
+                    cc.appendChild(card.container.appendChild(card.createImage(this.media.standardStar, 20)));
+                    const uniqueLabel = card.createLabel(`+${'y'}%`);
+                    uniqueLabel.id = `MICSR-${constellation}-unique-percentage`;
+                    cc.appendChild(uniqueLabel);
+                    cc.appendChild(card.container.appendChild(card.createImage(this.media.uniqueStar, 20)));
                     // add constellation to astrology card
                     card.container.appendChild(cc);
-                    // add popup
-                    this.createStandardAstrologyModifiers(card, constellation, activeConstellationModifiers);
-                    this.createUniqueAstrologyModifiers(card, constellation, activeConstellationModifiers);
+                    constellationImage.parentElement.onclick = () => this.toggleAstrologySelectCard(constellationIndex);
+                    // image buttons to open modifier selection
+                    let elementList = [];
+                    const standardStar = card.createImage(this.media.standardStar, 40);
+                    standardStar.id = `MICSR-${constellation.name}-Standard-Image`;
+                    card.container.appendChild(standardStar);
+                    this.createStandardAstrologyModifiers(card, elementList, constellation, activeConstellationModifiers);
+                    const uniqueStar = card.createImage(this.media.uniqueStar, 40);
+                    uniqueStar.id = `MICSR-${constellation.name}-Unique-Image`;
+                    card.container.appendChild(uniqueStar);
+                    this.createUniqueAstrologyModifiers(card, elementList, constellation, activeConstellationModifiers);
+                    this.constellationModifierContainers.push(elementList);
                 }
             }
 
-            createStandardAstrologyModifiers(card, constellation, activeConstellationModifiers) {
+            toggleAstrologySelectCard(selected = undefined) {
+                this.astrologySelected = this.astrologySelected === selected ? undefined : selected;
+                ASTROLOGY.forEach((constellation, index) => {
+                    if ([0, 2, 7].includes(index)) {
+                        return;
+                    }
+                    if (this.astrologySelected !== undefined && this.astrologySelected !== index) {
+                        this.constellationContainers[index].style.display = 'none';
+                    } else {
+                        this.constellationContainers[index].style.display = 'block';
+                    }
+                    const els = [
+                        document.getElementById(`MICSR-${constellation.name}-Standard-Image`),
+                        document.getElementById(`MICSR-${constellation.name}-Unique-Image`),
+                    ]
+                    for (const id of this.constellationModifierContainers[index]) {
+                        const el = document.getElementById(id).parentElement;
+                        els.push(el);
+                    }
+                    for (const el of els) {
+                        if (this.astrologySelected !== index) {
+                            el.style.display = 'none';
+                        } else {
+                            el.style.display = 'flex';
+                        }
+                    }
+                });
+            }
+
+            createStandardAstrologyModifiers(card, elementList, constellation, activeConstellationModifiers) {
                 const stdMod = [];
                 constellation.skills.forEach(skillID => {
                     if (!MICSR.showModifiersInstance.relevantModifiers.combat.skillIDs.includes(skillID)) {
@@ -917,7 +986,7 @@
                     const skillID = x[0];
                     const modifier = x[1];
                     if (skillID !== undefined) {
-                        card.addNumberInput(Skills[skillID] + ' ' + modifier, 0, 0, 15, (event) => {
+                        card.addNumberInput(`${constellation.name}-${Skills[skillID]}-${modifier}`, 0, 0, 15, (event) => {
                             activeConstellationModifiers[modifier] = activeConstellationModifiers[modifier].map(y => {
                                 if (y[0] !== skillID) {
                                     return y;
@@ -926,32 +995,41 @@
                             });
                             this.updateCombatStats();
                         });
+                        const id = `MCS ${constellation.name}-${Skills[skillID]}-${modifier} Input`;
+                        elementList.push(id);
+                        card.container.lastChild.firstChild.textContent = `${Skills[skillID]} ${modifier}`;
                         if (activeConstellationModifiers[modifier] === undefined) {
                             activeConstellationModifiers[modifier] = [];
                         }
                         activeConstellationModifiers[modifier].push([skillID, 0]);
                     } else if (!alreadyAdded.includes(modifier)) {
-                        card.addNumberInput(modifier, 0, 0, 15, (event) => {
+                        card.addNumberInput(`${constellation.name}-${modifier}`, 0, 0, 15, (event) => {
                             activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
                             this.updateCombatStats();
                         });
+                        const id = `MCS ${constellation.name}-${modifier} Input`;
+                        elementList.push(id);
+                        card.container.lastChild.firstChild.textContent = `${modifier}`;
                         activeConstellationModifiers[modifier] = 0;
                         alreadyAdded.push(modifier);
                     }
                 });
             }
 
-            createUniqueAstrologyModifiers(card, constellation, activeConstellationModifiers) {
+            createUniqueAstrologyModifiers(card, elementList, constellation, activeConstellationModifiers) {
                 // unique modifiers
                 const uniqMod = constellation.uniqueModifiers.filter(m =>
                     MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m)
                     || MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m.substring(9))
                 );
                 uniqMod.forEach(modifier => {
-                    card.addNumberInput(modifier, 0, 0, 15, (event) => {
+                    card.addNumberInput(`${constellation.name}-${modifier}`, 0, 0, 15, (event) => {
                         activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
                         this.updateCombatStats();
                     });
+                    const id = `MCS ${constellation.name}-${modifier} Input`;
+                    elementList.push(id);
+                    card.container.lastChild.firstChild.textContent = `${modifier}`;
                     activeConstellationModifiers[modifier] = 0;
                 });
             }
