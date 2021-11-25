@@ -867,6 +867,7 @@
                 if (!this.astrologySelectCard) {
                     this.astrologySelectCard = this.mainTabCard.addTab('Astrology', this.media.astrology, '', '100px');
                     this.astrologySelected = undefined;
+                    this.skipConstellations = [0, 2, 7];
                     initial = true;
                 } else {
                     this.astrologySelectCard.clearContainer();
@@ -889,7 +890,7 @@
                     // create constellation container
                     const cc = card.createCCContainer();
                     this.constellationContainers.push(cc);
-                    if ([0, 2, 7].includes(constellationIndex)) {
+                    if (this.skipConstellations.includes(constellationIndex)) {
                         this.constellationModifierContainers.push([]);
                         continue;
                     }
@@ -905,12 +906,12 @@
                     cc.appendChild(constellationImage);
                     cc.appendChild(card.createImage(SKILLS[constellation.skills[0]].media, 20));
                     cc.appendChild(card.createImage(SKILLS[constellation.skills[1]].media, 20));
-                    const standardLabel = card.createLabel(`+${'x'}%`)
-                    standardLabel.id = `MICSR-${constellation}-standard-percentage`;
+                    const standardLabel = card.createLabel(`+0%`)
+                    standardLabel.id = `MICSR-${constellation.name}-standard-percentage`;
                     cc.appendChild(standardLabel);
                     cc.appendChild(card.container.appendChild(card.createImage(this.media.standardStar, 20)));
-                    const uniqueLabel = card.createLabel(`+${'y'}%`);
-                    uniqueLabel.id = `MICSR-${constellation}-unique-percentage`;
+                    const uniqueLabel = card.createLabel(`+0%`);
+                    uniqueLabel.id = `MICSR-${constellation.name}-unique-percentage`;
                     cc.appendChild(uniqueLabel);
                     cc.appendChild(card.container.appendChild(card.createImage(this.media.uniqueStar, 20)));
                     // add constellation to astrology card
@@ -933,7 +934,7 @@
             toggleAstrologySelectCard(selected = undefined) {
                 this.astrologySelected = this.astrologySelected === selected ? undefined : selected;
                 ASTROLOGY.forEach((constellation, index) => {
-                    if ([0, 2, 7].includes(index)) {
+                    if (this.skipConstellations.includes(index)) {
                         return;
                     }
                     if (this.astrologySelected !== undefined && this.astrologySelected !== index) {
@@ -993,6 +994,7 @@
                                 }
                                 return [y[0], parseInt(event.currentTarget.value)];
                             });
+                            this.updateAstrologySummary();
                             this.updateCombatStats();
                         });
                         const id = `MCS ${constellation.name}-${Skills[skillID]}-${modifier} Input`;
@@ -1005,6 +1007,7 @@
                     } else if (!alreadyAdded.includes(modifier)) {
                         card.addNumberInput(`${constellation.name}-${modifier}`, 0, 0, 15, (event) => {
                             activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
+                            this.updateAstrologySummary();
                             this.updateCombatStats();
                         });
                         const id = `MCS ${constellation.name}-${modifier} Input`;
@@ -1025,12 +1028,40 @@
                 uniqMod.forEach(modifier => {
                     card.addNumberInput(`${constellation.name}-${modifier}`, 0, 0, 15, (event) => {
                         activeConstellationModifiers[modifier] = parseInt(event.currentTarget.value);
+                        this.updateAstrologySummary();
                         this.updateCombatStats();
                     });
                     const id = `MCS ${constellation.name}-${modifier} Input`;
                     elementList.push(id);
                     card.container.lastChild.firstChild.textContent = `${modifier}`;
                     activeConstellationModifiers[modifier] = 0;
+                });
+            }
+
+            updateAstrologySummary() {
+                this.player.activeAstrologyModifiers.forEach((constellation, idx) => {
+                    if (this.skipConstellations.includes(idx)) {
+                        return;
+                    }
+                    let standard = 0;
+                    let unique = 0;
+                    for (const modifier in constellation) {
+                        let val = 0;
+                        if (isNaN(constellation[modifier])) {
+                            constellation[modifier].forEach(x =>
+                                val += x[1]
+                            );
+                        } else {
+                            val += constellation[modifier];
+                        }
+                        if (AstrologyDefaults.standardAstrologyModifierList.includes(modifier)) {
+                            standard += val;
+                        } else {
+                            unique += val;
+                        }
+                    }
+                    document.getElementById(`MICSR-${ASTROLOGY[idx].name}-standard-percentage`).textContent = `+${standard}%`;
+                    document.getElementById(`MICSR-${ASTROLOGY[idx].name}-unique-percentage`).textContent = `+${unique}%`;
                 });
             }
 
