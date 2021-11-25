@@ -118,7 +118,7 @@
 
                 // get the active astrology modifiers
                 const astrologyModifiers = [];
-                for (const constellation of [activeAstrologyModifiers[1]]) {
+                for (const constellation of activeAstrologyModifiers) {
                     const modifiers = {};
                     for (const idx in constellation) {
                         const ms = constellation[idx];
@@ -131,7 +131,7 @@
                             } else {
                                 const i = modifiers[m].findIndex(x => x[0] === ms[m][0][0]);
                                 if (i === -1) {
-                                    modifiers[m].push(...ms[m]);
+                                    modifiers[m].push([...ms[m][0]]);
                                 } else {
                                     modifiers[m][i][1] += ms[m][0][1];
                                 }
@@ -187,6 +187,7 @@
                 return {
                     version: MICSR.version,
                     // lists
+                    astrologyModifiers: this.app.player.activeAstrologyModifiers,
                     course: [...this.app.player.course],
                     courseMastery: courseMastery,
                     equipment: this.app.player.equipment.slotArray.map(x => x.item.id),
@@ -249,6 +250,7 @@
                 this.importUseCombinationRunes(settings.useCombinationRunes);
                 this.importAgilityCourse(settings.course, settings.courseMastery, settings.pillar);
                 this.importSummoningSynergy(settings.summoningSynergy);
+                this.importAstrology(settings.astrologyModifiers);
             }
 
             update() {
@@ -408,6 +410,31 @@
 
             importAgilityCourse(course, masteries, pillar) {
                 this.app.agilityCourse.importAgilityCourse(course, masteries, pillar);
+            }
+
+            importAstrology(astrologyModifiers) {
+                this.app.player.activeAstrologyModifiers.forEach((constellation, idx) => {
+                    for (const modifier in constellation) {
+                        // import values and set rest to 0
+                        if (astrologyModifiers[idx][modifier] !== undefined) {
+                            constellation[modifier] = astrologyModifiers[idx][modifier];
+                        } else if (isNaN(constellation[modifier])) {
+                            // keep entries per skill, but set value to 0
+                            constellation[modifier] = constellation[modifier].map(x => [x[0], 0]);
+                        } else {
+                            constellation[modifier] = 0;
+                        }
+                        // update input fields
+                        if (isNaN(constellation[modifier])) {
+                            constellation[modifier].forEach(x =>
+                                document.getElementById(`MCS ${ASTROLOGY[idx].name}-${Skills[x[0]]}-${modifier} Input`).value = x[1]
+                            );
+                        } else {
+                            document.getElementById(`MCS ${ASTROLOGY[idx].name}-${modifier} Input`).value = constellation[modifier];
+                        }
+                    }
+                });
+                this.app.updateAstrologySummary();
             }
 
             checkRadio(baseID, check) {
