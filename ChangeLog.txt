@@ -1,5 +1,7 @@
 v1.6.0
-    WIP
+    Update for v1.0
+
+    Adds Astrology Tab
 
 v1.5.13
     Update for v0.22
