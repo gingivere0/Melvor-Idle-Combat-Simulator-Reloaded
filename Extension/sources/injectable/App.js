@@ -1047,7 +1047,7 @@
                     let unique = 0;
                     for (const modifier in constellation) {
                         let val = 0;
-                        if (isNaN(constellation[modifier])) {
+                        if (constellation[modifier].push) {
                             constellation[modifier].forEach(x =>
                                 val += x[1]
                             );

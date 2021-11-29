@@ -418,17 +418,23 @@
                         // import values and set rest to 0
                         if (astrologyModifiers[idx][modifier] !== undefined) {
                             constellation[modifier] = astrologyModifiers[idx][modifier];
-                        } else if (isNaN(constellation[modifier])) {
+                            if (constellation[modifier].push) {
+                                // filter non combat skill modifiers
+                                constellation[modifier] = constellation[modifier].filter(x =>
+                                    MICSR.showModifiersInstance.relevantModifiers.combat.skillIDs.includes(x[0])
+                                );
+                            }
+                        } else if (constellation[modifier].push) {
                             // keep entries per skill, but set value to 0
                             constellation[modifier] = constellation[modifier].map(x => [x[0], 0]);
                         } else {
                             constellation[modifier] = 0;
                         }
                         // update input fields
-                        if (isNaN(constellation[modifier])) {
-                            constellation[modifier].forEach(x =>
+                        if (constellation[modifier].push) {
+                            constellation[modifier].forEach(x => {
                                 document.getElementById(`MCS ${ASTROLOGY[idx].name}-${Skills[x[0]]}-${modifier} Input`).value = x[1]
-                            );
+                            });
                         } else {
                             document.getElementById(`MCS ${ASTROLOGY[idx].name}-${modifier} Input`).value = constellation[modifier];
                         }
