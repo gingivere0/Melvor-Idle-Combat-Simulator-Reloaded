@@ -122,6 +122,7 @@
 
         MICSR.dungeons = [];
         DUNGEONS.forEach(dungeon => MICSR.dungeons.push({...dungeon}));
+        MICSR.dungeons = MICSR.dungeons.filter(dungeon => dungeon.id !== Dungeons.Impending_Darkness);
         MICSR.dungeons[Dungeons.Into_the_Mist].monsters = [147, 148, 149];
 
         /**
