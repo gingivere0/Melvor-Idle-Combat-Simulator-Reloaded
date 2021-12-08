@@ -1,4 +1,15 @@
-v1.6.0
+v1.6.1
+    Fix perfect food heal amount, #69
+    Fix food heal amount display, #69
+    Fix Astrology Modifier display, #79
+    Fix tools menu creation on non-English Melvor Idle, #78
+    Add default astrology modifiers import
+    Specify "Out-of-"Combat Stats
+    Track non-ammo consumables
+    Fix missing consumables
+    Fix Throwing Power Glove
+
+1.6.0
     Update for v1.0
 
     Adds Astrology Tab
