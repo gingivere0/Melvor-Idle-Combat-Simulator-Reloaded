@@ -331,6 +331,7 @@
                 this.updateSpellOptions();
                 this.updatePrayerOptions();
                 this.updateCombatStats();
+                this.updateHealing();
                 this.updatePlotData();
                 this.toggleAstrologySelectCard();
                 // slayer sim is off by default, so toggle auto slayer off
@@ -453,64 +454,25 @@
                 combatStyleCCContainer.appendChild(magicStyleDropdown);
                 this.equipmentSelectCard.container.appendChild(combatStyleCCContainer);
                 // food container
-                const foodCCContainer = this.equipmentSelectCard.createCCContainer();
-                // food card
-                const containerDiv = document.createElement('div');
-                containerDiv.style.position = 'relative';
-                containerDiv.style.cursor = 'pointer';
-                const newImage = document.createElement('img');
-                newImage.id = 'MCS Food Image';
-                newImage.style.border = '1px solid red';
-                newImage.src = this.media.emptyFood;
-                newImage.className = 'combat-food';
-                newImage.dataset.tippyContent = 'No Food';
-                newImage.dataset.tippyHideonclick = 'true';
-                containerDiv.appendChild(newImage);
-                const foodPopup = (() => {
-                    const foodSelectPopup = document.createElement('div');
-                    foodSelectPopup.className = 'mcsPopup';
-                    const equipmentSelectCard = new MICSR.Card(foodSelectPopup, '', '600px');
-                    equipmentSelectCard.addSectionTitle('Food');
-                    const menuItems = [MICSR.emptyItems.Food, ...items].filter((item) => this.filterIfHasKey('healsFor', item));
-                    menuItems.sort((a, b) => b.healsFor - a.healsFor);
-                    const buttonMedia = menuItems.map((item) => this.getItemMedia(item));
-                    const buttonIds = menuItems.map((item) => this.getItemName(item.id));
-                    const buttonCallbacks = menuItems.map((item) => () => this.equipFood(item.id));
-                    const tooltips = menuItems.map((item) => this.getFoodTooltip(item));
-                    equipmentSelectCard.addImageButtons(buttonMedia, buttonIds, 'Small', buttonCallbacks, tooltips, '100%');
-                    return foodSelectPopup;
-                })();
-                containerDiv.appendChild(foodPopup);
-                foodCCContainer.appendChild(containerDiv);
-                foodPopup.style.display = 'none';
-                this.equipmentSelectCard.registerPopupMenu(containerDiv, foodPopup);
-                // auto eat dropdown
-                let autoEatTierNames = ['No Auto Eat'];
-                let autoEatTierValues = [-1];
-                for (let i = 1; i < 4; i++) {
-                    autoEatTierNames.push(SHOP.General[i].name);
-                    autoEatTierValues.push(i - 1);
-                }
-                const autoEatTierDropdown = this.equipmentSelectCard.createDropdown(autoEatTierNames, autoEatTierValues, 'MCS Auto Eat Tier Dropdown', (event) => {
-                    this.player.autoEatTier = parseInt(event.currentTarget.selectedOptions[0].value);
-                    this.updateCombatStats();
-                });
-                foodCCContainer.appendChild(autoEatTierDropdown);
-                this.equipmentSelectCard.container.appendChild(foodCCContainer);
+                this.createFoodContainer();
                 // cooking mastery
                 this.equipmentSelectCard.addToggleRadio(
                     '95% Cooking Pool',
                     'cookingPool',
                     this.player,
                     'cookingPool',
-                    this.player.cookingPool
+                    this.player.cookingPool,
+                    25,
+                    () => this.updateHealing(),
                 );
                 this.equipmentSelectCard.addToggleRadio(
                     '99 Cooking Mastery',
                     'cookingMastery',
                     this.player,
                     'cookingMastery',
-                    this.player.cookingMastery
+                    this.player.cookingMastery,
+                    25,
+                    () => this.updateHealing(),
                 );
                 this.equipmentSelectCard.addToggleRadio(
                     'Manual Eating',
@@ -562,6 +524,58 @@
                 this.equipmentSelectCard.container.appendChild(modifierCCContainer);
             }
 
+            createFoodContainer() {
+                this.foodCCContainer = this.equipmentSelectCard.createCCContainer();
+                // food card
+                const containerDiv = document.createElement('div');
+                containerDiv.style.position = 'relative';
+                containerDiv.style.cursor = 'pointer';
+                const newImage = document.createElement('img');
+                newImage.id = 'MCS Food Image';
+                newImage.style.border = '1px solid red';
+                newImage.src = this.media.emptyFood;
+                newImage.className = 'combat-food';
+                newImage.dataset.tippyContent = 'No Food';
+                newImage.dataset.tippyHideonclick = 'true';
+                containerDiv.appendChild(newImage);
+                const foodPopup = (() => {
+                    const foodSelectPopup = document.createElement('div');
+                    foodSelectPopup.className = 'mcsPopup';
+                    const equipmentSelectCard = new MICSR.Card(foodSelectPopup, '', '600px');
+                    equipmentSelectCard.addSectionTitle('Food');
+                    this.foodItems = [MICSR.emptyItems.Food, ...items].filter((item) => this.filterIfHasKey('healsFor', item));
+                    this.foodItems.sort((a, b) => b.healsFor - a.healsFor);
+                    const buttonMedia = this.foodItems.map((item) => this.getItemMedia(item));
+                    const buttonIds = this.foodItems.map((item) => this.getItemName(item.id));
+                    const buttonCallbacks = this.foodItems.map((item) => () => this.equipFood(item.id));
+                    const tooltips = this.foodItems.map((item) => this.getFoodTooltip(item));
+                    equipmentSelectCard.addImageButtons(buttonMedia, buttonIds, 'Small', buttonCallbacks, tooltips, '100%');
+                    return foodSelectPopup;
+                })();
+                containerDiv.appendChild(foodPopup);
+                this.foodCCContainer.appendChild(containerDiv);
+                foodPopup.style.display = 'none';
+                this.equipmentSelectCard.registerPopupMenu(containerDiv, foodPopup);
+                // heal amt
+                const label = this.equipmentSelectCard.createLabel('');
+                label.id = 'MICSR-heal-amount-Label';
+                this.foodCCContainer.appendChild(label);
+                // auto eat dropdown
+                let autoEatTierNames = ['No Auto Eat'];
+                let autoEatTierValues = [-1];
+                for (let i = 1; i < 4; i++) {
+                    autoEatTierNames.push(SHOP.General[i].name.replace(' - Tier', ''));
+                    autoEatTierValues.push(i - 1);
+                }
+                const autoEatTierDropdown = this.equipmentSelectCard.createDropdown(autoEatTierNames, autoEatTierValues, 'MCS Auto Eat Tier Dropdown', (event) => {
+                    this.player.autoEatTier = parseInt(event.currentTarget.selectedOptions[0].value);
+                    this.updateCombatStats();
+                });
+                this.foodCCContainer.appendChild(autoEatTierDropdown);
+                // append to equipmentSelectCard
+                this.equipmentSelectCard.container.appendChild(this.foodCCContainer);
+            }
+
             equipFood(itemID) {
                 this.player.equipFood(itemID);
                 const img = document.getElementById('MCS Food Image');
@@ -573,6 +587,7 @@
                     img.style.border = '';
                 }
                 img._tippy.setContent(this.getFoodTooltip(items[itemID]));
+                this.updateHealing();
             }
 
             getFoodTooltip(item) {
@@ -584,11 +599,17 @@
                     tooltip += `<span class='text-info'>${item.description.replace(/<br>\(/, ' (')}</span><br>`;
                 }
                 if (item.healsFor) {
-                    const amt = item.healsFor * numberMultiplier;
-                    tooltip += `<h5 class="font-w400 font-size-sm text-left text-combat-smoke m-1 mb-2">Heals for: <img class="skill-icon-xs mr-1" src="${this.media.hitpoints}"><span class="text-bank-desc">+${amt} HP</span></h5>`;
+                    const amt = this.player.getFoodHealing(item);
+                    tooltip += `<h5 class="font-w400 font-size-sm text-left text-combat-smoke m-1 mb-2">Base healing: <img class="skill-icon-xs mr-1" src="${this.media.hitpoints}"><span class="text-bank-desc">+${amt} HP</span></h5>`;
                 }
                 tooltip += '</small></div>';
                 return tooltip;
+            }
+
+            updateHealing() {
+                const amt = this.player.getFoodHealing(this.player.food.currentSlot.item);
+                const innerHTML = `<h5 class="font-w400 font-size-sm text-left text-combat-smoke m-1 mb-2"><img class="skill-icon-xs mr-1" src="${this.media.hitpoints}"><span class="text-bank-desc">+${amt} HP</span></h5>`;
+                document.getElementById('MICSR-heal-amount-Label').innerHTML = innerHTML;
             }
 
             createCombatStatDisplayCard() {
