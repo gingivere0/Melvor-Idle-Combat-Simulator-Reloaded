@@ -962,25 +962,19 @@
 
             createStandardAstrologyModifiers(card, elementList, constellation, activeConstellationModifiers) {
                 const stdMod = [];
-                constellation.skills.forEach(skillID => {
+                constellation.skills.forEach((skillID, idx) => {
                     if (!MICSR.showModifiersInstance.relevantModifiers.combat.skillIDs.includes(skillID)) {
                         return;
                     }
-                    // all skills have increasedSkillXP
-                    stdMod.push([skillID, 'increasedSkillXP']);
-                    // summoning has no other relevant modifiers
+                    // summoning has no relevant modifiers other than increasedSkillXP
                     if (Skills.Summoning === skillID) {
+                        stdMod.push([skillID, 'increasedSkillXP']);
                         return;
                     }
-                    // combat modifiers for all cb skills
-                    stdMod.push([undefined, 'increasedGPFromMonsters']);
-                    stdMod.push([undefined, 'increasedGlobalAccuracy']);
-                    // increasedHiddenSkillLevel or increasedSlayerCoins
-                    if ([Skills.Hitpoints, Skills.Slayer, Skills.Prayer].includes(skillID)) {
-                        stdMod.push([undefined, 'increasedSlayerCoins']);
-                    } else {
-                        stdMod.push([skillID, 'increasedHiddenSkillLevel']);
-                    }
+                    // for other combat skills all modifiers are relevant
+                    constellation.standardModifiers[idx].forEach(modifier =>
+                        stdMod.push([modifierData[modifier].isSkill ? skillID : undefined, modifier])
+                    );
                 });
                 const alreadyAdded = [];
                 stdMod.forEach(x => {
@@ -1054,10 +1048,10 @@
                         } else {
                             val += constellation[modifier];
                         }
-                        if (AstrologyDefaults.standardAstrologyModifierList.includes(modifier)) {
-                            standard += val;
-                        } else {
+                        if (ASTROLOGY[idx].uniqueModifiers.includes(modifier)) {
                             unique += val;
+                        } else {
+                            standard += val;
                         }
                     }
                     document.getElementById(`MICSR-${ASTROLOGY[idx].name}-standard-percentage`).textContent = `+${standard}%`;
