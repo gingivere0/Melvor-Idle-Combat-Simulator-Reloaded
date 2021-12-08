@@ -82,7 +82,7 @@
 
             // insert menu before Minigames
             document.getElementsByClassName('nav-main-heading').forEach(heading => {
-                if (heading.textContent === 'Minigame') {
+                if (heading.textContent === getLangString('PAGE_NAME_MISC', '1')) {
                     heading.parentElement.insertBefore(menu, heading);
                 }
             });
