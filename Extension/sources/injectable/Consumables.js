@@ -125,6 +125,11 @@
                         this.addItemInput(ammoCard, ammoID, () => ammoID === this.player.equipmentID(equipmentSlotData.Quiver.id), ammoInfo.id)
                     );
                 });
+                // other quiver items
+                this.addConsumableInput(ammoCard, 'otherQuiver', 'Other Quiver Items', () => false, 'ammo');
+                items.filter(x => x.validSlots && x.validSlots.includes('Quiver') && x.ammoType === undefined).map(x => x.id).forEach(quiverID =>
+                    this.addItemInput(ammoCard, quiverID, () => quiverID === this.player.equipmentID(equipmentSlotData.Quiver.id), 'otherQuiver')
+                );
                 // summons
                 const summonCard = new MICSR.Card(this.card.container, '', '100px');
                 items.filter(x => x.equipmentStats && x.equipmentStats.find(y => y.key === 'summoningMaxhit')).map(x => x.id).forEach(summonID =>
