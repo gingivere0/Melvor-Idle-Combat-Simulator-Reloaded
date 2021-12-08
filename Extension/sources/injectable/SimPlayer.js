@@ -667,8 +667,7 @@
 
             getFoodHealingBonus(item) {
                 let bonus = this.modifiers.increasedFoodHealingValue - this.modifiers.decreasedFoodHealingValue;
-                const sID = Skills.Cooking;
-                if (item.masteryID !== undefined && item.masteryID[0] === sID && this.cookingMastery) {
+                if (item.cookingID !== undefined && this.cookingMastery) {
                     bonus += 20;
                 }
                 if (this.cookingPool) {
