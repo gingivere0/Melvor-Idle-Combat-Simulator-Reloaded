@@ -410,6 +410,7 @@
                     {name: 'summoningData', data: summoningData},
                     {name: 'summoningItems', data: summoningItems},
                     {name: 'synergyElements', data: {}},
+                    {name: 'SynergyItem', data: SynergyItem},
                     {name: 'TICK_INTERVAL', data: TICK_INTERVAL},
                     {name: 'tutorialComplete', data: tutorialComplete},
                     {name: 'unknownArea', data: unknownArea},
