@@ -29,6 +29,7 @@
 
         MICSR.defaultSettings = {
             // version: MICSR.version,
+            astrologyModifiers: [],
             course: Array(10).fill(-1),
             courseMastery: {"-1": false},
             equipment: Array(Object.getOwnPropertyNames(equipmentSlotData).length).fill(-1),
@@ -416,7 +417,7 @@
                 this.app.player.activeAstrologyModifiers.forEach((constellation, idx) => {
                     for (const modifier in constellation) {
                         // import values and set rest to 0
-                        if (astrologyModifiers[idx][modifier] !== undefined) {
+                        if (astrologyModifiers[idx] !== undefined && astrologyModifiers[idx][modifier] !== undefined) {
                             constellation[modifier] = astrologyModifiers[idx][modifier];
                             if (constellation[modifier].push) {
                                 // filter non combat skill modifiers
