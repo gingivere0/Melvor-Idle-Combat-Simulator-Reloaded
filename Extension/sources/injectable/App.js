@@ -593,7 +593,7 @@
 
             createCombatStatDisplayCard() {
                 this.combatStatCard = new MICSR.Card(this.topContent, '', '60px', true);
-                this.combatStatCard.addSectionTitle('Combat Stats');
+                this.combatStatCard.addSectionTitle('Out-of-Combat Stats');
                 const combatStatNames = [
                     'Attack Interval',
                     'Min Hit',
