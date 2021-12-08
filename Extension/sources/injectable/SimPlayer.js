@@ -586,6 +586,12 @@
                 }
             }
 
+            consumeQuiver(type) {
+                if (this.equipment.slots.Quiver.item.consumesOn === type) {
+                    this.usedAmmo++;
+                }
+            }
+
             //
             getRuneCosts(spell) {
                 let runeCost = spell.runesRequired;
