@@ -557,9 +557,18 @@
                 foodPopup.style.display = 'none';
                 this.equipmentSelectCard.registerPopupMenu(containerDiv, foodPopup);
                 // heal amt
-                const label = this.equipmentSelectCard.createLabel('');
+                let label = document.createElement('span');
                 label.id = 'MICSR-heal-amount-Label';
-                this.foodCCContainer.appendChild(label);
+                label.className = 'text-bank-desc';
+                label.textContent = '+0';
+                const image = document.createElement('img');
+                image.className = 'skill-icon-xs mr-1';
+                image.src = this.media.hitpoints;
+                const wrapper = document.createElement('h5');
+                wrapper.className = 'font-w400 font-size-sm text-left text-combat-smoke m-1 mb-2';
+                wrapper.appendChild(image);
+                wrapper.appendChild(label);
+                this.foodCCContainer.appendChild(wrapper);
                 // auto eat dropdown
                 let autoEatTierNames = ['No Auto Eat'];
                 let autoEatTierValues = [-1];
@@ -599,7 +608,7 @@
                     tooltip += `<span class='text-info'>${item.description.replace(/<br>\(/, ' (')}</span><br>`;
                 }
                 if (item.healsFor) {
-                    const amt = this.player.getFoodHealing(item);
+                    const amt = item.healsFor * numberMultiplier;
                     tooltip += `<h5 class="font-w400 font-size-sm text-left text-combat-smoke m-1 mb-2">Base healing: <img class="skill-icon-xs mr-1" src="${this.media.hitpoints}"><span class="text-bank-desc">+${amt} HP</span></h5>`;
                 }
                 tooltip += '</small></div>';
@@ -608,8 +617,7 @@
 
             updateHealing() {
                 const amt = this.player.getFoodHealing(this.player.food.currentSlot.item);
-                const innerHTML = `<h5 class="font-w400 font-size-sm text-left text-combat-smoke m-1 mb-2"><img class="skill-icon-xs mr-1" src="${this.media.hitpoints}"><span class="text-bank-desc">+${amt} HP</span></h5>`;
-                document.getElementById('MICSR-heal-amount-Label').innerHTML = innerHTML;
+                document.getElementById('MICSR-heal-amount-Label').textContent = `+${amt}`;
             }
 
             createCombatStatDisplayCard() {
