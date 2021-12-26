@@ -1,3 +1,9 @@
+v1.6.2
+    Update for v1.0.1
+
+    Change tick limit to per trial
+    Improve tick limit warning
+
 v1.6.1
     Fix perfect food heal amount, #69
     Fix food heal amount display, #69
