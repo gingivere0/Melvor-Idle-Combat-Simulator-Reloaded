@@ -2514,6 +2514,9 @@
             getSimFailureText(data) {
                 const prefix = 'No valid simulation data';
                 if (data.reason) {
+                    if (data.tickCount >= MICSR.maxTicks * MICSR.trials) {
+                        return `Insufficient simulation time: ${data.reason}.`
+                    }
                     return `${prefix}: ${data.reason}.`;
                 }
                 if (!data.simSuccess) {

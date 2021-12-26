@@ -130,6 +130,7 @@
                 // success
                 data.simSuccess = simResult.success;
                 data.reason = undefined;
+                data.tickCount = simResult.tickCount;
                 // xp rates
                 data.xpPerSecond = gps.skillXP[Skills.Attack]
                     + gps.skillXP[Skills.Strength]

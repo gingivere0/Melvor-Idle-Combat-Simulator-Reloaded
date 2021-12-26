@@ -770,6 +770,7 @@
                 // combine failure reasons, if any
                 this.combineReasons(data, monsterIDs, dungeonID);
                 data.simSuccess = true;
+                data.tickCount = 0;
 
                 // not time-weighted averages
                 data.deathRate = 0;
@@ -779,12 +780,14 @@
                 data.simulationTime = 0;
                 for (const monsterID of monsterIDs) {
                     const simID = this.simID(monsterID, dungeonID);
-                    data.simSuccess &&= this.monsterSimData[simID].simSuccess;
-                    data.deathRate = 1 - (1 - data.deathRate) * (1 - this.monsterSimData[simID].deathRate);
-                    data.highestDamageTaken = Math.max(data.highestDamageTaken, this.monsterSimData[simID].highestDamageTaken);
-                    data.lowestHitpoints = Math.min(data.lowestHitpoints, this.monsterSimData[simID].lowestHitpoints);
-                    data.killTimeS += this.monsterSimData[simID].killTimeS;
-                    data.simulationTime += this.monsterSimData[simID].simulationTime;
+                    const mData = this.monsterSimData[simID];
+                    data.simSuccess &&= mData.simSuccess;
+                    data.deathRate = 1 - (1 - data.deathRate) * (1 - mData.deathRate);
+                    data.highestDamageTaken = Math.max(data.highestDamageTaken, mData.highestDamageTaken);
+                    data.lowestHitpoints = Math.min(data.lowestHitpoints, mData.lowestHitpoints);
+                    data.killTimeS += mData.killTimeS;
+                    data.simulationTime += mData.simulationTime;
+                    data.tickCount = Math.max(data.tickCount, mData.tickCount);
                 }
                 data.killsPerSecond = 1 / data.killTimeS;
 
