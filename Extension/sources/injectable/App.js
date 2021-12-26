@@ -1257,7 +1257,7 @@
                 // advanced options
                 this.simOptionsCard.addSectionTitle('Advanced Options');
                 this.simOptionsCard.addNumberInput('# Trials', MICSR.trials, 1, 1e5, (event) => this.numTrialsInputOnChange(event));
-                this.simOptionsCard.addNumberInput('Max ticks (x1000)', MICSR.maxTicks / 1000, 1, 1e5, (event) => this.maxKiloTicksInputOnChange(event));
+                this.simOptionsCard.addNumberInput('Max tick/trial', MICSR.maxTicks, 1, 1e8, (event) => this.maxTicksInputOnChange(event));
                 this.simOptionsCard.addToggleRadio(
                     'Heal After Death',
                     'healAfterDeath',
@@ -2103,13 +2103,13 @@
             }
 
             /**
-             * Callback for when the number of trials input is changed
+             * Callback for when the number of ticks input is changed
              * @param {Event} event The change event for an input
              */
-            maxKiloTicksInputOnChange(event) {
-                const maxKiloTicks = parseInt(event.currentTarget.value);
-                if (maxKiloTicks > 0) {
-                    MICSR.maxTicks = maxKiloTicks * 1000;
+            maxTicksInputOnChange(event) {
+                const maxTicks = parseInt(event.currentTarget.value);
+                if (maxTicks > 0) {
+                    MICSR.maxTicks = maxTicks;
                 }
             }
 

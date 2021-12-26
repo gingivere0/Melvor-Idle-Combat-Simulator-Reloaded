@@ -287,10 +287,11 @@
                         this.dungeonProgress++;
                     }
                 }
+                const totalTickLimit = trials * tickLimit;
                 const success = this.player.checkRequirements(areaData.entryRequirements, true, 'fight this monster.');
                 if (success) {
                     this.selectMonster(monsterID, areaData);
-                    while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < tickLimit) {
+                    while (this.simStats.killCount + this.simStats.deathCount < trials && this.tickCount < totalTickLimit) {
                         if (!this.isInCombat && !this.spawnTimer.active) {
                             this.selectMonster(monsterID, areaData);
                         }

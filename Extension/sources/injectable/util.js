@@ -80,7 +80,7 @@
 
         // simulation settings
         MICSR.trials = 1e3;
-        MICSR.maxTicks = 1e6;
+        MICSR.maxTicks = 1e3;
 
         // empty items
         const makeEmptyItem = (img, slot) => {
