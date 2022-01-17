@@ -138,7 +138,7 @@
              * @param {string} containerWidth container width
              * @return {HTMLDivElement[]} The image buttons
              */
-            addImageButtons(sources, idtexts, size, onclickCallbacks, tooltips = [], containerWidth) {
+            addImageButtons(sources, idtexts, size, onclickCallbacks, tooltips, containerWidth = undefined) {
                 const newCCContainer = document.createElement('div');
                 newCCContainer.className = 'mcsMultiImageButtonContainer';
                 for (let i = 0; i < sources.length; i++) {

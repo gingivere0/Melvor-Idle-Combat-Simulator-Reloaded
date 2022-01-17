@@ -361,7 +361,7 @@
                     {name: 'DotTypeIDs', data: DotTypeIDs},
                     {name: 'Dungeons', data: Dungeons},
                     {name: 'DUNGEONS', data: DUNGEONS},
-                    {name: 'effectMedia', data:{}},
+                    {name: 'effectMedia', data: {}},
                     {name: 'elementalEffects', data: elementalEffects},
                     {name: 'emptyFood', data: emptyFood},
                     {name: 'enemyHTMLElements', data: {}},

@@ -815,7 +815,6 @@
                         prayerSources.push(prayer.media);
                         prayerNames.push(this.getPrayerName(prayer.id));
                         prayerCallbacks.push(e => this.prayerButtonOnClick(e, prayer.id));
-                        console.log(prayer.id, prayer.name)
                         tooltips.push(this.createPrayerTooltip(prayer));
                     });
                 this.prayerSelectCard.addImageButtons(prayerSources, prayerNames, 'Medium', prayerCallbacks, tooltips);
