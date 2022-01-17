@@ -821,7 +821,7 @@
                     tooltip += prayer.description;
                     tooltip += '<br></span>';
                     if (prayer.pointsPerPlayer > 0) {
-                        tooltip += `<span class='text-success'>+${(2 / numberMultiplier * prayer.pointsPerPlayer).toFixed(2)} Prayer XP per damage dealt to enemy</span><br>`;
+                        tooltip += `<span class='text-success'>+${(prayer.pointsPerPlayer / 3 / numberMultiplier).toFixed(3)} Prayer XP per damage dealt to enemy</span><br>`;
                     }
                     tooltip += '<span class="text-warning">Prayer Point Cost:</span><br><span class="text-info">';
                     if (prayer.pointsPerPlayer > 0) {

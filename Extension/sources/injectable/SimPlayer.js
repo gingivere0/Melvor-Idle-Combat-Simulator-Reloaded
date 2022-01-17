@@ -523,6 +523,7 @@
                 this.activePrayers.forEach((pID) => {
                     return (prayerRatio += PRAYER[pID].pointsPerPlayer);
                 });
+                prayerRatio /= 3;
                 if (prayerRatio > 0) {
                     this.addXP(Skills.Prayer, prayerRatio * damage);
                 }
