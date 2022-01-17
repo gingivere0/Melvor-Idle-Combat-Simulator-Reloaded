@@ -609,7 +609,7 @@
                     tooltip += `<span class='text-info'>${item.description.replace(/<br>\(/, ' (')}</span><br>`;
                 }
                 if (item.healsFor) {
-                    const amt = item.healsFor * numberMultiplier;
+                    const amt = Math.round(item.healsFor * numberMultiplier);
                     tooltip += `<h5 class="font-w400 font-size-sm text-left text-combat-smoke m-1 mb-2">Base healing: <img class="skill-icon-xs mr-1" src="${this.media.hitpoints}"><span class="text-bank-desc">+${amt} HP</span></h5>`;
                 }
                 tooltip += '</small></div>';
