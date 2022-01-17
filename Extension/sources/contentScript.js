@@ -73,6 +73,7 @@ function injectScripts() {
         'CombatData',
         'Consumables',
         'DataExport',
+        'ExportCheat',
         'Import',
         'Loot',
         'Plotter',
