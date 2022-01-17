@@ -69,6 +69,13 @@
 
             constructor(app) {
                 this.app = app;
+                this.player = app.player;
+                this.document = document;
+                this.autoEatTiers = [
+                    GeneralShopPurchases.Auto_Eat_Tier_I,
+                    GeneralShopPurchases.Auto_Eat_Tier_II,
+                    GeneralShopPurchases.Auto_Eat_Tier_III,
+                ];
             }
 
             /**
@@ -102,11 +109,7 @@
 
                 // get the player's auto eat tier
                 let autoEatTier = -1;
-                [
-                    GeneralShopPurchases.Auto_Eat_Tier_I,
-                    GeneralShopPurchases.Auto_Eat_Tier_II,
-                    GeneralShopPurchases.Auto_Eat_Tier_III,
-                ].forEach(id => {
+                this.autoEatTiers.forEach(id => {
                     if (shopItemsPurchased.size === 0) {
                         return;
                     }
@@ -163,16 +166,16 @@
                     currentGamemode: currentGamemode,
                     curse: player.spellSelection.curse,
                     foodSelected: foodSelected.id,
-                    healAfterDeath: this.app.player.healAfterDeath,
+                    healAfterDeath: this.player.healAfterDeath,
                     isAncient: player.spellSelection.ancient !== -1,
-                    isManualEating: this.app.player.isManualEating,
-                    isSlayerTask: this.app.player.isSlayerTask,
+                    isManualEating: this.player.isManualEating,
+                    isSlayerTask: this.player.isSlayerTask,
                     pillar: agilityPassivePillarActive,
                     potionID: potionID,
                     potionTier: potionTier,
                     prayerSelected: [...player.activePrayers],
                     standard: player.spellSelection.standard,
-                    summoningSynergy: this.app.player.summoningSynergy, // TODO: import mark levels
+                    summoningSynergy: this.player.summoningSynergy, // TODO: import mark levels
                     useCombinationRunes: useCombinationRunes,
                 };
 
@@ -184,38 +187,38 @@
 
             exportSettings() {
                 const courseMastery = {};
-                this.app.player.course.forEach((o, i) => courseMastery[o] = this.app.player.courseMastery[i]);
+                this.player.course.forEach((o, i) => courseMastery[o] = this.player.courseMastery[i]);
                 return {
                     version: MICSR.version,
                     // lists
-                    astrologyModifiers: this.app.player.activeAstrologyModifiers,
-                    course: [...this.app.player.course],
+                    astrologyModifiers: this.player.activeAstrologyModifiers,
+                    course: [...this.player.course],
                     courseMastery: courseMastery,
-                    equipment: this.app.player.equipment.slotArray.map(x => x.item.id),
-                    levels: [...this.app.player.skillLevel],
-                    petUnlocked: [...this.app.player.petUnlocked],
+                    equipment: this.player.equipment.slotArray.map(x => x.item.id),
+                    levels: [...this.player.skillLevel],
+                    petUnlocked: [...this.player.petUnlocked],
                     // objects
-                    styles: {...this.app.player.attackStyles},
-                    prayerSelected: [...this.app.player.activePrayers],
+                    styles: {...this.player.attackStyles},
+                    prayerSelected: [...this.player.activePrayers],
                     // simple values
-                    ancient: this.app.player.spellSelection.ancient,
-                    aurora: this.app.player.spellSelection.aurora,
-                    autoEatTier: this.app.player.autoEatTier,
-                    cookingMastery: this.app.player.cookingMastery,
-                    cookingPool: this.app.player.cookingPool,
-                    currentGamemode: this.app.player.currentGamemode,
-                    curse: this.app.player.spellSelection.curse,
-                    foodSelected: this.app.player.food.currentSlot.item.id,
-                    healAfterDeath: this.app.player.healAfterDeath,
-                    isAncient: this.app.player.spellSelection.ancient > -1,
-                    isManualEating: this.app.player.isManualEating,
-                    isSlayerTask: this.app.player.isSlayerTask,
-                    pillar: this.app.player.pillar,
-                    potionID: this.app.player.potionID,
-                    potionTier: this.app.player.potionTier,
-                    standard: this.app.player.spellSelection.standard,
-                    summoningSynergy: this.app.player.summoningSynergy,
-                    useCombinationRunes: this.app.player.useCombinationRunes,
+                    ancient: this.player.spellSelection.ancient,
+                    aurora: this.player.spellSelection.aurora,
+                    autoEatTier: this.player.autoEatTier,
+                    cookingMastery: this.player.cookingMastery,
+                    cookingPool: this.player.cookingPool,
+                    currentGamemode: this.player.currentGamemode,
+                    curse: this.player.spellSelection.curse,
+                    foodSelected: this.player.food.currentSlot.item.id,
+                    healAfterDeath: this.player.healAfterDeath,
+                    isAncient: this.player.spellSelection.ancient > -1,
+                    isManualEating: this.player.isManualEating,
+                    isSlayerTask: this.player.isSlayerTask,
+                    pillar: this.player.pillar,
+                    potionID: this.player.potionID,
+                    potionTier: this.player.potionTier,
+                    standard: this.player.spellSelection.standard,
+                    summoningSynergy: this.player.summoningSynergy,
+                    useCombinationRunes: this.player.useCombinationRunes,
                 }
             }
 
@@ -252,6 +255,8 @@
                 this.importAgilityCourse(settings.course, settings.courseMastery, settings.pillar);
                 this.importSummoningSynergy(settings.summoningSynergy);
                 this.importAstrology(settings.astrologyModifiers);
+                // notify completion
+                this.app.notify('Import completed.');
             }
 
             update() {
@@ -263,7 +268,7 @@
 
             importEquipment(equipment) {
                 // clear previous items
-                this.app.player.equipment.unequipAll();
+                this.player.equipment.unequipAll();
                 for (const slot in equipmentSlotData) {
                     const slotID = equipmentSlotData[slot].id;
                     this.app.setEquipmentImage(slotID, -1);
@@ -283,9 +288,9 @@
 
             importLevels(levels) {
                 this.app.skillKeys.forEach(key => {
-                    document.getElementById(`MCS ${key} Input`).value = levels[Skills[key]];
+                    this.document.getElementById(`MCS ${key} Input`).value = levels[Skills[key]];
                 });
-                this.app.player.skillLevel = [...levels];
+                this.player.skillLevel = [...levels];
             }
 
             importStyle(styles) {
@@ -294,15 +299,15 @@
                     'ranged',
                     'magic',
                 ].forEach(style => {
-                    this.app.player.setAttackStyle(style, styles[style]);
-                    document.getElementById(`MCS ${style} Style Dropdown`).selectedIndex = attackStyles[styles[style]].id % 3;
+                    this.player.setAttackStyle(style, styles[style]);
+                    this.document.getElementById(`MCS ${style} Style Dropdown`).selectedIndex = attackStyles[styles[style]].id % 3;
                 });
             }
 
             importSpells(spellSelection) {
                 // Set all active spell UI to be disabled
                 Object.keys(this.app.combatData.spells).forEach((spellType) => {
-                    const spellID = this.app.player.spellSelection[spellType];
+                    const spellID = this.player.spellSelection[spellType];
                     if (spellID > -1) {
                         this.app.disableSpell(spellType, spellID);
                     }
@@ -313,15 +318,13 @@
 
             importPrayers(prayerSelected) {
                 // toggle old prayers off
-                this.app.player.activePrayers.forEach(prayerID => {
-                    this.app.player.activePrayers.delete(prayerID)
-                });
+                this.player.activePrayers.clear();
                 // Update prayers
                 PRAYER.forEach(prayer => {
-                    const prayButton = document.getElementById(`MCS ${this.app.getPrayerName(prayer.id)} Button`);
+                    const prayButton = this.document.getElementById(`MCS ${this.app.getPrayerName(prayer.id)} Button`);
                     if (prayerSelected.includes(prayer.id)) {
                         this.app.selectButton(prayButton);
-                        this.app.player.activePrayers.add(prayer.id);
+                        this.player.activePrayers.add(prayer.id);
                     } else {
                         this.app.unselectButton(prayButton);
                     }
@@ -330,83 +333,83 @@
 
             importPotion(potionID, potionTier) {
                 // Deselect potion if selected
-                if (this.app.player.potionSelected) {
-                    this.app.unselectButton(document.getElementById(`MCS ${this.app.getPotionName(this.app.player.potionID)} Button`));
-                    this.app.player.potionSelected = false;
-                    this.app.player.potionID = -1;
+                if (this.player.potionSelected) {
+                    this.app.unselectButton(this.document.getElementById(`MCS ${this.app.getPotionName(this.player.potionID)} Button`));
+                    this.player.potionSelected = false;
+                    this.player.potionID = -1;
                 }
                 // Select new potion if applicable
                 if (potionID !== -1) {
-                    this.app.player.potionSelected = true;
-                    this.app.player.potionID = potionID;
-                    this.app.selectButton(document.getElementById(`MCS ${this.app.getPotionName(this.app.player.potionID)} Button`));
+                    this.player.potionSelected = true;
+                    this.player.potionID = potionID;
+                    this.app.selectButton(this.document.getElementById(`MCS ${this.app.getPotionName(this.player.potionID)} Button`));
                 }
                 // Set potion tier if applicable
                 if (potionTier !== -1) {
-                    this.app.player.potionTier = potionTier;
+                    this.player.potionTier = potionTier;
                     this.app.updatePotionTier(potionTier);
                     // Set dropdown to correct option
-                    document.getElementById('MCS Potion Tier Dropdown').selectedIndex = potionTier;
+                    this.document.getElementById('MCS Potion Tier Dropdown').selectedIndex = potionTier;
                 }
             }
 
             importPets(petUnlocked) {
                 // Import PETS
                 petUnlocked.forEach((owned, petID) => {
-                    this.app.player.petUnlocked[petID] = owned;
+                    this.player.petUnlocked[petID] = owned;
                     if (this.app.petIDs.includes(petID)) {
                         if (owned) {
-                            this.app.selectButton(document.getElementById(`MCS ${PETS[petID].name} Button`));
+                            this.app.selectButton(this.document.getElementById(`MCS ${PETS[petID].name} Button`));
                         } else {
-                            this.app.unselectButton(document.getElementById(`MCS ${PETS[petID].name} Button`));
+                            this.app.unselectButton(this.document.getElementById(`MCS ${PETS[petID].name} Button`));
                         }
                     }
-                    if (petID === 4 && owned) document.getElementById('MCS Rock').style.display = '';
+                    if (petID === 4 && owned) this.document.getElementById('MCS Rock').style.display = '';
                 });
             }
 
             importAutoEat(autoEatTier, foodSelected, cookingPool, cookingMastery) {
                 // Import Food Settings
-                this.app.player.autoEatTier = autoEatTier;
-                document.getElementById('MCS Auto Eat Tier Dropdown').selectedIndex = autoEatTier + 1;
+                this.player.autoEatTier = autoEatTier;
+                this.document.getElementById('MCS Auto Eat Tier Dropdown').selectedIndex = autoEatTier + 1;
                 this.app.equipFood(foodSelected);
                 this.checkRadio('MCS 95% Cooking Pool', cookingPool);
-                this.app.player.cookingPool = cookingPool;
+                this.player.cookingPool = cookingPool;
                 this.checkRadio('MCS 99 Cooking Mastery', cookingMastery);
-                this.app.player.cookingMastery = cookingMastery;
+                this.player.cookingMastery = cookingMastery;
             }
 
             importManualEating(isManualEating) {
                 this.checkRadio('MCS Manual Eating', isManualEating);
-                this.app.player.isManualEating = isManualEating;
+                this.player.isManualEating = isManualEating;
             }
 
             importHealAfterDeath(healAfterDeath) {
                 this.checkRadio('MCS Heal After Death', healAfterDeath);
-                this.app.player.healAfterDeath = healAfterDeath;
+                this.player.healAfterDeath = healAfterDeath;
             }
 
             importSlayerTask(isSlayerTask) {
                 // Update slayer task mode
                 this.checkRadio('MCS Slayer Task', isSlayerTask);
-                this.app.player.isSlayerTask = isSlayerTask;
+                this.player.isSlayerTask = isSlayerTask;
                 this.app.slayerTaskSimsToggle();
             }
 
             importGameMode(currentGamemode) {
-                this.app.player.currentGamemode = currentGamemode;
-                document.getElementById('MCS Game Mode Dropdown').selectedIndex = currentGamemode;
+                this.player.currentGamemode = currentGamemode;
+                this.document.getElementById('MCS Game Mode Dropdown').selectedIndex = currentGamemode;
             }
 
             importSummoningSynergy(summoningSynergy) {
                 // Update summoningSynergy
-                this.app.player.summoningSynergy = summoningSynergy;
+                this.player.summoningSynergy = summoningSynergy;
             }
 
             importUseCombinationRunes(useCombinationRunes) {
                 // Update hardcore mode
                 this.checkRadio('MCS Use Combination Runes', useCombinationRunes);
-                this.app.player.useCombinationRunes = useCombinationRunes;
+                this.player.useCombinationRunes = useCombinationRunes;
             }
 
             importAgilityCourse(course, masteries, pillar) {
@@ -414,7 +417,7 @@
             }
 
             importAstrology(astrologyModifiers) {
-                this.app.player.activeAstrologyModifiers.forEach((constellation, idx) => {
+                this.player.activeAstrologyModifiers.forEach((constellation, idx) => {
                     for (const modifier in constellation) {
                         // import values and set rest to 0
                         if (astrologyModifiers[idx] !== undefined && astrologyModifiers[idx][modifier] !== undefined) {
@@ -434,10 +437,10 @@
                         // update input fields
                         if (constellation[modifier].push) {
                             constellation[modifier].forEach(x => {
-                                document.getElementById(`MCS ${ASTROLOGY[idx].name}-${Skills[x[0]]}-${modifier} Input`).value = x[1]
+                                this.document.getElementById(`MCS ${ASTROLOGY[idx].name}-${Skills[x[0]]}-${modifier} Input`).value = x[1]
                             });
                         } else {
-                            document.getElementById(`MCS ${ASTROLOGY[idx].name}-${modifier} Input`).value = constellation[modifier];
+                            this.document.getElementById(`MCS ${ASTROLOGY[idx].name}-${modifier} Input`).value = constellation[modifier];
                         }
                     }
                 });
@@ -446,7 +449,7 @@
 
             checkRadio(baseID, check) {
                 const yesOrNo = check ? 'Yes' : 'No';
-                document.getElementById(`${baseID} Radio ${yesOrNo}`).checked = true;
+                this.document.getElementById(`${baseID} Radio ${yesOrNo}`).checked = true;
             }
         }
     }
