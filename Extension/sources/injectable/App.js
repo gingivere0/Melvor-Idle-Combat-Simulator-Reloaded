@@ -1018,8 +1018,11 @@
                                 if (y[0] !== skillID) {
                                     return y;
                                 }
-                                return [y[0], parseInt(event.currentTarget.value)];
+                                return [skillID, parseInt(event.currentTarget.value)];
                             });
+                            if (activeConstellationModifiers[modifier].find(x => x[0] === skillID) === undefined) {
+                                activeConstellationModifiers[modifier].push([skillID, parseInt(event.currentTarget.value)]);
+                            }
                             this.updateAstrologySummary();
                             this.updateCombatStats();
                         });
