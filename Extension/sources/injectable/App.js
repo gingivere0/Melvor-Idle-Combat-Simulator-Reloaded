@@ -809,34 +809,37 @@
                 const prayerSources = [];
                 const prayerNames = [];
                 const prayerCallbacks = [];
-                for (let i = 0; i < PRAYER.length; i++) {
-                    prayerSources.push(PRAYER[i].media);
-                    prayerNames.push(this.getPrayerName(i));
-                    prayerCallbacks.push((e) => this.prayerButtonOnClick(e, i));
-                }
-
                 const tooltips = [];
-                PRAYER.forEach((prayer) => {
-                    let tooltip = `<div class="text-center">${prayer.name}<br><small><span class='text-info'>`;
-                    tooltip += prayer.description;
-                    tooltip += '<br></span>';
-                    if (prayer.pointsPerPlayer > 0) {
-                        tooltip += `<span class='text-success'>+${(prayer.pointsPerPlayer / 3 / numberMultiplier).toFixed(3)} Prayer XP per damage dealt to enemy</span><br>`;
-                    }
-                    tooltip += '<span class="text-warning">Prayer Point Cost:</span><br><span class="text-info">';
-                    if (prayer.pointsPerPlayer > 0) {
-                        tooltip += `${prayer.pointsPerPlayer}</span> per <span class='text-success'>PLAYER</span> attack`;
-                    }
-                    if (prayer.pointsPerEnemy > 0) {
-                        tooltip += `${prayer.pointsPerEnemy}</span> per <span class='text-danger'>ENEMY</span> attack`;
-                    }
-                    if (prayer.pointsPerRegen > 0) {
-                        tooltip += `${prayer.pointsPerRegen}</span> per <span class='text-info'>HP REGEN</span>`;
-                    }
-                    tooltip += '</small></div>';
-                    tooltips.push(tooltip);
-                });
+                PRAYER.map(x => x).sort((a, b) => a.prayerLevel - b.prayerLevel)
+                    .forEach(prayer => {
+                        prayerSources.push(prayer.media);
+                        prayerNames.push(this.getPrayerName(prayer.id));
+                        prayerCallbacks.push(e => this.prayerButtonOnClick(e, prayer.id));
+                        console.log(prayer.id, prayer.name)
+                        tooltips.push(this.createPrayerTooltip(prayer));
+                    });
                 this.prayerSelectCard.addImageButtons(prayerSources, prayerNames, 'Medium', prayerCallbacks, tooltips);
+            }
+
+            createPrayerTooltip(prayer) {
+                let tooltip = `<div class="text-center">${prayer.name}<br><small><span class='text-info'>`;
+                tooltip += prayer.description;
+                tooltip += '<br></span>';
+                if (prayer.pointsPerPlayer > 0) {
+                    tooltip += `<span class='text-success'>+${(prayer.pointsPerPlayer / 3 / numberMultiplier).toFixed(3)} Prayer XP per damage dealt to enemy</span><br>`;
+                }
+                tooltip += '<span class="text-warning">Prayer Point Cost:</span><br><span class="text-info">';
+                if (prayer.pointsPerPlayer > 0) {
+                    tooltip += `${prayer.pointsPerPlayer}</span> per <span class='text-success'>PLAYER</span> attack`;
+                }
+                if (prayer.pointsPerEnemy > 0) {
+                    tooltip += `${prayer.pointsPerEnemy}</span> per <span class='text-danger'>ENEMY</span> attack`;
+                }
+                if (prayer.pointsPerRegen > 0) {
+                    tooltip += `${prayer.pointsPerRegen}</span> per <span class='text-info'>HP REGEN</span>`;
+                }
+                tooltip += '</small></div>';
+                return tooltip;
             }
 
             createPotionSelectCard() {
@@ -2686,15 +2689,16 @@
              */
             updatePrayerOptions() {
                 const prayerLevel = this.player.skillLevel[Skills.Prayer];
-                PRAYER.forEach((prayer, i) => {
+                PRAYER.forEach(prayer => {
+                    const prayerName = this.getPrayerName(prayer.id);
                     if (prayer.prayerLevel > prayerLevel) {
-                        document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = this.media.question;
-                        if (this.player.activePrayers.has(i)) {
-                            this.prayerButtonOnClick({currentTarget: document.getElementById(`MCS ${this.getPrayerName(i)} Button`)}, i);
-                            notifyPlayer(Skills.Prayer, `${this.getPrayerName(i)} has been de-selected. It requires level ${prayer.prayerLevel} Prayer.`, 'danger');
+                        document.getElementById(`MCS ${prayerName} Button Image`).src = this.media.question;
+                        if (this.player.activePrayers.has(prayer.id)) {
+                            this.prayerButtonOnClick({currentTarget: document.getElementById(`MCS ${prayerName} Button`)}, prayer.id);
+                            notifyPlayer(Skills.Prayer, `${prayerName} has been de-selected. It requires level ${prayer.prayerLevel} Prayer.`, 'danger');
                         }
                     } else {
-                        document.getElementById(`MCS ${this.getPrayerName(i)} Button Image`).src = prayer.media;
+                        document.getElementById(`MCS ${prayerName} Button Image`).src = prayer.media;
                     }
                 });
             }

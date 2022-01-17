@@ -317,15 +317,15 @@
                     this.app.player.activePrayers.delete(prayerID)
                 });
                 // Update prayers
-                for (let prayerID = 0; prayerID < PRAYER.length; prayerID++) {
-                    const prayButton = document.getElementById(`MCS ${this.app.getPrayerName(prayerID)} Button`);
-                    if (prayerSelected.includes(prayerID)) {
+                PRAYER.forEach(prayer => {
+                    const prayButton = document.getElementById(`MCS ${this.app.getPrayerName(prayer.id)} Button`);
+                    if (prayerSelected.includes(prayer.id)) {
                         this.app.selectButton(prayButton);
-                        this.app.player.activePrayers.add(prayerID);
+                        this.app.player.activePrayers.add(prayer.id);
                     } else {
                         this.app.unselectButton(prayButton);
                     }
-                }
+                });
             }
 
             importPotion(potionID, potionTier) {
