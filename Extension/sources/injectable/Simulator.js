@@ -374,7 +374,7 @@
                     {name: 'GAMEMODES', data: GAMEMODES},
                     {name: 'GeneralShopPurchases', data: GeneralShopPurchases},
                     {name: 'gp', data: 1e9}, // required for confetti crossbow
-                    {name: 'herbloreItemData', data: herbloreItemData},
+                    {name: 'Herblore', data: {potions: Herblore.potions}},
                     {name: 'markOfDeathEffect', data: markOfDeathEffect},
                     {name: 'ModifierTarget', data: ModifierTarget},
                     {name: 'MonsterStats', data: {}},

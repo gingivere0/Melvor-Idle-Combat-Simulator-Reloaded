@@ -78,8 +78,8 @@
                 this.card.addTabMenu();
                 // potions
                 const potionCard = new MICSR.Card(this.card.container, '', '100px');
-                herbloreItemData.filter(data => data.category === 0).map(data => data.itemID[0]).forEach(potionID =>
-                    this.addConsumableInput(potionCard, potionID, items[potionID].name.replace('Potion I', 'Potion'), () => this.player.potionID !== -1 && potionID === herbloreItemData[this.player.potionID].itemID[0], 'potion')
+                Herblore.potions.filter(data => data.category === 0).map(data => data.potionIDs[0]).forEach(potionID =>
+                    this.addConsumableInput(potionCard, potionID, items[potionID].name.replace('Potion I', 'Potion'), () => this.player.potionID !== -1 && potionID === Herblore.potions[this.player.potionID].potionIDs[0], 'potion')
                 );
                 // food
                 const foodCard = new MICSR.Card(this.card.container, '', '100px');
@@ -341,7 +341,7 @@
                 }
                 // potion
                 if (data.potionsUsedPerSecond > 0) {
-                    const potionID = herbloreItemData[this.player.potionID].itemID[0];
+                    const potionID = Herblore.potions[this.player.potionID].potionIDs[0];
                     factor += data.potionsUsedPerSecond * this.getConsumableCostInSeconds(potionID);
                 }
                 // food

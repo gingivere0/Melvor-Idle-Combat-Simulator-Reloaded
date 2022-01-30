@@ -89,10 +89,10 @@
                 const itemID = herbloreBonuses[13].itemID;
                 if (itemID !== 0) {
                     // Get tier and potionID
-                    for (let i = 0; i < herbloreItemData.length; i++) {
-                        if (herbloreItemData[i].category === 0) {
-                            for (let j = 0; j < herbloreItemData[i].itemID.length; j++) {
-                                if (herbloreItemData[i].itemID[j] === itemID) {
+                    for (let i = 0; i < Herblore.potions.length; i++) {
+                        if (Herblore.potions[i].category === 0) {
+                            for (let j = 0; j < Herblore.potions[i].potionIDs.length; j++) {
+                                if (Herblore.potions[i].potionIDs[j] === itemID) {
                                     potionID = i;
                                     potionTier = j;
                                 }

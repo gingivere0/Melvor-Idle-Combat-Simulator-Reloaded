@@ -134,7 +134,7 @@
             computePotionBonus() {
                 this.luckyHerb = 0;
                 if (this.player.potionSelected) {
-                    const potion = items[herbloreItemData[this.player.potionID].itemID[this.player.potionTier]];
+                    const potion = items[Herblore.potions[this.player.potionID].potionIDs[this.player.potionTier]];
                     if (potion.potionBonusID === 11) {
                         this.luckyHerb = potion.potionBonus;
                     }

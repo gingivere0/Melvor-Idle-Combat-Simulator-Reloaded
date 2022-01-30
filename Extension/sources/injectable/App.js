@@ -851,9 +851,9 @@
                 const tooltips = [];
                 /** @type {number[]} */
                 this.combatPotionIDs = [];
-                for (let i = 0; i < herbloreItemData.length; i++) {
-                    if (herbloreItemData[i].category === 0) {
-                        const potion = items[herbloreItemData[i].itemID[0]];
+                for (let i = 0; i < Herblore.potions.length; i++) {
+                    if (Herblore.potions[i].category === 0) {
+                        const potion = items[Herblore.potions[i].potionIDs[0]];
                         potionSources.push(getItemMedia(potion.id));
                         potionNames.push(this.getPotionName(i));
                         potionCallbacks.push((e) => this.potionImageButtonOnClick(e, i));
@@ -2773,7 +2773,7 @@
              */
             updatePotionTier(potionTier) {
                 this.combatPotionIDs.forEach((potionId) => {
-                    const potion = items[herbloreItemData[potionId].itemID[potionTier]];
+                    const potion = items[Herblore.potions[potionId].potionIDs[potionTier]];
                     const img = document.getElementById(`MCS ${this.getPotionName(potionId)} Button Image`);
                     img.src = getItemMedia(potion.id);
                     img.parentElement._tippy.setContent(this.getPotionTooltip(potion));
@@ -2842,11 +2842,11 @@
 
             /**
              * Removes HTML from the potion name
-             * @param {number} potionID The index of herbloreItemData
+             * @param {number} potionID The index of Herblore.potions
              * @return {string} The name of a potion
              */
             getPotionName(potionID) {
-                return this.replaceApostrophe(herbloreItemData[potionID].name);
+                return this.replaceApostrophe(Herblore.potions[potionID].name);
             }
 
             /**

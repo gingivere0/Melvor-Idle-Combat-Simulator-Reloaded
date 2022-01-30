@@ -149,7 +149,7 @@
                 data.combinationRunesUsedPerSecond = gps.usedCombinationRunes;
                 let potionCharges = 1;
                 if (this.player.potionID > -1) {
-                    const potion = items[herbloreItemData[this.player.potionID].itemID[this.player.potionTier]];
+                    const potion = items[Herblore.potions[this.player.potionID].potionIDs[this.player.potionTier]];
                     potionCharges = potion.potionCharges + MICSR.getModifierValue(this.player.modifiers, 'PotionChargesFlat');
                 }
                 data.potionsUsedPerSecond = gps.usedPotionCharges / potionCharges; // TODO: divide by potion capacity

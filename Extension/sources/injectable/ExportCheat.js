@@ -90,7 +90,7 @@
             }
 
             importPotion(potionID, potionTier) {
-                if (herbloreItemData[potionID] === undefined) {
+                if (Herblore.potions[potionID] === undefined) {
                     herbloreBonuses[13] = {
                         bonus: [null, null],
                         charges: 0,
@@ -98,7 +98,7 @@
                     };
                     return;
                 }
-                const id = (herbloreItemData[potionID].itemID[potionTier]);
+                const id = (Herblore.potions[potionID].potionIDs[potionTier]);
                 addItemToBank(id, 1000000, true, false, true)
                 usePotion(id, false, true);
             }

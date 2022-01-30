@@ -544,14 +544,14 @@
             }
 
             getPotion() {
-                return items[herbloreItemData[this.potionID].itemID[this.potionTier]];
+                return items[Herblore.potions[this.potionID].potionIDs[this.potionTier]];
             }
 
             // track potion usage instead of consuming
             consumePotionCharge(type) {
                 if (this.potionSelected) {
                     const item = this.getPotion();
-                    if (type === herbloreItemData[item.masteryID[1]].consumesOn
+                    if (type === Herblore.potions[item.masteryID[1]].consumesOn
                         && !rollPercentage(this.modifiers.increasedChanceToPreservePotionCharge - this.modifiers.decreasedChanceToPreservePotionCharge)
                     ) {
                         this.usedPotionCharges++;
