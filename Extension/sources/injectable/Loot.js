@@ -222,7 +222,7 @@
             computeValueAlchs(f, ...args) {
                 const value = this[f](...args);
                 this.computingAlchCount = true;
-                const alchTime = this[f](...args) * magicInterval / 1000;
+                const alchTime = this[f](...args) * game.altMagic.baseInterval / 1000;
                 this.computingAlchCount = false;
                 return {value: value, alchTime: alchTime};
             }
