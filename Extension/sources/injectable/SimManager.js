@@ -64,7 +64,12 @@
             detachGlobals() {
                 this.bank = {
                     addItem: () => true,
-                    checkForItems: () => true,
+                    checkForItems: costs => {
+                        if (costs.find(x => items[x.itemID].type === "Rune") !== undefined) {
+                            return this.player.hasRunes;
+                        }
+                        return true;
+                    },
                     consumeItems: () => {
                     },
                     getQty: () => 1e6,

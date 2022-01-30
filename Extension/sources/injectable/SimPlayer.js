@@ -59,6 +59,7 @@
                         'healAfterDeath',
                         'isManualEating',
                         'isSlayerTask',
+                        'hasRunes',
                     ],
                     numbers: [
                         'currentGamemode',
@@ -199,6 +200,8 @@
                 });
                 // activeAstrologyModifiers
                 this.activeAstrologyModifiers = [];
+                // runes in bank
+                this.hasRunes = true;
             }
 
             computeConditionalListeners() {
@@ -622,6 +625,8 @@
                     });
                 }
             }
+
+            onMagicAttackFailure() {}
 
             updateForEquipmentChange() {
                 this.computeAllStats();

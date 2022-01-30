@@ -1271,6 +1271,13 @@
                     'healAfterDeath',
                     this.player.healAfterDeath,
                 );
+                this.simOptionsCard.addToggleRadio(
+                    'Has Runes',
+                    'hasRunes',
+                    this.player,
+                    'hasRunes',
+                    this.player.hasRunes,
+                );
                 // settings export and import
                 this.simOptionsCard.container.appendChild(document.createElement('br'));
                 this.simOptionsCard.addSectionTitle('Settings Export - Import');

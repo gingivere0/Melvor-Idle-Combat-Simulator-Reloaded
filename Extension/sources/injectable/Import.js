@@ -308,9 +308,7 @@
                 // Set all active spell UI to be disabled
                 Object.keys(this.app.combatData.spells).forEach((spellType) => {
                     const spellID = this.player.spellSelection[spellType];
-                    if (spellID > -1) {
-                        this.app.disableSpell(spellType, spellID);
-                    }
+                    this.app.disableSpell(spellType, spellID);
                     this.app.enableSpell(spellType, spellSelection[spellType]);
                 });
                 this.app.spellSanityCheck();
