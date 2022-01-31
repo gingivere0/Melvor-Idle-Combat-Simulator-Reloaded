@@ -271,6 +271,10 @@
                 for (const interval in this.petRolls) {
                     petRolls[interval] = this.petRolls[interval] / seconds;
                 }
+                let usedSummoningCharges = (this.chargesUsed.Summon1 + this.chargesUsed.Summon2);
+                if (this.chargesUsed.Summon1 > 0 && this.chargesUsed.Summon2 > 0) {
+                    usedSummoningCharges /= 2;
+                }
                 return {
                     gp: this.gp / seconds,
                     skillXP: this.skillXP.map(x => x / seconds),
@@ -283,7 +287,7 @@
                     usedFood: this.usedFood / seconds,
                     usedPotionCharges: this.usedPotionCharges / seconds,
                     usedPrayerPoints: this.usedPrayerPoints / seconds,
-                    usedSummoningCharges: (this.chargesUsed.Summon1 + this.chargesUsed.Summon2) / 2 / seconds,
+                    usedSummoningCharges: usedSummoningCharges / seconds,
                     highestDamageTaken: this.highestDamageTaken,
                     lowestHitpoints: this.lowestHitpoints,
                 }
