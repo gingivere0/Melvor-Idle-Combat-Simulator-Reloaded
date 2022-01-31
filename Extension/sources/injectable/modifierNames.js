@@ -27,7 +27,7 @@
         const MICSR = window.MICSR;
 
         /**
-         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.8, latest version can be found at:
+         * class ShowModifiers is copied from Melvor Show Modifiers v0.2.10, latest version can be found at:
          * https://raw.githubusercontent.com/gmiclotte/melvor-scripts/master/Show-Modifiers/Show-Modifiers.js
          * TODO: instead of copying it, pull it as a required file or something? No idea how to go about that.
          */
@@ -195,6 +195,7 @@
                     ],
                     firemaking: [
                         'ChanceForDiamondFiremaking',
+                        'GPFromFiremaking',
                     ],
                     fishing: [
                         'FishingSpecialChance',
