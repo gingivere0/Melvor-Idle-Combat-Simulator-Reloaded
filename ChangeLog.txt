@@ -1,3 +1,21 @@
+v1.6.3
+    Update for v1.0.2
+
+    Fix Summoning tablet use, #86
+    Fix Summoning consumables, #86
+    Update Show Modifiers to v0.2.10
+    Fix alt magic interval
+    Add "Has Runes" toggle
+    Replace herbloreItemData with Herblore.potions
+    Add ExportCheat
+    Refactor Import fields
+    Fix astrology skill modifier bug
+    Sort Prayers by unlock level
+    Fix Prayer xp rate, #81
+    Round base food healing amounts, #82
+    Add missing pet Bone, #84
+    Fix undefined effectMedia in worker, #85
+
 v1.6.2
     Update for v1.0.1
 
