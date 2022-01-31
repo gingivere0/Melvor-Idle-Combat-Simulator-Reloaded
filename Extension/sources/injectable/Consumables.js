@@ -367,7 +367,7 @@
                         MICSR.melvorCombatSim.player.equipmentID(EquipmentSlots.Summon2),
                     ].forEach(summonID => {
                         if (this.consumables[summonID]) {
-                            factor += data.ammoUsedPerSecond * this.getConsumableCostInSeconds(summonID);
+                            factor += data.tabletsUsedPerSecond * this.getConsumableCostInSeconds(summonID);
                         }
                     });
                 }
