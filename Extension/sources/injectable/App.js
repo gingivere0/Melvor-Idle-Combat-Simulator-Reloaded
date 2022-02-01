@@ -1373,8 +1373,8 @@
              * @param {Function} filterFunction Filter equipment with this function
              * @param {Function} sortFunction Sort equipment by this key
              */
-            addEquipmentMultiButton(card, equipmentSlot, filterFunction, sortFunction = item => item.id) {
-                const menuItems = this.equipmentSubsets[equipmentSlot].filter(filterFunction);
+            addEquipmentMultiButton(card, equipmentSlot, filterFunction, sortFunction = item => item.id, golbinRaid = false) {
+                const menuItems = this.equipmentSubsets[equipmentSlot].filter(filterFunction).filter(x => !!x.golbinRaidExclusive === golbinRaid);
                 const sortKey = item => {
                     const x = sortFunction(item);
                     return x ? x : 0;
@@ -1669,6 +1669,8 @@
                 } else {
                     throw Error(`Invalid equipmentSlot: ${equipmentSlot}`);
                 }
+                equipmentSelectCard.addSectionTitle('Golbin Raid Exclusive');
+                this.addEquipmentMultiButton(equipmentSelectCard, equipmentSlot, () => true, x => x.name, true);
                 return equipmentSelectPopup;
             }
 
