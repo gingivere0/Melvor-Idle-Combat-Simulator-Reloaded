@@ -279,6 +279,10 @@
                 this.barTooltips[id].style.display = 'none';
             }
 
+            colourGradient(x, base = [70, 130, 180], death = [220, 20, 60]) {
+                return base.map((_, i) => (1 - x) * base[i] + x * death[i]);
+            }
+
             /**
              * Changes the displayed data
              * @param {number[]} barData The new data to diplay
@@ -288,9 +292,6 @@
                 let barMax = 0;
                 for (let i = 0; i < this.bars.length; i++) {
                     this.bars[i].className = 'mcsBar';
-                    if (!enterSet[i]) {
-                        this.bars[i].classList.add('mcsBarCantEnter');
-                    }
                     if (isNaN(barData[i]) || !isFinite(barData[i])) {
                         continue;
                     }
@@ -298,10 +299,11 @@
                         barMax = barData[i];
                     }
                 }
+                const maxBars = [];
                 if (!this.parent.isViewingDungeon) {
                     for (let i = 0; i < barData.length; i++) {
                         if (Math.abs(barData[i] - barMax) < 0.0000001) {
-                            this.bars[i].classList.add('mcs-bar-max');
+                            maxBars.push(i);
                         }
                     }
                 }
@@ -374,8 +376,12 @@
                     }
                     // close tooltip
                     tooltip += '</div>';
-                    // set tooltip conten
+                    // set tooltip content
                     this.bars[barIndex]._tippy.setContent(tooltip);
+                    // color the bar based on death rate
+                    const base = maxBars.includes(barIndex) ? [215, 180, 0] : [70, 130, 180];
+                    const gradient = this.colourGradient(rawData[dataIndex].deathRate, base).join(',');
+                    this.bars[barIndex].style.backgroundColor = `rgb(${gradient})`;
                 }
                 for (let i = 0; i < 20; i++) {
                     if (i < (Ndivs - 1)) {
