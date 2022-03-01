@@ -335,8 +335,7 @@
                 const constantNames = [
                     // actual constants
                     {name: 'afflictionEffect', data: afflictionEffect},
-                    {name: 'agilityObstacles', data: agilityObstacles},
-                    {name: 'agilityPassivePillars', data: agilityPassivePillars},
+                    {name: 'Agility', data: {obstacles: Agility.obstacles, passivePillars: Agility.passivePillars}},
                     {name: 'ANCIENT', data: ANCIENT},
                     {name: 'attacks', data: attacks},
                     {name: 'attacksIDMap', data: attacksIDMap},

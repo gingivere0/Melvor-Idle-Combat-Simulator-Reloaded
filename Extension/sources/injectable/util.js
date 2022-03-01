@@ -232,13 +232,13 @@
                     break;
                 }
                 if (courseMastery[i]) {
-                    modifiers.addModifiers(agilityObstacles[course[i]].modifiers, 0.5);
+                    modifiers.addModifiers(Agility.obstacles[course[i]].modifiers, 0.5);
                 } else {
-                    modifiers.addModifiers(agilityObstacles[course[i]].modifiers);
+                    modifiers.addModifiers(Agility.obstacles[course[i]].modifiers);
                 }
             }
             if (fullCourse && pillar > -1) {
-                modifiers.addModifiers(agilityPassivePillars[pillar].modifiers);
+                modifiers.addModifiers(Agility.passivePillars[pillar].modifiers);
             }
         }
     }

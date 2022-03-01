@@ -145,6 +145,10 @@
                     astrologyModifiers.push(modifiers);
                 }
 
+                // get the chosen agility obstacles
+                const chosenAgilityObstacles = [];
+                game.agility.builtObstacles.forEach(x => chosenAgilityObstacles.push(x.id));
+
                 // create settings object
                 const settings = {
                     version: MICSR.version,
@@ -170,7 +174,7 @@
                     isAncient: player.spellSelection.ancient !== -1,
                     isManualEating: this.player.isManualEating,
                     isSlayerTask: this.player.isSlayerTask,
-                    pillar: agilityPassivePillarActive,
+                    pillar: game.agility.builtPassivePillar.id,
                     potionID: potionID,
                     potionTier: potionTier,
                     prayerSelected: [...player.activePrayers],

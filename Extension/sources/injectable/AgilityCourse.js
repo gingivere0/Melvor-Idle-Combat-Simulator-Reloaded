@@ -59,13 +59,13 @@
                     name: 'None',
                     requirements: {},
                 }
-                this.agilityObstacles = [noObstacle, ...agilityObstacles.map((x, id) => {
+                this.agilityObstacles = [noObstacle, ...Agility.obstacles.map((x, id) => {
                     const obstacle = {...x};
                     obstacle.id = id;
                     this.filters.forEach(filter => obstacle[filter.tag] = MICSR.showModifiersInstance.printRelevantModifiers(x.modifiers, filter.tag).length > 0);
                     return obstacle;
                 })];
-                this.agilityPillars = [noObstacle, ...agilityPassivePillars.map((x, id) => {
+                this.agilityPillars = [noObstacle, ...Agility.passivePillars.map((x, id) => {
                     const pillar = {...x};
                     pillar.id = id;
                     pillar.media = [this.media.combat, this.media.statistics, this.media.gp][id]
