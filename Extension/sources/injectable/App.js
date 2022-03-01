@@ -909,7 +909,7 @@
                 this.constellationModifierContainers = [];
                 const card = this.astrologySelectCard;
                 let index = 0;
-                for (const constellation of ASTROLOGY) {
+                for (const constellation of Astrology.constellations) {
                     const constellationIndex = index;
                     index += 1;
                     // create constellation modifier object
@@ -965,7 +965,7 @@
 
             toggleAstrologySelectCard(selected = undefined) {
                 this.astrologySelected = this.astrologySelected === selected ? undefined : selected;
-                ASTROLOGY.forEach((constellation, index) => {
+                Astrology.constellations.forEach((constellation, index) => {
                     if (this.skipConstellations.includes(index)) {
                         return;
                     }
@@ -1050,7 +1050,7 @@
 
             createUniqueAstrologyModifiers(card, elementList, constellation, activeConstellationModifiers) {
                 // unique modifiers
-                const uniqMod = constellation.uniqueModifiers.filter(m =>
+                const uniqMod = constellation.uniqueModifiers.reduce((acc, val) => acc.concat(val), []).filter(m =>
                     MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m)
                     || MICSR.showModifiersInstance.relevantModifiers.combat.names.includes(m.substring(9))
                 );
@@ -1083,14 +1083,14 @@
                         } else {
                             val += constellation[modifier];
                         }
-                        if (ASTROLOGY[idx].uniqueModifiers.includes(modifier)) {
+                        if (Astrology.constellations[idx].uniqueModifiers.includes(modifier)) {
                             unique += val;
                         } else {
                             standard += val;
                         }
                     }
-                    document.getElementById(`MICSR-${ASTROLOGY[idx].name}-standard-percentage`).textContent = `+${standard}%`;
-                    document.getElementById(`MICSR-${ASTROLOGY[idx].name}-unique-percentage`).textContent = `+${unique}%`;
+                    document.getElementById(`MICSR-${Astrology.constellations[idx].name}-standard-percentage`).textContent = `+${standard}%`;
+                    document.getElementById(`MICSR-${Astrology.constellations[idx].name}-unique-percentage`).textContent = `+${unique}%`;
                 });
             }
 

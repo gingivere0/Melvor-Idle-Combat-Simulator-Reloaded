@@ -122,24 +122,14 @@
 
                 // get the active astrology modifiers
                 const astrologyModifiers = [];
-                for (const constellation of activeAstrologyModifiers) {
+                for (const constellation of Astrology.constellations) {
+                    const constellationModifiers = game.astrology.constellationModifiers.get(constellation);
                     const modifiers = {};
-                    for (const idx in constellation) {
-                        const ms = constellation[idx];
-                        for (const m in ms) {
-                            if (modifiers[m] === undefined) {
-                                modifiers[m] = ms[m].push === undefined ? 0 : [];
-                            }
-                            if (ms[m].push === undefined) {
-                                modifiers[m] += ms[m];
-                            } else {
-                                const i = modifiers[m].findIndex(x => x[0] === ms[m][0][0]);
-                                if (i === -1) {
-                                    modifiers[m].push([...ms[m][0]]);
-                                } else {
-                                    modifiers[m][i][1] += ms[m][0][1];
-                                }
-                            }
+                    for (const m of [...constellationModifiers.standard, ...constellationModifiers.unique]) {
+                        if (m.value === undefined) {
+                            modifiers[m.key] = [...m.values];
+                        } else {
+                            modifiers[m.key] = m.value;
                         }
                     }
                     astrologyModifiers.push(modifiers);
@@ -439,10 +429,10 @@
                         // update input fields
                         if (constellation[modifier].push) {
                             constellation[modifier].forEach(x => {
-                                this.document.getElementById(`MCS ${ASTROLOGY[idx].name}-${Skills[x[0]]}-${modifier} Input`).value = x[1]
+                                this.document.getElementById(`MCS ${Astrology.constellations[idx].name}-${Skills[x[0]]}-${modifier} Input`).value = x[1]
                             });
                         } else {
-                            this.document.getElementById(`MCS ${ASTROLOGY[idx].name}-${modifier} Input`).value = constellation[modifier];
+                            this.document.getElementById(`MCS ${Astrology.constellations[idx].name}-${modifier} Input`).value = constellation[modifier];
                         }
                     }
                 });
