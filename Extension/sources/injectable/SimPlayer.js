@@ -55,7 +55,7 @@
                         'summoningSynergy',
                         'cookingPool',
                         'cookingMastery',
-                        'useCombinationRunes',
+                        'useCombinationRunesFlag',
                         'healAfterDeath',
                         'isManualEating',
                         'isSlayerTask',
@@ -186,7 +186,8 @@
                 this.cookingPool = false;
                 this.cookingMastery = false;
                 // useCombinationRunes
-                this.useCombinationRunes = false;
+                this.useCombinationRunesFlag = false;
+                this.combinations = items.filter(x => x.type === 'Rune' && x.providesRune);
                 // other
                 this.healAfterDeath = true;
                 this.isSlayerTask = false;
@@ -291,7 +292,7 @@
                 for (const id in this.usedRunes) {
                     const amt = this.usedRunes[id] / seconds;
                     usedRunesBreakdown[id] = amt;
-                    if (combinations.includes(Number(id))) {
+                    if (this.combinations.includes(Number(id))) {
                         usedCombinationRunes += amt;
                     } else {
                         usedRunes += amt;

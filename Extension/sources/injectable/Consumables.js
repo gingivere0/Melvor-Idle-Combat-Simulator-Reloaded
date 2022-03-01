@@ -88,13 +88,13 @@
                 );
                 // runes
                 const runesCard = new MICSR.Card(this.card.container, '', '100px');
-                items.filter(x => x.runecraftingCategory === 0).map(rune => rune.id).forEach(runeID =>
+                items.filter(x => x.type === 'Rune' && x.masteryID[0] === 15 && !x.providesRune).map(rune => rune.id).forEach(runeID =>
                     this.addItemInput(runesCard, runeID, () => this.runesInUse[runeID], 'rune')
                 );
                 // combination runes
                 const combinationCard = new MICSR.Card(this.card.container, '', '100px');
-                combinations.forEach(runeID =>
-                    this.addItemInput(combinationCard, runeID, () => this.runesInUse[runeID], 'combination')
+                items.filter(x => x.type === 'Rune' && x.providesRune).forEach(combinationRune =>
+                    this.addItemInput(combinationCard, combinationRune.id, () => this.runesInUse[combinationRune.id], 'combination')
                 );
                 // ammo
                 const ammoCard = new MICSR.Card(this.card.container, '', '100px');

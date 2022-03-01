@@ -351,7 +351,6 @@
                     {name: 'combatSkills', data: combatSkills},
                     {name: 'CombatStats', data: {}},
                     {name: 'combatTriangle', data: combatTriangle},
-                    {name: 'combinations', data: combinations},
                     {name: 'CONSTANTS', data: CONSTANTS},
                     {name: 'CURSES', data: CURSES},
                     {name: 'DotTypeIDs', data: DotTypeIDs},
