@@ -71,16 +71,37 @@
                 itemConditionalModifiers.forEach((itemCondition) => {
                     conditionalModifiers.set(itemCondition.itemID, itemCondition.conditionals);
                 });
-                // update SUMMONING functions
-                for (const i in SUMMONING.Synergies) {
-                    for (const j in SUMMONING.Synergies[i]) {
-                        if (SUMMONING.Synergies[i][j].conditionalModifiers) {
-                            for (let k = 0; k < SUMMONING.Synergies[i][j].conditionalModifiers.length; k++) {
-                                SUMMONING.Synergies[i][j].conditionalModifiers[k].condition = MICSR[`SUMMONING-conditional-${i}-${j}-${k}`];
+                // update Summoning functions
+                for (const i in Summoning.synergies) {
+                    for (const j in Summoning.synergies[i]) {
+                        if (Summoning.synergies[i][j].conditionalModifiers) {
+                            for (let k = 0; k < Summoning.synergies[i][j].conditionalModifiers.length; k++) {
+                                Summoning.synergies[i][j].conditionalModifiers[k].condition = MICSR[`SUMMONING-conditional-${i}-${j}-${k}`];
                             }
                         }
                     }
                 }
+                Summoning.getTabletConsumptionXP = getTabletConsumptionXP;
+                Summoning.synergiesByItemID = Summoning.synergies.reduce((synergyMap, synergy) => {
+                    const setSynergy = (item0, item1) => {
+                        let itemMap = synergyMap.get(item0);
+                        if (itemMap === undefined) {
+                            itemMap = new Map();
+                            synergyMap.set(item0, itemMap);
+                        }
+                        itemMap.set(item1, synergy);
+                    };
+                    const itemID0 = Summoning.marks[synergy.summons[0]].itemID;
+                    const itemID1 = Summoning.marks[synergy.summons[1]].itemID;
+                    setSynergy(itemID0, itemID1);
+                    setSynergy(itemID1, itemID0);
+                    return synergyMap;
+                }, new Map());
+                Summoning.marksByItemID = Summoning.marks.reduce((itemMap, mark) => {
+                    itemMap.set(mark.itemID, mark);
+                    return itemMap;
+                }, new Map());
+                Summoning.getMarkFromItemID = itemID => Summoning.marksByItemID.get(itemID);
                 // update itemSynergies conditional modifiers
                 for (let i = 0; i < itemSynergies.length; i++) {
                     if (itemSynergies[i].conditionalModifiers) {

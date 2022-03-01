@@ -236,32 +236,29 @@
                 }
                 // clone SUMMONING
                 const summoningClone = {
-                    ...SUMMONING,
+                    marks: Summoning.marks,
                 };
-                summoningClone.Synergies = {};
-                for (const i in SUMMONING.Synergies) {
-                    summoningClone.Synergies[i] = {};
-                    for (const j in SUMMONING.Synergies[i]) {
-                        summoningClone.Synergies[i][j] = {
-                            ...SUMMONING.Synergies[i][j],
-                            description: SUMMONING.Synergies[i][j].description,
-                        };
-                        if (summoningClone.Synergies[i][j].conditionalModifiers) {
-                            summoningClone.Synergies[i][j].conditionalModifiers = [...summoningClone.Synergies[i][j].conditionalModifiers];
-                            for (let k = 0; k < summoningClone.Synergies[i][j].conditionalModifiers.length; k++) {
-                                const condition = summoningClone.Synergies[i][j].conditionalModifiers[k].condition.toString();
-                                summoningClone.Synergies[i][j].conditionalModifiers[k] = {
-                                    ...summoningClone.Synergies[i][j].conditionalModifiers[k],
-                                    condition: condition,
-                                };
-                                cloneBackupMethods.push({
-                                    name: `MICSR["SUMMONING-conditional-${i}-${j}-${k}"]`,
-                                    data: `MICSR["SUMMONING-conditional-${i}-${j}-${k}"]=${condition}`,
-                                    condition: condition,
-                                });
-                            }
+                summoningClone.synergies = [];
+                let synergyIndex = 0;
+                for (const synergy of Summoning.synergies) {
+                    const synergyClone = {...synergy};
+                    if (synergyClone.conditionalModifiers) {
+                        synergyClone.conditionalModifiers = [...synergyClone.conditionalModifiers];
+                        for (let k = 0; k < synergyClone.conditionalModifiers.length; k++) {
+                            const condition = synergyClone.conditionalModifiers[k].condition.toString();
+                            synergyClone.conditionalModifiers[k] = {
+                                ...synergyClone.conditionalModifiers[k],
+                                condition: condition,
+                            };
+                            cloneBackupMethods.push({
+                                name: `MICSR["SUMMONING-conditional-${synergyIndex}-${k}"]`,
+                                data: `MICSR["SUMMONING-conditional-${synergyIndex}-${k}"]=${condition}`,
+                                condition: condition,
+                            });
                         }
                     }
+                    summoningClone.synergies.push(synergyClone);
+                    synergyIndex++;
                 }
                 // clone itemSynergies
                 const itemSynergiesClone = [];
@@ -310,9 +307,9 @@
                     'MICSR["itemConditionalModifiers-condition-8-0"]': "typeVsTypeCondition('melee', 'ranged')",
                     'MICSR["itemConditionalModifiers-condition-9-0"]': "typeVsTypeCondition('ranged', 'magic')",
                     'MICSR["itemConditionalModifiers-condition-10-0"]': "typeVsTypeCondition('magic', 'melee')",
-                    'MICSR["SUMMONING-conditional-1-2-0"]': "playerHitpointsAboveCondition(100)",
-                    'MICSR["SUMMONING-conditional-1-2-1"]': "playerHitpointsAboveCondition(100)",
-                    'MICSR["SUMMONING-conditional-6-15-0"]': "enemyHasDotCondition('Burn')",
+                    'MICSR["SUMMONING-conditional-9-0"]': "playerHitpointsAboveCondition(100)",
+                    'MICSR["SUMMONING-conditional-9-1"]': "playerHitpointsAboveCondition(100)",
+                    'MICSR["SUMMONING-conditional-53-0"]': "enemyHasDotCondition('Burn')",
                     'MICSR["itemSynergies-conditional-3-0"]': "playerHasDotCondition('Poison')",
                     'MICSR["itemSynergies-conditional-3-1"]': "enemyHasDotCondition('Poison')",
                     'MICSR["itemSynergies-conditional-4-0"]': "anyCondition([" +
@@ -406,11 +403,9 @@
                     {name: 'SPELLS', data: SPELLS},
                     {name: 'stackingEffects', data: stackingEffects},
                     {name: 'Stats', data: {}},
-                    {name: 'SUMMONING', data: summoningClone},
-                    {name: 'summoningData', data: summoningData},
-                    {name: 'summoningItems', data: summoningItems},
                     {name: 'synergyElements', data: {}},
                     {name: 'SynergyItem', data: SynergyItem},
+                    {name: 'Summoning', data: summoningClone},
                     {name: 'TICK_INTERVAL', data: TICK_INTERVAL},
                     {name: 'tutorialComplete', data: tutorialComplete},
                     {name: 'unknownArea', data: unknownArea},
@@ -446,15 +441,12 @@
                     {name: 'formatNumber', data: formatNumber},
                     {name: 'getAttackFromID', data: getAttackFromID},
                     {name: 'getBankId', data: getBankId},
-                    {name: 'getBaseSummoningXP', data: getBaseSummoningXP},
+                    {name: 'getTabletConsumptionXP', data: Summoning.getTabletConsumptionXP},
                     {name: 'getDamageRoll', data: getDamageRoll},
                     {name: 'getLangString', data: (key, id) => `${key}${id}`},
                     {name: 'getMonsterArea', data: getMonsterArea},
                     {name: 'getMonsterCombatLevel', data: getMonsterCombatLevel},
                     {name: 'getNumberMultiplierValue', data: getNumberMultiplierValue},
-                    {name: 'getSummoningSynergy', data: getSummoningSynergy},
-                    {name: 'getSummonSynergyEnemyModifiers', data: getSummonSynergyEnemyModifiers},
-                    {name: 'getSummonSynergyModifiers', data: getSummonSynergyModifiers},
                     {name: 'isEquipment', data: isEquipment},
                     {name: 'isFood', data: isFood},
                     {name: 'isSeedItem', data: isSeedItem},
@@ -484,7 +476,12 @@
                 ];
                 const functions = {};
                 functionNames.forEach(func => {
-                    functions[func.name] = `${func.name} = ${func.data.toString().replace(`function ${func.name}`, 'function')}`;
+                    let fstring = func.data.toString();
+                    if (!fstring.startsWith('function ') && !fstring.includes('=>')) {
+                        fstring = 'function ' + fstring;
+                    }
+                    fstring = fstring.replace(`function ${func.name}`, 'function');
+                    functions[func.name] = `${func.name} = ${fstring}`;
                 });
                 // modify value cloned functions
                 cloneBackupMethods.forEach(func => {

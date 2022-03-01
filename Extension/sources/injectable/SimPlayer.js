@@ -204,6 +204,36 @@
                 this.hasRunes = true;
             }
 
+            getSynergyData(summon1, summon2) {
+                var _a;
+                return (_a = Summoning.synergiesByItemID.get(summon1)) === null || _a === void 0 ? void 0 : _a.get(summon2);
+            }
+
+            // override getters
+            get activeTriangle() {
+                return combatTriangle[GAMEMODES[this.currentGamemode].combatTriangle];
+            }
+
+            get useCombinationRunes() {
+                return this.useCombinationRunesFlag;
+            }
+
+            set useCombinationRunes(useCombinationRunes) {
+                this.useCombinationRunesFlag = useCombinationRunes;
+            }
+
+            get allowRegen() {
+                return GAMEMODES[this.currentGamemode].hasRegen;
+            }
+
+            get summoningIDs() {
+                const summon1 = this.equipment.slots.Summon1.item.summoningID ?? -1;
+                const summon2 = this.equipment.slots.Summon2.item.summoningID ?? -1;
+                return [Math.min(summon1, summon2), Math.max(summon1, summon2)];
+            }
+
+            rollForSummoningMarks() {}
+
             computeConditionalListeners() {
                 // Reset the listener sets
                 Object.values(this.conditionalListeners).forEach((list) => list.clear());
@@ -218,7 +248,7 @@
                     }
                 });
                 // Summoning Synergy
-                const args = this.getSummoningIDs();
+                const args = this.summoningIDs;
                 if (this.isSynergyUnlocked(...args)) {
                     const synergy = getSummoningSynergy(...args);
                     if (synergy.conditionalModifiers !== undefined)
@@ -439,61 +469,7 @@
                 if (!this.summoningSynergy) {
                     return false;
                 }
-                const minID = Math.min(summon1, summon2);
-                const maxID = Math.max(summon1, summon2);
-                return SUMMONING.Synergies[minID] !== undefined && SUMMONING.Synergies[minID][maxID] !== undefined;
-            }
-
-            addSummonSynergyModifiers() {
-                const args = this.getSummoningIDs();
-                if (this.isSynergyUnlocked(...args)) {
-                    const modifiers = getSummonSynergyModifiers(...args);
-                    this.modifiers.addModifiers(modifiers);
-                }
-            }
-
-
-            computeTargetModifiers() {
-                this.targetModifiers.reset();
-                this.equipment.slotArray.forEach((slot) => {
-                    const item = slot.item;
-                    if (slot.providesStats) {
-                        if (item.enemyModifiers !== undefined) {
-                            this.targetModifiers.addModifiers(item.enemyModifiers);
-                        }
-                    }
-                });
-                const args = this.getSummoningIDs();
-                if (this.isSynergyUnlocked(...args)) {
-                    const modifiers = getSummonSynergyEnemyModifiers(...args);
-                    this.targetModifiers.addModifiers(modifiers);
-                }
-                if (this.modifiers.summoningSynergy_1_12 > 0 && this.manager.onSlayerTask) {
-                    this.targetModifiers.addModifiers({
-                        decreasedGlobalAccuracy: this.modifiers.summoningSynergy_1_12,
-                    });
-                }
-                if (this.modifiers.summoningSynergy_1_2 > 0) {
-                    this.synergy_1_2_isActive.enemy = this.hitpoints === this.stats.maxHitpoints;
-                    if (this.synergy_1_2_isActive.enemy) {
-                        const mult = this.modifiers.summoningSynergy_1_2;
-                        this.targetModifiers.addModifiers(items[Items.Summoning_Familiar_Occultist].enemyModifiers, mult, mult);
-                    }
-                }
-            }
-
-            getCurrentSynergy() {
-                if (!this.summoningSynergy) {
-                    return undefined;
-                }
-                const summLeft = this.equipmentID(equipmentSlotData.Summon1.id);
-                const summRight = this.equipmentID(equipmentSlotData.Summon2.id);
-                if (summLeft > 0 && summRight > 0 && summLeft !== summRight) {
-                    const min = Math.min(items[summLeft].summoningID, items[summRight].summoningID);
-                    const max = Math.max(items[summLeft].summoningID, items[summRight].summoningID);
-                    return SUMMONING.Synergies[min][max];
-                }
-                return undefined;
+                return this.getSynergyData(summon1, summon2) !== undefined;
             }
 
             equipmentID(slotID) {
@@ -686,38 +662,54 @@
                 return bonus;
             }
 
+            get synergyDescription() {
+                const synergy = this.equippedSummoningSynergy;
+                if (synergy !== undefined) {
+                    if (this.isSynergyUnlocked(synergy)) {
+                        return synergy.langDescription;
+                    }
+                    else {
+                        return getLangString('MENU_TEXT', 'LOCKED');
+                    }
+                }
+                else {
+                    return '';
+                }
+            }
+
+            get activeSummoningSynergy() {
+                return this.getUnlockedSynergyData(this.equipment.slots.Summon1.item.id, this.equipment.slots.Summon2.item.id);
+            }
+
+            get equippedSummoningSynergy() {
+                return this.getSynergyData(this.equipment.slots.Summon1.item.id, this.equipment.slots.Summon2.item.id);
+            }
+
+            getUnlockedSynergyData(summon1, summon2) {
+                const synergyData = this.getSynergyData(summon1, summon2);
+                if (synergyData !== undefined && this.isSynergyUnlocked(synergyData))
+                    return synergyData;
+                return undefined;
+            }
+
+            isCombatSynergyEquipped() {
+                if (this.activeSummonSlots.length < 2)
+                    return false;
+                return (this.getUnlockedSynergyData(this.equipment.slots[this.activeSummonSlots[0]].item.id, this.equipment.slots[this.activeSummonSlots[1]].item.id) !== undefined);
+            }
+
             isSynergyActive(summonID1, summonID2) {
                 if (!this.isSynergyUnlocked(summonID1, summonID2)) {
                     return false;
                 }
-                return this.equipment.checkForItemID(summoningItems[summonID1].itemID) && this.equipment.checkForItemID(summoningItems[summonID2].itemID);
+                const itemID1 = Summoning.marks[summonID1].itemID;
+                const itemID2 = Summoning.marks[summonID2].itemID;
+                return this.equipment.checkForItemID(itemID1) && this.equipment.checkForItemID(itemID2);
             }
 
             removeSummonCharge(slot, charges = 1) {
                 if (!rollPercentage(this.modifiers.increasedSummoningChargePreservation - this.modifiers.decreasedSummoningChargePreservation)) {
                     this.chargesUsed[slot] += charges;
-                }
-            }
-
-            computeTargetModifiers() {
-                this.targetModifiers.reset();
-                this.equipment.slotArray.forEach((slot) => {
-                    const item = slot.item;
-                    if (slot.providesStats) {
-                        if (item.enemyModifiers !== undefined) {
-                            this.targetModifiers.addModifiers(item.enemyModifiers);
-                        }
-                    }
-                });
-                const args = this.getSummoningIDs();
-                if (this.isSynergyUnlocked(...args)) {
-                    const modifiers = getSummonSynergyEnemyModifiers(...args);
-                    this.targetModifiers.addModifiers(modifiers);
-                }
-                if (this.modifiers.summoningSynergy_1_12 > 0 && this.manager.onSlayerTask) {
-                    this.targetModifiers.addModifiers({
-                        decreasedGlobalAccuracy: this.modifiers.summoningSynergy_1_12,
-                    });
                 }
             }
 

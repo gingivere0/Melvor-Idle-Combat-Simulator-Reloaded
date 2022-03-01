@@ -398,7 +398,7 @@
                     text.textContent = 'Synergy locked';
                     return;
                 }
-                const synergy = this.player.getCurrentSynergy();
+                const synergy = this.player.activeSummoningSynergy;
                 if (synergy) {
                     text.textContent = synergy.description;
                     return;
