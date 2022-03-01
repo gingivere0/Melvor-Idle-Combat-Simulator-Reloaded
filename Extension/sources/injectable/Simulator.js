@@ -461,7 +461,6 @@
                     {name: 'rollInteger', data: rollInteger},
                     {name: 'rollPercentage', data: rollPercentage},
                     {name: 'roundToTickInterval', data: roundToTickInterval},
-                    {name: 'showCommas', data: showCommas}, // TODO: wipe references to this method?
                     {name: 'typeVsTypeCondition', data: typeVsTypeCondition},
                     // MICSR functions
                     {

@@ -71,18 +71,11 @@
                     ],
                 }
                 //
-                this.activeTriangleData = super.activeTriangle;
             }
-
-            get activeTriangle() {
-                return this.activeTriangleData;
-            }
-
 
             initForWebWorker() {
                 currentGamemode = this.currentGamemode;
-                numberMultiplier = combatTriangle[GAMEMODES[currentGamemode].numberMultiplier];
-                this.activeTriangleData = combatTriangle[GAMEMODES[currentGamemode].combatTriangle];
+                numberMultiplier = combatTriangle[GAMEMODES[this.currentGamemode].numberMultiplier];
                 // recompute stats
                 this.updateForEquipmentChange();
                 this.resetGains();
