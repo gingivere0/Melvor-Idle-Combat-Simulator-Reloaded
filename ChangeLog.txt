@@ -1,7 +1,16 @@
 v1.6.4
     Update for v1.0.3
 
-    WIP
+    Fix various summoning issues
+    Fix Agility import when no pillar built
+    Fix astrology importing bug, #93
+    Update game mode settings
+    Fix rune changes
+    Update for tick-based summoning
+    Update for tick-based astrology
+    Update for tick-based agility
+    Add colour gradient to show death rate in bar plot
+    Separate Golbin Raid Exclusives in gear selection
 
 v1.6.3
     Update for v1.0.2
