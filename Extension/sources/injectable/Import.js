@@ -166,7 +166,7 @@
                     isAncient: player.spellSelection.ancient !== -1,
                     isManualEating: this.player.isManualEating,
                     isSlayerTask: this.player.isSlayerTask,
-                    pillar: game.agility.builtPassivePillar.id,
+                    pillar: game.agility.builtPassivePillar === undefined ? -1 : game.agility.builtPassivePillar.id,
                     potionID: potionID,
                     potionTier: potionTier,
                     prayerSelected: [...player.activePrayers],
