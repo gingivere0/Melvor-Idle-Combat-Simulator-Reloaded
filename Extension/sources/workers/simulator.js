@@ -73,11 +73,9 @@
                 });
                 // update Summoning functions
                 for (const i in Summoning.synergies) {
-                    for (const j in Summoning.synergies[i]) {
-                        if (Summoning.synergies[i][j].conditionalModifiers) {
-                            for (let k = 0; k < Summoning.synergies[i][j].conditionalModifiers.length; k++) {
-                                Summoning.synergies[i][j].conditionalModifiers[k].condition = MICSR[`SUMMONING-conditional-${i}-${j}-${k}`];
-                            }
+                    if (Summoning.synergies[i].conditionalModifiers) {
+                        for (let k = 0; k < Summoning.synergies[i].conditionalModifiers.length; k++) {
+                            Summoning.synergies[i].conditionalModifiers[k].condition = MICSR[`SUMMONING-conditional-${i}-${k}`];
                         }
                     }
                 }

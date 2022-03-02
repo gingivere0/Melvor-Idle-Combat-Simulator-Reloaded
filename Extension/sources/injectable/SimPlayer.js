@@ -198,11 +198,6 @@
                 this.hasRunes = true;
             }
 
-            getSynergyData(summon1, summon2) {
-                var _a;
-                return (_a = Summoning.synergiesByItemID.get(summon1)) === null || _a === void 0 ? void 0 : _a.get(summon2);
-            }
-
             // override getters
             get activeTriangle() {
                 return combatTriangle[GAMEMODES[this.currentGamemode].combatTriangle];
@@ -218,12 +213,6 @@
 
             get allowRegen() {
                 return GAMEMODES[this.currentGamemode].hasRegen;
-            }
-
-            get summoningIDs() {
-                const summon1 = this.equipment.slots.Summon1.item.summoningID ?? -1;
-                const summon2 = this.equipment.slots.Summon2.item.summoningID ?? -1;
-                return [Math.min(summon1, summon2), Math.max(summon1, summon2)];
             }
 
             rollForSummoningMarks() {}
@@ -242,12 +231,9 @@
                     }
                 });
                 // Summoning Synergy
-                const args = this.summoningIDs;
-                if (this.isSynergyUnlocked(...args)) {
-                    const synergy = getSummoningSynergy(...args);
-                    if (synergy.conditionalModifiers !== undefined)
-                        this.registerConditionalListeners(synergy.conditionalModifiers);
-                }
+                const synergy = this.activeSummoningSynergy;
+                if ((synergy === null || synergy === void 0 ? void 0 : synergy.conditionalModifiers) !== undefined)
+                    this.registerConditionalListeners(synergy.conditionalModifiers);
                 // Equipment Synergy
                 this.activeItemSynergies.forEach((synergy) => {
                     if (synergy.conditionalModifiers !== undefined)
@@ -459,13 +445,6 @@
                 // other shop modifiers are not relevant for combat sim at this point
             }
 
-            isSynergyUnlocked(summon1, summon2) {
-                if (!this.summoningSynergy) {
-                    return false;
-                }
-                return this.getSynergyData(summon1, summon2) !== undefined;
-            }
-
             equipmentID(slotID) {
                 return this.equipment.slotArray[slotID].item.id;
             }
@@ -659,7 +638,7 @@
             get synergyDescription() {
                 const synergy = this.equippedSummoningSynergy;
                 if (synergy !== undefined) {
-                    if (this.isSynergyUnlocked(synergy)) {
+                    if (this.isSynergyActive(synergy)) {
                         return synergy.langDescription;
                     }
                     else {
@@ -679,10 +658,19 @@
                 return this.getSynergyData(this.equipment.slots.Summon1.item.id, this.equipment.slots.Summon2.item.id);
             }
 
+            getSynergyData(summon1, summon2) {
+                var _a;
+                return (_a = Summoning.synergiesByItemID.get(summon1)) === null || _a === void 0 ? void 0 : _a.get(summon2);
+            }
+
             getUnlockedSynergyData(summon1, summon2) {
+                if (!this.summoningSynergy) {
+                    return undefined;
+                }
                 const synergyData = this.getSynergyData(summon1, summon2);
-                if (synergyData !== undefined && this.isSynergyUnlocked(synergyData))
+                if (synergyData !== undefined) {
                     return synergyData;
+                }
                 return undefined;
             }
 
@@ -693,12 +681,14 @@
             }
 
             isSynergyActive(summonID1, summonID2) {
-                if (!this.isSynergyUnlocked(summonID1, summonID2)) {
+                if (!this.summoningSynergy) {
                     return false;
                 }
                 const itemID1 = Summoning.marks[summonID1].itemID;
                 const itemID2 = Summoning.marks[summonID2].itemID;
-                return this.equipment.checkForItemID(itemID1) && this.equipment.checkForItemID(itemID2);
+                return (this.getUnlockedSynergyData(itemID1, itemID2) !== undefined &&
+                    this.equipment.checkForItemID(itemID1) &&
+                    this.equipment.checkForItemID(itemID2));
             }
 
             removeSummonCharge(slot, charges = 1) {
