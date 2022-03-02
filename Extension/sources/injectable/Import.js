@@ -125,11 +125,13 @@
                 for (const constellation of Astrology.constellations) {
                     const constellationModifiers = game.astrology.constellationModifiers.get(constellation);
                     const modifiers = {};
-                    for (const m of [...constellationModifiers.standard, ...constellationModifiers.unique]) {
-                        if (m.value === undefined) {
-                            modifiers[m.key] = [...m.values];
-                        } else {
-                            modifiers[m.key] = m.value;
+                    if (constellationModifiers) {
+                        for (const m of [...constellationModifiers.standard, ...constellationModifiers.unique]) {
+                            if (m.value === undefined) {
+                                modifiers[m.key] = [...m.values];
+                            } else {
+                                modifiers[m.key] = m.value;
+                            }
                         }
                     }
                     astrologyModifiers.push(modifiers);
