@@ -128,9 +128,24 @@
                     if (constellationModifiers) {
                         for (const m of [...constellationModifiers.standard, ...constellationModifiers.unique]) {
                             if (m.value === undefined) {
-                                modifiers[m.key] = [...m.values];
+                                if (m.values.length === 0) {
+                                    continue;
+                                }
+                                const skillID = m.values[0][0];
+                                const value = m.values[0][1];
+                                modifiers[m.key] = modifiers[m.key] ?? [];
+                                const index = modifiers[m.key].findIndex(x => x[0] === skillID);
+                                if (index === -1) {
+                                    modifiers[m.key] = modifiers[m.key] ?? [];
+                                    modifiers[m.key].push([skillID, value]);
+                                } else {
+                                    modifiers[m.key][index][1] += value;
+                                }
                             } else {
-                                modifiers[m.key] = m.value;
+                                if (m.value === 0) {
+                                    continue;
+                                }
+                                modifiers[m.key] = (modifiers[m.key] ?? 0) + m.value;
                             }
                         }
                     }
