@@ -180,7 +180,7 @@
                 this.cookingMastery = false;
                 // useCombinationRunes
                 this.useCombinationRunesFlag = false;
-                this.combinations = items.filter(x => x.type === 'Rune' && x.providesRune);
+                this.combinations = items.filter(x => x.type === 'Rune' && x.providesRune).map(x => x.id);
                 // other
                 this.healAfterDeath = true;
                 this.isSlayerTask = false;
