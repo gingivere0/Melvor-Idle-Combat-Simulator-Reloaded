@@ -215,7 +215,8 @@
                 return GAMEMODES[this.currentGamemode].hasRegen;
             }
 
-            rollForSummoningMarks() {}
+            rollForSummoningMarks() {
+            }
 
             computeConditionalListeners() {
                 // Reset the listener sets
@@ -579,7 +580,8 @@
                 }
             }
 
-            onMagicAttackFailure() {}
+            onMagicAttackFailure() {
+            }
 
             updateForEquipmentChange() {
                 this.computeAllStats();
@@ -640,12 +642,10 @@
                 if (synergy !== undefined) {
                     if (this.isSynergyActive(synergy)) {
                         return synergy.langDescription;
-                    }
-                    else {
+                    } else {
                         return getLangString('MENU_TEXT', 'LOCKED');
                     }
-                }
-                else {
+                } else {
                     return '';
                 }
             }
