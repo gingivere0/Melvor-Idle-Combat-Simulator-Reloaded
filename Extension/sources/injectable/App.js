@@ -901,6 +901,16 @@
                     this.astrologySelected = undefined;
                     this.skipConstellations = [0, 2, 7];
                     initial = true;
+                    this.uniqueModifiers = [];
+                    for (const constellation of Astrology.constellations) {
+                        const uniques = {};
+                        for (const modifiers of constellation.uniqueModifiers) {
+                            for (const modifier of modifiers) {
+                                uniques[modifier] = true;
+                            }
+                        }
+                        this.uniqueModifiers.push(uniques);
+                    }
                 } else {
                     this.astrologySelectCard.clearContainer();
                 }
@@ -1083,7 +1093,7 @@
                         } else {
                             val += constellation[modifier];
                         }
-                        if (Astrology.constellations[idx].uniqueModifiers.includes(modifier)) {
+                        if (this.uniqueModifiers[idx][modifier]) {
                             unique += val;
                         } else {
                             standard += val;
