@@ -1,6 +1,10 @@
 v1.6.4
     Update for v1.0.3
 
+    Fix regular vs combination rune usage
+    Fix crashes during post-processing
+    Fix astrology import
+    Fix astrology standard vs unique totals
     Fix various summoning issues
     Fix Agility import when no pillar built
     Fix astrology importing bug, #93
