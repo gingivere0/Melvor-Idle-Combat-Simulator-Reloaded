@@ -206,7 +206,12 @@
             }
 
             setConsumableSeconds(id, seconds) {
+                if (this.consumables[id] === undefined) {
+                    MICSR.warn(`Unknown consumable id ${id} in Consumables.setConsumableSeconds`);
+                    return;
+                }
                 if (this.consumables[id].seconds === seconds) {
+                    // exit so we don't force an unnecessary update
                     return;
                 }
                 this.consumables[id].seconds = seconds;
@@ -271,6 +276,10 @@
                     return 0;
                 }
                 const consumable = this.consumables[id];
+                if (consumable === undefined) {
+                    MICSR.warn(`Unknown consumable id ${id} in Consumables.getConsumableCostInSeconds`);
+                    return 0;
+                }
                 if (consumable.seconds !== undefined) {
                     return consumable.seconds;
                 }
