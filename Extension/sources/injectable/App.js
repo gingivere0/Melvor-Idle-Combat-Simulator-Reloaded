@@ -2023,8 +2023,8 @@
                 // get spell
                 const spell = this.combatData.spells[spellType][spellID];
                 // Escape for not meeting the level/item requirement
-                if (this.player.skillLevel[Skills.Magic] < spell.magicLevelRequired) {
-                    notifyPlayer(Skills.Magic, `${spell.name} requires level ${spell.magicLevelRequired} Magic.`, 'danger');
+                if (this.player.skillLevel[Skills.Magic] < spell.level) {
+                    notifyPlayer(Skills.Magic, `${spell.name} requires level ${spell.level} Magic.`, 'danger');
                     return;
                 }
                 if (spell.requiredItem !== undefined && spell.requiredItem !== -1 && !this.player.equipmentIDs().includes(spell.requiredItem)) {
@@ -2671,11 +2671,20 @@
             updateSpellOptions() {
                 this.player.computeAttackType();
                 this.player.checkMagicUsage();
+                this.checkForSpellLevel();
+                this.checkForSpellItem();
+                this.spellSanityCheck();
+            }
+
+            /**
+             * Checks if magic level required for spell is met
+             */
+            checkForSpellLevel() {
                 const magicLevel = this.player.skillLevel[Skills.Magic];
                 const setSpellsPerLevel = (spell, spellID, spellType) => {
-                    if (spell.magicLevelRequired > magicLevel) {
+                    if (magicLevel < spell.level) {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
-                        this.disableSpell(spellType, spellID, `${spell.name} has been de-selected. It requires level ${spell.magicLevelRequired} Magic.`);
+                        this.disableSpell(spellType, spellID, `${spell.name} has been de-selected. It requires level ${spell.level} Magic.`);
                     } else {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
                     }
@@ -2684,25 +2693,23 @@
                 AURORAS.forEach((spell, index) => setSpellsPerLevel(spell, index, 'aurora'));
                 CURSES.forEach((spell, index) => setSpellsPerLevel(spell, index, 'curse'));
                 ANCIENT.forEach((spell, index) => setSpellsPerLevel(spell, index, 'ancient'));
-                this.checkForElisAss();
-                this.spellSanityCheck();
             }
 
             /**
-             * Checks if Eli's Ass is equipped and set aurora menu options
+             * Checks if item required for spell is equipped
              */
-            checkForElisAss() {
-                AURORAS.forEach((spell, spellID) => {
-                    if (spell.requiredItem === -1) {
-                        return;
-                    }
-                    if (this.player.equipmentIDs().includes(spell.requiredItem) && this.player.skillLevel[Skills.Magic] >= spell.magicLevelRequired) {
-                        document.getElementById(`MCS ${spell.name} Button Image`).src = spell.media;
-                    } else {
+            checkForSpellItem() {
+                const equipmentIDs = this.player.equipmentIDs();
+                const disableSpellsForItem = (spell, spellID, spellType) => {
+                    if (spell.requiredItem !== undefined && !equipmentIDs.includes(spell.requiredItem)) {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
-                        this.disableSpell('aurora', spellID, `${spell.name} has been de-selected. It requires ${this.getItemName(spell.requiredItem)}.`);
+                        this.disableSpell(spellType, spellID, `${spell.name} has been de-selected. It requires ${this.getItemName(spell.requiredItem)}.`);
                     }
-                });
+                };
+                SPELLS.forEach((spell, index) => disableSpellsForItem(spell, index, 'standard'));
+                AURORAS.forEach((spell, index) => disableSpellsForItem(spell, index, 'aurora'));
+                CURSES.forEach((spell, index) => disableSpellsForItem(spell, index, 'curse'));
+                ANCIENT.forEach((spell, index) => disableSpellsForItem(spell, index, 'ancient'));
             }
 
             /**
