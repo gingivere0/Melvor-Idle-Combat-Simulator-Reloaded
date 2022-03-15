@@ -1163,7 +1163,7 @@
                         (e) => this.sellBonesRadioOnChange(e, true),
                         (e) => this.sellBonesRadioOnChange(e, false),
                     ],
-                    1,
+                    this.loot.sellBones ? 0 : 1,
                 );
                 this.lootSelectCard.addRadio(
                     'Convert Shards',
@@ -1174,7 +1174,7 @@
                         (e) => this.convertShardsRadioOnChange(e, true),
                         (e) => this.convertShardsRadioOnChange(e, false),
                     ],
-                    1,
+                    this.loot.convertShards ? 0 : 1,
                 );
                 this.lootSelectCard.addRadio(
                     'High Alch Drops',
@@ -1185,7 +1185,7 @@
                         (e) => this.alchHighValueItemsRadioOnChange(e, true),
                         (e) => this.alchHighValueItemsRadioOnChange(e, false),
                     ],
-                    1,
+                    this.loot.alchHighValueItems ? 0 : 1,
                 );
                 this.lootSelectCard.addNumberInput(
                     'Alch Min Sale Value',
@@ -2144,9 +2144,7 @@
              */
             alchemyCutoffInputOnChange(event) {
                 const alchemyCutoff = parseInt(event.currentTarget.value);
-                if (alchemyCutoff > 0) {
-                    this.loot.alchemyCutoff = alchemyCutoff;
-                }
+                this.loot.alchemyCutoff = alchemyCutoff;
                 this.updatePlotForGP();
             }
 

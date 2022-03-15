@@ -197,13 +197,21 @@
             }
 
             getItemValue(id) {
+                if (id === -1) {
+                    // boneID from monster without bones, value and alch count are of course 0
+                    return 0;
+                }
+                if (items[id] === undefined) {
+                    MICSR.error(`Unexpected item id ${id} in Loot.getItemValue`);
+                    return 0;
+                }
                 const value = items[id].sellsFor;
                 const willAlch = this.alchHighValueItems && value >= this.alchemyCutoff
                 if (this.computingAlchCount) {
                     return willAlch ? 1 : 0;
                 }
                 if (willAlch) {
-                    return value * ALTMAGIC[10].convertToQty;
+                    return value * AltMagic.spells[10].productionRatio;
                 }
                 return value;
             }
