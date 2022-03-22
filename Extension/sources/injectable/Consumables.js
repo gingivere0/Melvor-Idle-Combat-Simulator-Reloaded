@@ -350,8 +350,12 @@
                 }
                 // potion
                 if (data.potionsUsedPerSecond > 0) {
-                    const potionID = Herblore.potions[this.player.potionID].potionIDs[0];
-                    factor += data.potionsUsedPerSecond * this.getConsumableCostInSeconds(potionID);
+                    if (Herblore.potions[this.player.potionID]) {
+                        const potionID = Herblore.potions[this.player.potionID].potionIDs[0];
+                        factor += data.potionsUsedPerSecond * this.getConsumableCostInSeconds(potionID);
+                    } else {
+                        MICSR.warn(`Unknown potion id ${this.player.potionID} in Consumables.computeFactor, with ${data.potionsUsedPerSecond} potions per second`);
+                    }
                 }
                 // food
                 if (data.atePerSecond > 0) {
