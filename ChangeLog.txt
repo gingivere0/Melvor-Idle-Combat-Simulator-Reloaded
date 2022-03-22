@@ -1,3 +1,8 @@
+v1.6.5
+    Prevent crash when potion is undefined, #87
+    Fix high alchemy and loot settings display
+    Fix spell selection options, #94
+
 v1.6.4
     Update for v1.0.3
 
