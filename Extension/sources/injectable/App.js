@@ -2754,6 +2754,7 @@
             updatePlotForLoot() {
                 document.getElementById('MCS Drops/h Label').textContent = this.getSelectedDropLabel();
                 this.loot.updateDropChance();
+                this.consumables.update();
                 if (this.plotter.plotType === 'dropChance') {
                     this.updatePlotData();
                 }
