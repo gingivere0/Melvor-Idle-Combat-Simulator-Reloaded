@@ -2261,17 +2261,6 @@
             slayerTaskRadioOnChange(event, newState) {
                 this.player.isSlayerTask = newState;
                 this.slayerTaskSimsToggle();
-                this.updatePlotForSlayerXP();
-                this.updatePlotForSlayerCoins();
-            }
-
-            /**
-             * Callback for when the slayer task option is changed
-             * @param {Event} event The change event for a radio
-             * @param {boolean} newState The new value for the option
-             */
-            manualEatRadioOnChange(event, newState) {
-                this.player.isManualEating = newState;
             }
 
             slayerTaskSimsToggle() {
@@ -2766,26 +2755,6 @@
                 document.getElementById('MCS Drops/h Label').textContent = this.getSelectedDropLabel();
                 this.loot.updateDropChance();
                 if (this.plotter.plotType === 'dropChance') {
-                    this.updatePlotData();
-                }
-                this.updateZoneInfoCard();
-            }
-
-            /**
-             * Updates the simulator display for when the slayer task option is changed
-             */
-            updatePlotForSlayerXP() {
-                if (this.plotter.plotType === 'slayerXpPerSecond') {
-                    this.updatePlotData();
-                }
-                this.updateZoneInfoCard();
-            }
-
-            /**
-             * Updates the simulator display for when the slayer task option is changed
-             */
-            updatePlotForSlayerCoins() {
-                if (this.plotter.plotType === 'slayerCoinsPerSecond') {
                     this.updatePlotData();
                 }
                 this.updateZoneInfoCard();
