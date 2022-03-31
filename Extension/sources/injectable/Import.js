@@ -154,7 +154,9 @@
 
                 // get the chosen agility obstacles
                 const chosenAgilityObstacles = [];
-                game.agility.builtObstacles.forEach(x => chosenAgilityObstacles.push(x.id));
+                for (let i = 0; i < game.agility.builtObstacles.size; i++) {
+                    chosenAgilityObstacles.push(game.agility.builtObstacles.get(i).id);
+                }
 
                 // create settings object
                 const settings = {
