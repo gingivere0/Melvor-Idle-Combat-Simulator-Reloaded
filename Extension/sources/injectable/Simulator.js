@@ -589,7 +589,7 @@
                 this.simulationQueue = [];
                 this.resetSimDone();
                 // check selection
-                if (!this.parent.barSelected) {
+                if (!this.parent.barSelected && !this.parent.isViewingDungeon) {
                     this.parent.notify('There is nothing selected!', 'danger');
                     return {};
                 }
@@ -612,6 +612,10 @@
                 }
                 if (dungeonID !== undefined) {
                     if (this.dungeonSimFilter[dungeonID]) {
+                        if (this.parent.isViewingDungeon && this.parent.barSelected) {
+                            this.pushMonsterToQueue(this.parent.getSelectedDungeonMonsterID(), dungeonID);
+                            return {dungeonID: dungeonID};
+                        }
                         MICSR.dungeons[dungeonID].monsters.forEach(monsterID => {
                             this.pushMonsterToQueue(monsterID, dungeonID);
                         });
