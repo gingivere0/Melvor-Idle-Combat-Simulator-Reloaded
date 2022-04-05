@@ -153,9 +153,12 @@
                 }
 
                 // get the chosen agility obstacles
-                const chosenAgilityObstacles = [];
-                for (let i = 0; i < game.agility.builtObstacles.size; i++) {
-                    chosenAgilityObstacles.push(game.agility.builtObstacles.get(i).id);
+                const chosenAgilityObstacles = Array(1 + Math.max(...Agility.obstacles.map(x => x.category))).fill(-1);
+                for (let i = 0; i < chosenAgilityObstacles.length; i++) {
+                    const obstacle = game.agility.builtObstacles.get(i);
+                    if (obstacle !== undefined) {
+                        chosenAgilityObstacles[i] = obstacle.id;
+                    }
                 }
 
                 // create settings object
