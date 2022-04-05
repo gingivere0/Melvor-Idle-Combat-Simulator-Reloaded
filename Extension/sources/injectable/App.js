@@ -971,10 +971,42 @@
                     this.createUniqueAstrologyModifiers(card, elementList, constellation, activeConstellationModifiers);
                     this.constellationModifierContainers.push(elementList);
                 }
+                this.astrologySelectCard.addButton('Clear All Star Modifiers', () => this.clearAstrology());
+            }
+
+            clearAstrology() {
+                // set modifiers to 0
+                this.player.activeAstrologyModifiers.forEach((constellation, idx) => {
+                    if (this.skipConstellations.includes(idx)) {
+                        return;
+                    }
+                    for (const modifier in constellation) {
+                        if (constellation[modifier].push) {
+                            constellation[modifier].forEach(x =>
+                                x[1] = 0
+                            );
+                        } else {
+                            constellation[modifier] = 0;
+                        }
+                    }
+                });
+                // set UI to 0
+                this.constellationModifierContainers.forEach(containers => containers.forEach(x =>
+                    document.getElementById(x).value = 0
+                ));
+                // update summary
+                this.updateAstrologySummary();
+                // update stats
+                this.updateCombatStats();
             }
 
             toggleAstrologySelectCard(selected = undefined) {
                 this.astrologySelected = this.astrologySelected === selected ? undefined : selected;
+                if (this.astrologySelected === undefined) {
+                    document.getElementById('MCS Clear All Star Modifiers Button').style.display = 'block';
+                } else {
+                    document.getElementById('MCS Clear All Star Modifiers Button').style.display = 'none';
+                }
                 Astrology.constellations.forEach((constellation, index) => {
                     if (this.skipConstellations.includes(index)) {
                         return;
