@@ -2581,6 +2581,13 @@
                         ? MICSR.mcsFormatNum(this.simulator.getValue(true, data, dataKey, this.plotTypes[i].scale), 4)
                         : 'N/A';
                 }
+                if (data.highestDamageTaken >= data.lowestHitpoints) {
+                    document.getElementById('MCS highestDamageTaken Output').style.color = 'orange';
+                    document.getElementById('MCS lowestHitpoints Output').style.color = 'orange';
+                } else {
+                    document.getElementById('MCS highestDamageTaken Output').style.color = '';
+                    document.getElementById('MCS lowestHitpoints Output').style.color = '';
+                }
                 if (data.deathRate > 0) {
                     document.getElementById('MCS deathRate Output').style.color = 'red';
                 } else {
