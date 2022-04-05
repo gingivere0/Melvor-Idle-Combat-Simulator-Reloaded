@@ -1,3 +1,12 @@
+v1.6.7
+    Fix Agility Import
+    Add Clear All Pets button to pets card
+    Simulate only selected monster in inspected dungeon
+    Fix aurora display
+    Fix Summoning Max Hit in stat card
+    Highlight highest hit taken and lowest hitpoints when risk of death
+    Add HP icon to max hitpoints
+
 v1.6.6
     Add "Clear All Star Modifiers" button to astrology tab
     Fix loot rate updates when consumable rates apply
