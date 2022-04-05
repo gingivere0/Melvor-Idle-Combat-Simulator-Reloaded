@@ -873,6 +873,10 @@
                 const petButtonCallbacks = this.petIDs.map((petId) => (e) => this.petButtonOnClick(e, petId));
                 const tooltips = combatPets.map((pet) => `<div class="text-center">${pet.name}<br><small class='text-info'>${pet.description.replace(/\.$/, '')}</small></div>`);
                 this.petSelectCard.addImageButtons(petImageSources, petNames, 'Medium', petButtonCallbacks, tooltips);
+                this.petSelectCard.addButton("Clear All Pets", () => {
+                    this.import.importPets(Array(PETS.length).fill(false));
+                    this.updateCombatStats();
+                });
                 this.petSelectCard.addImage(PETS[4].media, 100, 'MCS Rock').style.display = 'none';
             }
 
