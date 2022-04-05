@@ -1,3 +1,8 @@
+v1.6.6
+    Add "Clear All Star Modifiers" button to astrology tab
+    Fix loot rate updates when consumable rates apply
+    Fix agility import order bug
+
 v1.6.5
     Prevent crash when potion is undefined, #87
     Fix high alchemy and loot settings display
