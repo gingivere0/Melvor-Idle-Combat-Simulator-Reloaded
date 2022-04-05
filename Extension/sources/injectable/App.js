@@ -2059,7 +2059,7 @@
                     notifyPlayer(Skills.Magic, `${spell.name} requires level ${spell.level} Magic.`, 'danger');
                     return;
                 }
-                if (spell.requiredItem !== undefined && spell.requiredItem !== -1 && !this.player.equipmentIDs().includes(spell.requiredItem)) {
+                if (this.checkRequiredItem(spell)) {
                     notifyPlayer(Skills.Magic, `${spell.name} requires ${this.getItemName(spell.requiredItem)}.`, 'danger');
                     return;
                 }
@@ -2721,13 +2721,16 @@
                 ANCIENT.forEach((spell, index) => setSpellsPerLevel(spell, index, 'ancient'));
             }
 
+            checkRequiredItem(spell) {
+                return spell.requiredItem !== undefined && spell.requiredItem !== -1 && !this.player.equipmentIDs().includes(spell.requiredItem);
+            }
+
             /**
              * Checks if item required for spell is equipped
              */
             checkForSpellItem() {
-                const equipmentIDs = this.player.equipmentIDs();
                 const disableSpellsForItem = (spell, spellID, spellType) => {
-                    if (spell.requiredItem !== undefined && !equipmentIDs.includes(spell.requiredItem)) {
+                    if (this.checkRequiredItem(spell)) {
                         document.getElementById(`MCS ${spell.name} Button Image`).src = this.media.question;
                         this.disableSpell(spellType, spellID, `${spell.name} has been de-selected. It requires ${this.getItemName(spell.requiredItem)}.`);
                     }
