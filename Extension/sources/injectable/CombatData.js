@@ -112,7 +112,7 @@
                 this.combatStats.minHit = this.player.stats.minHit;
 
                 // max summ roll
-                this.combatStats.summoningMaxHit = this.player.equipmentStats.summoningMaxhit * numberMultiplier;
+                this.combatStats.summoningMaxHit = this.player.stats.summoningMaxHit;
 
                 // max defence roll
                 this.combatStats.maxDefRoll = this.player.stats.evasion.melee;
