@@ -702,7 +702,12 @@
                 let idx = 0;
                 for (; idx < this.subInfoCard.container.children.length; idx++) {
                     const child = this.subInfoCard.container.children[idx].lastChild;
-                    if (child && child.id === 'MCS runesUsedPerSecond Output') {
+                    if (child && [
+                        'MCS prayerXpPerSecond Output',
+                        'MCS runesUsedPerSecond Output',
+                        'MCS gpPerSecond Output',
+                        'MCS deathRate Output',
+                    ].includes(child.id)) {
                         this.addNoSingletonTippy(child);
                     }
                 }
@@ -2599,7 +2604,40 @@
                 } else {
                     document.getElementById('MCS deathRate Output').style.color = '';
                 }
+                this.setDeathRateTooltip(data.deathRate, data.killTimeS);
+                this.setGPTooltip(data.baseGpPerSecond, data.killTimeS);
                 this.setRuneTooltip(data.usedRunesBreakdown, data.killTimeS);
+                this.setPrayerTooltip(data.prayerXpPerSecond, data.ppConsumedPerSecond);
+            }
+
+            setDeathRateTooltip(deathRate, killTimeS) {
+                let dataMultiplier = this.timeMultiplier;
+                if (dataMultiplier === -1) {
+                    dataMultiplier = killTimeS;
+                }
+                let tooltip = `<span>${Math.floor(deathRate / killTimeS * dataMultiplier * 10000) / 10000} Est. Deaths/${this.selectedTimeShorthand}</span><br/>`;
+                tooltip = `<div className="text-center">${tooltip}</div>`;
+                document.getElementById(`MCS deathRate Output`)._tippy.setContent(tooltip);
+            }
+
+            setGPTooltip(baseGpPerSecond, killTimeS) {
+                let dataMultiplier = this.timeMultiplier;
+                if (dataMultiplier === -1) {
+                    dataMultiplier = killTimeS;
+                }
+                let tooltip = `<span>${formatNumber(Math.floor(baseGpPerSecond * dataMultiplier))} raw GP/${this.selectedTimeShorthand}</span><br/>`;
+                tooltip = `<div className="text-center">${tooltip}</div>`;
+                document.getElementById(`MCS gpPerSecond Output`)._tippy.setContent(tooltip);
+            }
+
+            setPrayerTooltip(prayerXpPerSecond, ppConsumedPerSecond) {
+                let xpPerPP = prayerXpPerSecond / ppConsumedPerSecond;
+                if (prayerXpPerSecond === 0) {
+                    xpPerPP = 0;
+                }
+                let tooltip = `<span>${(xpPerPP).toFixed(3)} Prayer XP per point</span><br/>`;
+                tooltip = `<div className="text-center">${tooltip}</div>`;
+                document.getElementById(`MCS prayerXpPerSecond Output`)._tippy.setContent(tooltip);
             }
 
             setRuneTooltip(runesUsed, killTimeS) {
