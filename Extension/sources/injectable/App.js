@@ -2625,7 +2625,7 @@
                 if (dataMultiplier === -1) {
                     dataMultiplier = killTimeS;
                 }
-                let tooltip = `<span>${formatNumber(Math.floor(baseGpPerSecond * dataMultiplier))} raw GP/${this.selectedTimeShorthand}</span><br/>`;
+                let tooltip = `<span>${formatNumber(Math.floor(baseGpPerSecond * dataMultiplier))} Raw GP/${this.selectedTimeShorthand}</span><br/>`;
                 tooltip = `<div className="text-center">${tooltip}</div>`;
                 document.getElementById(`MCS gpPerSecond Output`)._tippy.setContent(tooltip);
             }
@@ -2635,7 +2635,7 @@
                 if (prayerXpPerSecond === 0) {
                     xpPerPP = 0;
                 }
-                let tooltip = `<span>${(xpPerPP).toFixed(3)} Prayer XP per point</span><br/>`;
+                let tooltip = `<span>${(xpPerPP).toFixed(3)} Prayer XP/Point</span><br/>`;
                 tooltip = `<div className="text-center">${tooltip}</div>`;
                 document.getElementById(`MCS prayerXpPerSecond Output`)._tippy.setContent(tooltip);
             }
