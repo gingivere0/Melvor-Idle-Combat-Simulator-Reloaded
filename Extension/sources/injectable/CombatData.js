@@ -58,6 +58,7 @@
                     maxMagDefRoll: 0,
                     maxHitpoints: 0,
                     damageReduction: 0,
+                    autoEatThreshold: 0,
                     lootBonusPercent: 0,
                     gpBonus: 0,
                 };
@@ -126,6 +127,9 @@
                 this.combatStats.baseMaxHitpoints = this.player.levels.Hitpoints;
                 this.combatStats.baseMaxHitpoints += MICSR.getModifierValue(modifiers, 'MaxHitpoints');
                 this.combatStats.maxHitpoints = this.player.stats.maxHitpoints
+
+                // Calculate auto eat threshold
+                this.combatStats.autoEatThreshold = this.player.autoEatThreshold;
             }
 
             /**

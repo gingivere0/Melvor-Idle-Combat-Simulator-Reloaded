@@ -635,6 +635,7 @@
                     'Evasion Rating',
                     'Max Hitpoints',
                     'Damage Reduction',
+                    'Auto Eat Threshold',
                     'Drop Doubling (%)',
                     'GP Multiplier',
                 ];
@@ -663,6 +664,7 @@
                     'maxMagDefRoll',
                     'maxHitpoints',
                     'damageReduction',
+                    'autoEatThreshold',
                     'lootBonusPercent',
                     'gpBonus',
                 ];
