@@ -51,7 +51,7 @@
                 this.notSimulatedReason = 'entity not simulated';
                 // Simulation data;
                 /** @type {Object} */
-                const newSimData = isMonster => {
+                this.newSimData = isMonster => {
                     const data = {
                         simSuccess: false,
                         reason: this.notSimulatedReason,
@@ -64,18 +64,18 @@
                 }
                 this.monsterSimData = {};
                 for (let monsterID = 0; monsterID < MONSTERS.length; monsterID++) {
-                    this.monsterSimData[monsterID] = newSimData(true);
+                    this.monsterSimData[monsterID] = this.newSimData(true);
                     this.monsterSimFilter.push(true);
                 }
                 /** @type {MonsterSimResult[]} */
                 this.dungeonSimData = [];
                 for (let dungeonID = 0; dungeonID < MICSR.dungeons.length; dungeonID++) {
-                    this.dungeonSimData.push(newSimData(false));
+                    this.dungeonSimData.push(this.newSimData(false));
                     this.dungeonSimFilter.push(true);
                     MICSR.dungeons[dungeonID].monsters.forEach(monsterID => {
                         const simID = this.simID(monsterID, dungeonID);
                         if (!this.monsterSimData[simID]) {
-                            this.monsterSimData[simID] = newSimData(true);
+                            this.monsterSimData[simID] = this.newSimData(true);
                         }
                     });
                 }
@@ -84,7 +84,7 @@
                 this.slayerSimData = [];
                 for (let taskID = 0; taskID < SlayerTask.data.length; taskID++) {
                     this.slayerTaskMonsters.push([]);
-                    this.slayerSimData.push(newSimData(false));
+                    this.slayerSimData.push(this.newSimData(false));
                     this.slayerSimFilter.push(true);
                 }
                 /** Variables of currently stored simulation */
@@ -1002,19 +1002,13 @@
              */
             resetSimDone() {
                 for (let simID in this.monsterSimData) {
-                    this.monsterSimData[simID].inQueue = false;
-                    this.monsterSimData[simID].simSuccess = false;
-                    this.monsterSimData[simID].reason = this.notSimulatedReason;
+                    this.monsterSimData[simID] = this.newSimData(true);
                 }
                 for (let simID in this.dungeonSimData) {
-                    this.dungeonSimData[simID].inQueue = false;
-                    this.dungeonSimData[simID].simSuccess = false;
-                    this.dungeonSimData[simID].reason = this.notSimulatedReason;
+                    this.dungeonSimData[simID] = this.newSimData(false);
                 }
                 for (let simID in this.slayerSimData) {
-                    this.slayerSimData[simID].inQueue = false;
-                    this.slayerSimData[simID].simSuccess = false;
-                    this.slayerSimData[simID].reason = this.notSimulatedReason;
+                    this.slayerSimData[simID] = this.newSimData(false);
                 }
             }
 
