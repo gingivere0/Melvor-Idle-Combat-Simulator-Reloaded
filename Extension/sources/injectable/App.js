@@ -1392,16 +1392,17 @@
             loadSavedSimulation(idx) {
                 const simulation = this.savedSimulations[idx];
                 if (!simulation) {
-                    MICSR.log(`Unable to load simulation with index ${idx}`);
+                    MICSR.error(`Unable to load simulation with index ${idx}`);
                     return;
                 }
                 // load settings
                 this.import.importSettings(simulation.settings);
                 this.import.update();
                 // load results
-                this.simulator.monsterSimData = simulation.monsterSimData;
-                this.simulator.dungeonSimData = simulation.dungeonSimData;
-                this.simulator.slayerSimData = simulation.slayerSimData;
+                for (const id in simulation.monsterSimData) {
+                    this.simulator.monsterSimData[id] = {...simulation.monsterSimData[id]};
+                }
+                this.simulator.performPostSimAnalysis();
                 this.updateDisplayPostSim();
             }
 
