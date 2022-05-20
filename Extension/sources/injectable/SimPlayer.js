@@ -190,7 +190,9 @@
                 // conditionalModifiers
                 this.conditionalModifiers = new Map();
                 itemConditionalModifiers.forEach((itemCondition) => {
-                    this.conditionalModifiers.set(itemCondition.itemID, itemCondition.conditionals);
+                    this.conditionalModifiers.set(itemCondition.itemID, itemCondition.conditionals.map(x => {
+                        return {...x}
+                    }));
                 });
                 // activeAstrologyModifiers
                 this.activeAstrologyModifiers = [];
