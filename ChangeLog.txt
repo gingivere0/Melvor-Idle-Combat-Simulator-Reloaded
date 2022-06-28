@@ -1,3 +1,6 @@
+v1.6.9
+    Update for v1.0.4
+
 v1.6.8
     Fix conditional modifiers, #97
     Fix tooltip capitalization
