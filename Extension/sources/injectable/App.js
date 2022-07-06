@@ -1291,7 +1291,7 @@
                 // apply undiscovered filter
                 if (this.dropListFilters.onlyUndiscovered) {
                     lootList = lootList.filter(itemID => {
-                        return itemStats[itemID].stats[Stats.TimesFound] === 0;
+                        return game.stats.Items.get(itemID, ItemStats.TimesFound) === 0;
                     });
                 }
                 // sort by name
