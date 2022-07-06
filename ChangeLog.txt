@@ -1,3 +1,8 @@
+v1.6.10
+    Update for v1.0.5
+    Fix "Only Undiscovered" toggle in loot tab, #99
+    Skip load confirmation after successful load, #100
+
 v1.6.9
     Update for v1.0.4
 
