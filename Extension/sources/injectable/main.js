@@ -41,15 +41,21 @@
                         // MICSR.log('Loading sim with provided URLS');
                         let tryLoad = true;
                         let wrongVersion = false;
-                        if (gameVersion !== MICSR.gameVersion) {
+                        if (gameVersion !== MICSR.gameVersion && gameVersion !== localStorage.getItem('MICSR-gameVersion')) {
                             wrongVersion = true;
-                            tryLoad = window.confirm(`${MICSR.name}\nA different game version was detected. Loading the combat sim may cause unexpected behaviour or result in inaccurate simulation results.\n Try loading it anyways?`);
+                            tryLoad = window.confirm(`${MICSR.name} ${MICSR.version}\n`
+                                + `A different game version was detected (expected: ${MICSR.gameVersion}).\n`
+                                + `Loading the combat sim may cause unexpected behaviour.\n`
+                                + `After a successful load, this popup will be skipped for Melvor ${gameVersion}\n`
+                                + `Try loading the simulator?`);
                         }
                         if (tryLoad) {
                             try {
                                 MICSR.melvorCombatSim = new MICSR.App(event.data.urls);
                                 if (wrongVersion) {
                                     MICSR.log(`${MICSR.name} ${MICSR.version} loaded, but simulation results may be inaccurate due to game version incompatibility.`);
+                                    MICSR.log(`No further warnings will be given when loading the simulator in Melvor ${gameVersion}`);
+                                    localStorage.setItem('MICSR-gameVersion', gameVersion);
                                 } else {
                                     MICSR.log(`${MICSR.name} ${MICSR.version} loaded.`);
                                 }
